@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "421430700553",
+    "project_id": "students-mental-health-app",
+    "storage_bucket": "students-mental-health-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:421430700553:android:fd19ce04a64609286da6d8",
+        "android_client_info": {
+          "package_name": "com.capsu.studentmentalhealthapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOaR_ok4olFYA9OFHXOGL9RZxhkVS8lmU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
