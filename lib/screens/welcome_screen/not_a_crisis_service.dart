@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:student_mental_health/screens/chatbot_screen/chatbot_screen.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
-import 'package:student_mental_health/widgets/widgets/custom_button.dart';
+import 'package:student_mental_health/widgets/utils/loading.dart';
 import 'package:student_mental_health/widgets/widgets/widgets.dart';
 
 class NotACrisisService extends StatelessWidget {
@@ -103,9 +104,13 @@ class NotACrisisService extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 250),
+            const SizedBox(height: 230),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () => nextScreen(
+                  context,
+                  const LoadingWidget(
+                    thenMoveToThisWidget: ChatBotScreen(),
+                  )),
               style: ButtonStyle(
                 fixedSize: MaterialStateProperty.all<Size>(const Size(125, 48)),
                 foregroundColor: MaterialStateProperty.all<Color>(Colors.white),

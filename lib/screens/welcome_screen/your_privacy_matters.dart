@@ -127,15 +127,20 @@ class _YourPrivacyMattersState extends State<YourPrivacyMatters> {
                             context: context,
                             builder: (context) => AlertDialog(
                               title: const Text('Privacy Policy'),
-                              content: const Text(
-                                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas eu ex in tellus auctor fermentum congue eu nunc. Orci varius. Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas eu ex in tellus auctor fermentum congue eu nunc. Orci varius. Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci.'),
+                              content: const SizedBox(
+                                height: 350,
+                                child: SingleChildScrollView(
+                                  child: Text(
+                                      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas eu ex in tellus auctor fermentum congue eu nunc. Orci varius. Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas eu ex in tellus auctor fermentum congue eu nunc. Orci varius. Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Tortor consequat id porta nibh venenatis cras sed felis eget. Suspendisse in est ante in nibh mauris cursus mattis. Tortor consequat id porta nibh venenatis. Nam at lectus urna duis convallis convallis tellus id. Ac tortor vitae purus faucibus. Non enim praesent elementum facilisis leo vel fringilla est ullamcorper. Egestas tellus rutrum tellus pellentesque eu. Eu non diam phasellus vestibulum lorem sed risus ultricies tristique. Ac ut consequat semper viverra nam libero justo laoreet sit. Pharetra convallis posuere morbi leo urna molestie. At varius vel pharetra vel turpis. Arcu non odio euismod lacinia at quis risus. Malesuada fames ac turpis egestas maecenas pharetra. Sed velit dignissim sodales ut eu sem integer. Massa tincidunt dui ut ornare lectus sit amet est placerat. Tellus in metus vulputate eu scelerisque felis imperdiet proin fermentum. Varius vel pharetra vel turpis nunc eget. Amet volutpat consequat mauris nunc. Arcu non odio euismod lacinia at. Quam nulla porttitor massa id neque aliquam. Bibendum neque egestas congue quisque egestas diam. Arcu dui vivamus arcu felis. Sed id semper risus in hendrerit gravida rutrum quisque. Et tortor at risus viverra adipiscing at in. Mi in nulla posuere sollicitudin. Feugiat vivamus at augue eget. Lacinia quis vel eros donec ac odio tempor orci. Sagittis id consectetur purus ut faucibus. Aliquam ultrices sagittis orci a scelerisque purus semper. Diam volutpat commodo sed egestas. Pulvinar etiam non quam lacus suspendisse faucibus. Nec sagittis aliquam malesuada bibendum. Quam adipiscing vitae proin sagittis nisl rhoncus mattis.'),
+                                ),
+                              ),
                               actions: [
                                 TextButton(
                                     onPressed: () {
                                       nextScreenPop(context);
                                     },
                                     child: const Text(
-                                      'OK',
+                                      'Agree',
                                       style: TextStyle(color: primaryColor),
                                     )),
                               ],
