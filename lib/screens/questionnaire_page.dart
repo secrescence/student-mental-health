@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:student_mental_health/screens/counseling_page.dart';
 import 'package:student_mental_health/service/database_service.dart';
-import 'package:student_mental_health/widgets/question.dart';
+import 'package:student_mental_health/screens/questionnaire_screen/question.dart';
 import 'package:student_mental_health/widgets/widgets/widgets.dart';
 
 class QuestionnairePage extends StatefulWidget {
