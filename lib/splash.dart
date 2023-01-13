@@ -62,10 +62,8 @@ class _SplashState extends State<Splash> {
               flex: 5,
               child: Image.asset(
                 'assets/logo-white-splash.png',
-                //width: 300,
               ),
             ),
-            //const SizedBox(height: 100),
             const Expanded(
               child: SpinKitSpinningLines(
                 color: Colors.white,

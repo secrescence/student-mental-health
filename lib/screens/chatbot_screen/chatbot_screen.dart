@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:student_mental_health/screens/questionnaire_screen/from_yes_or_no.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
+// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart' show toBeginningOfSentenceCase;
+import 'package:student_mental_health/widgets/utils/loading.dart';
+import 'package:student_mental_health/widgets/widgets/widgets.dart';
 
 class ChatBotScreen extends StatefulWidget {
   const ChatBotScreen({super.key});
@@ -60,6 +64,12 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
+        centerTitle: true,
+        title: Image.asset(
+          'assets/logo-violet.png',
+          fit: BoxFit.cover,
+        ),
+        //TODO - disable back button
         //automaticallyImplyLeading: false,
       ),
       body: Column(
@@ -75,26 +85,8 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 15),
                   child: Visibility(
                     visible: helloImChatbotVisible,
-                    replacement: Container(
-                      alignment: Alignment.bottomLeft,
-                      padding: const EdgeInsets.only(
-                          top: 10, bottom: 10, left: 20, right: 20),
-                      decoration: const BoxDecoration(
-                          color: primaryColor,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(10),
-                            topRight: Radius.circular(10),
-                            bottomRight: Radius.circular(10),
-                          )),
-                      child: const Text(
-                        'Hi, I\'m Chatbot\nWhat should I call you?',
-                        style: TextStyle(
-                          height: 1.2,
-                          color: Colors.white,
-                          fontFamily: 'Sofia Pro',
-                        ),
-                      ),
-                    ),
+                    replacement: _chatBubble(
+                        text: 'Hi, I\'m Chatbot\nWhat should I call you?'),
                     child: Container(
                       width: 100,
                       height: 100,
@@ -119,26 +111,8 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 15),
                   child: Visibility(
                     visible: niceToMeetYouVisible,
-                    replacement: Container(
-                      alignment: Alignment.bottomLeft,
-                      padding: const EdgeInsets.only(
-                          top: 10, bottom: 10, left: 20, right: 20),
-                      decoration: const BoxDecoration(
-                          color: primaryColor,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(10),
-                            topRight: Radius.circular(10),
-                            bottomRight: Radius.circular(10),
-                          )),
-                      child: Text(
-                        'Nice to meet you, $userCallName :)',
-                        style: const TextStyle(
-                          height: 1.2,
-                          color: Colors.white,
-                          fontFamily: 'Sofia Pro',
-                        ),
-                      ),
-                    ),
+                    replacement:
+                        _chatBubble(text: 'Nice to meet you $userCallName 😊'),
                     child: Container(
                       width: 100,
                       height: 100,
@@ -163,27 +137,10 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 15),
                   child: Visibility(
                     visible: beforeWeProceedVisible,
-                    replacement: Container(
-                      alignment: Alignment.bottomLeft,
-                      padding: const EdgeInsets.only(
-                          top: 10, bottom: 10, left: 20, right: 20),
-                      decoration: const BoxDecoration(
-                          color: primaryColor,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(10),
-                            topRight: Radius.circular(10),
-                            bottomRight: Radius.circular(10),
-                          )),
-                      child: const Text(
-                        'Before we proceed, I would like\n'
-                        'you to answer a 36 items\n'
-                        'questionnaire.',
-                        style: TextStyle(
-                          height: 1.2,
-                          color: Colors.white,
-                          fontFamily: 'Sofia Pro',
-                        ),
-                      ),
+                    replacement: _chatBubble(
+                      text: 'Before we proceed, I would like\n'
+                          'you to answer a 36 items\n'
+                          'questionnaire.',
                     ),
                     child: Container(
                       width: 100,
@@ -209,27 +166,10 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 15),
                   child: Visibility(
                     visible: areYouGoingToTakeItVisible,
-                    replacement: Container(
-                      alignment: Alignment.bottomLeft,
-                      padding: const EdgeInsets.only(
-                          top: 10, bottom: 10, left: 20, right: 20),
-                      decoration: const BoxDecoration(
-                          color: primaryColor,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(10),
-                            topRight: Radius.circular(10),
-                            bottomRight: Radius.circular(10),
-                          )),
-                      child: const Text(
-                        'This questionnaire will help me\n'
-                        'know you more. Are you going\n'
-                        'to take it?',
-                        style: TextStyle(
-                          height: 1.2,
-                          color: Colors.white,
-                          fontFamily: 'Sofia Pro',
-                        ),
-                      ),
+                    replacement: _chatBubble(
+                      text: 'This questionnaire will help me\n'
+                          'know you more. Are you going\n'
+                          'to take it?',
                     ),
                     child: Container(
                       width: 100,
@@ -250,7 +190,7 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
             repeat: isRepeat,
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 15, right: 15, bottom: 30),
+            padding: const EdgeInsets.only(left: 15, right: 15, bottom: 23),
             child: SizedBox(
               height: 55,
               child: Visibility(
@@ -263,18 +203,15 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                     replacement: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        //TODO
                         ElevatedButton(
+                          //yes button
                           onPressed: () {
-                            setState(() {
-                              nextButtonVisible2 = false; //hide the next button
-                            });
-                            Future.delayed(const Duration(milliseconds: 1500))
-                                .then((value) {
-                              setState(() {
-                                areYouGoingToTakeItVisible = false;
-                              });
-                            });
+                            //TODO : add sf to save 'done with chatbot'
+                            nextScreenReplace(
+                                context,
+                                const LoadingWidget(
+                                    thenMoveToThisWidget:
+                                        FromYesOrNo(yesOrNo: 'yes')));
                           },
                           style: ButtonStyle(
                             fixedSize: MaterialStateProperty.all<Size>(
@@ -296,16 +233,14 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                         ),
                         const SizedBox(width: 30),
                         ElevatedButton(
+                          //no button
                           onPressed: () {
-                            setState(() {
-                              nextButtonVisible2 = false; //hide the next button
-                            });
-                            Future.delayed(const Duration(milliseconds: 1500))
-                                .then((value) {
-                              setState(() {
-                                areYouGoingToTakeItVisible = false;
-                              });
-                            });
+                            //TODO : add sf to save 'done with chatbot'
+                            nextScreenReplace(
+                                context,
+                                const LoadingWidget(
+                                    thenMoveToThisWidget:
+                                        FromYesOrNo(yesOrNo: 'no')));
                           },
                           style: ButtonStyle(
                             fixedSize: MaterialStateProperty.all<Size>(
@@ -465,30 +400,27 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
     );
   }
 
-  Widget chatBubble({required String text}) {
+  Widget _chatBubble({required String text}) {
     return Row(
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          child: Container(
-            alignment: Alignment.bottomLeft,
-            padding:
-                const EdgeInsets.only(top: 10, bottom: 10, left: 20, right: 20),
-            decoration: const BoxDecoration(
-              color: primaryColor,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(10),
-                topRight: Radius.circular(10),
-                bottomRight: Radius.circular(10),
-              ),
+        Container(
+          alignment: Alignment.bottomLeft,
+          padding:
+              const EdgeInsets.only(top: 10, bottom: 10, left: 20, right: 20),
+          decoration: const BoxDecoration(
+            color: primaryColor,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(10),
+              topRight: Radius.circular(10),
+              bottomRight: Radius.circular(10),
             ),
-            child: Text(
-              text,
-              style: const TextStyle(
-                height: 1.2,
-                color: Colors.white,
-                fontFamily: 'Sofia Pro',
-              ),
+          ),
+          child: Text(
+            text,
+            style: const TextStyle(
+              height: 1.2,
+              color: Colors.white,
+              fontFamily: 'Sofia Pro',
             ),
           ),
         ),
