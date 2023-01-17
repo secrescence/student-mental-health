@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pinput/pinput.dart';
 import 'package:student_mental_health/helper/helper_function.dart';
+import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 import 'package:student_mental_health/service/auth_service.dart';
 import 'package:student_mental_health/widgets/widgets/custom_snackbar.dart';
@@ -22,6 +24,7 @@ class OtpScreen extends StatefulWidget {
 
 class _OtpScreenState extends State<OtpScreen> {
   String? userOtp;
+  Timer? _timer;
   int timerStart = 20;
   bool timerStop = false;
   bool sendCodeAgainVisible = true;
@@ -79,7 +82,12 @@ class _OtpScreenState extends State<OtpScreen> {
         backgroundColor: Colors.transparent,
         leading: IconButton(
           onPressed: () {
-            Navigator.pop(context);
+            if (mounted) {
+              setState(() {
+                timerStop = true;
+              });
+              Navigator.pop(context);
+            }
           },
           icon: const Icon(
             Icons.arrow_back_ios,
@@ -219,26 +227,36 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   void verifyOTP() async {
-    AuthService().verifyOtp(
+    await AuthService().verifyOtp(
         context: context,
         verificationId: widget.verificationId,
         userOtp: userOtp!);
-    HelperFunctions.saveUserLoggedInStatus(true);
+    await HelperFunctions.saveUserLoggedInStatus(true);
+    await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
+        .savePhoneNumberToDB(widget.phoneNumber);
   }
 
   void resendOtpTimer() {
     const onsec = Duration(seconds: 1);
-    Timer.periodic(onsec, (timer) {
-      if (timerStart == 0 || timerStop) {
+    _timer = Timer.periodic(onsec, (timer) {
+      if (timerStart == 0 || timerStop || !mounted) {
         timer.cancel();
         setState(() {
           sendCodeAgainVisible = false;
         });
       } else {
-        setState(() {
-          timerStart--;
-        });
+        if (mounted) {
+          setState(() {
+            timerStart--;
+          });
+        }
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 }

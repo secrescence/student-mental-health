@@ -1,15 +1,11 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fl_country_code_picker/fl_country_code_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:student_mental_health/helper/helper_function.dart';
-import 'package:student_mental_health/screens/auth/signup_user_info.dart';
 import 'package:student_mental_health/service/auth_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
-import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/widgets/custom_snackbar.dart';
 import 'package:student_mental_health/widgets/widgets/custom_button.dart';
-import 'package:student_mental_health/widgets/widgets/widgets.dart';
 
 class SignUpPhone extends StatefulWidget {
   const SignUpPhone({super.key});
@@ -19,8 +15,6 @@ class SignUpPhone extends StatefulWidget {
 }
 
 class _SignUpPhoneState extends State<SignUpPhone> {
-  String email = '';
-  String? phoneNumberToBeChecked;
   final TextEditingController phoneController = TextEditingController();
   final countryPicker = const FlCountryCodePicker();
   bool isEmpty = false;
@@ -31,24 +25,13 @@ class _SignUpPhoneState extends State<SignUpPhone> {
     dialCode: '+63',
   );
 
+  //otp code timeout
+  bool _smsTimeout = false;
+
   @override
   void dispose() {
     phoneController.dispose();
     super.dispose();
-  }
-
-  @override
-  void initState() {
-    getUserEmailFromSF();
-    super.initState();
-  }
-
-  getUserEmailFromSF() async {
-    await HelperFunctions.getUserEmailFromSF().then((value) {
-      setState(() {
-        email = value!;
-      });
-    });
   }
 
   @override
@@ -248,17 +231,7 @@ class _SignUpPhoneState extends State<SignUpPhone> {
                     height: 46,
                     child: CustomButton(
                       text: "Send",
-                      onPressed: () {
-                        // String fromController = phoneController.text.trim();
-                        // String? phoneNumberCollected = countryCode == null
-                        //     ? '${defaultCountryCode.dialCode}$fromController'
-                        //     : '${countryCode?.dialCode}$fromController';
-                        // final db = await DatabaseService(
-                        //         uid: FirebaseAuth.instance.currentUser!.uid)
-                        //     .getUserPhoneNumber(phoneController.text);
-                        // print(db);
-                        sendPhoneNumber(context);
-                      },
+                      onPressed: () => sendPhoneNumber(context),
                       color: phoneFieldButtonColor,
                     ),
                   ),
@@ -277,9 +250,7 @@ class _SignUpPhoneState extends State<SignUpPhone> {
         ? '${defaultCountryCode.dialCode}$fromController'
         : '${countryCode?.dialCode}$fromController';
     if (fromController.length == 10 && fromController.startsWith('9')) {
-      //HelperFunctions.saveUserPhoneNumberSF(phoneNumberCollected);
-      await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
-          .savePhoneNumberToDB(phoneNumberCollected);
+      await HelperFunctions.saveUserLoggedInStatus(true);
       await AuthService().signUpPhone(
         context: context,
         phoneNumber: phoneNumberCollected,

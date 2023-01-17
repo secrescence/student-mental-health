@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:student_mental_health/screens/questionnaire_screen/question.dart';
+import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 
 class Questionnaire extends StatefulWidget {
@@ -34,18 +36,28 @@ class _QuestionnaireState extends State<Questionnaire> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
-        automaticallyImplyLeading: false,
+        // automaticallyImplyLeading: false,
+        leading: IconButton(
+          onPressed: () {
+            setState(() {
+              currentQuestionIndex--;
+            });
+          },
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: Color(0xFF000000),
+          ),
+        ),
       ),
       body: Container(
-        margin: const EdgeInsets.symmetric(
-          horizontal: 16,
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+        child: Column(
+          children: [
+            _questionWidget(),
+            const SizedBox(height: 30),
+            _answerList(),
+          ],
         ),
-        child:
-            Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-          _questionWidget(),
-          _answerList(),
-          _nextButton(),
-        ]),
       ),
     );
   }
@@ -53,16 +65,15 @@ class _QuestionnaireState extends State<Questionnaire> {
   _questionWidget() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 25),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: RichText(
             text: TextSpan(
               style: const TextStyle(
                 color: Colors.black,
                 fontFamily: 'Sofia Pro',
-                fontSize: 23,
+                fontSize: 21,
                 fontWeight: FontWeight.w500,
               ),
               children: <TextSpan>[
@@ -75,24 +86,21 @@ class _QuestionnaireState extends State<Questionnaire> {
             ),
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 30),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Container(
-            alignment: Alignment.center,
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Text(
-              questionList[currentQuestionIndex].questionText,
-              style: const TextStyle(
-                color: primaryColor,
-                fontFamily: 'Sofia Pro',
-                fontSize: 38,
-                fontWeight: FontWeight.w500,
-              ),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Text(
+            questionList[currentQuestionIndex].questionText,
+            style: const TextStyle(
+              color: primaryColor,
+              fontFamily: 'Sofia Pro',
+              fontSize: 40,
+              fontWeight: FontWeight.w500,
             ),
+            // textAlign: TextAlign.center,
+            //TODO format text alignment
           ),
-        )
+        ),
       ],
     );
   }
@@ -112,8 +120,8 @@ class _QuestionnaireState extends State<Questionnaire> {
     bool isSelected = answer == selectedAnswer;
 
     return Container(
-      width: 300,
-      margin: const EdgeInsets.symmetric(vertical: 10),
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(vertical: 8.5, horizontal: 20),
       height: 60,
       child: ElevatedButton(
         style: ButtonStyle(
@@ -133,7 +141,7 @@ class _QuestionnaireState extends State<Questionnaire> {
             ),
           ),
         ),
-        onPressed: () {
+        onPressed: () async {
           if (selectedAnswer == null) {
             switch (answer.category) {
               case 'NONACCEPTANCE':
@@ -172,6 +180,48 @@ class _QuestionnaireState extends State<Questionnaire> {
               totalScore += answer.score;
               selectedAnswer = answer;
             });
+            if (selectedAnswer != null) {
+              print(
+                  'selectedAnswer: ${selectedAnswer!.answerText} and category: ${answer.category} and score: ${answer.score} and total scrore is: $totalScore');
+              
+              //if last question
+              if (currentQuestionIndex == questionList.length - 1) {
+                setState(() {
+                  grandMean = totalScore / 36;
+                  categoryNonacceptanceMEAN = categoryNonacceptance / 6;
+                  categoryGoalsMEAN = categoryGoals / 5;
+                  categoryImpulseMEAN = categoryImpulseMEAN / 6;
+                  categoryAwarenessMEAN = categoryAwareness / 6;
+                  categoryStrategiesMEAN = categoryStrategies / 8;
+                  categoryClarityMEAN = categoryClarity / 5;
+                });
+                print('grandMean: $grandMean');
+                print('categoryNonacceptanceMEAN: $categoryNonacceptanceMEAN');
+                print('categoryGoalsMEAN: $categoryGoalsMEAN');
+                print('categoryImpulseMEAN: $categoryImpulseMEAN');
+                print('categoryAwarenessMEAN: $categoryAwarenessMEAN');
+                print('categoryStrategiesMEAN: $categoryStrategiesMEAN');
+                print('categoryClarityMEAN: $categoryClarityMEAN');
+                await DatabaseService(
+                        uid: FirebaseAuth.instance.currentUser!.uid)
+                    .questionnaireResult(
+                  grandMean,
+                  categoryNonacceptanceMEAN,
+                  categoryGoalsMEAN,
+                  categoryImpulseMEAN,
+                  categoryAwarenessMEAN,
+                  categoryStrategiesMEAN,
+                  categoryClarityMEAN,
+                );
+              } else {
+                Future.delayed(const Duration(milliseconds: 800), () {
+                  setState(() {
+                    selectedAnswer = null;
+                    currentQuestionIndex++;
+                  });
+                });
+              }
+            }
           }
         },
         child: Text(
@@ -181,46 +231,6 @@ class _QuestionnaireState extends State<Questionnaire> {
               fontFamily: 'Sofia Pro',
               fontWeight: FontWeight.w500),
         ),
-      ),
-    );
-  }
-
-  _nextButton() {
-    bool isLastQuestion = false;
-    if (currentQuestionIndex == questionList.length - 1) {
-      isLastQuestion = true;
-    }
-
-    return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.5,
-      height: 48,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          foregroundColor: Colors.white,
-          shape: const StadiumBorder(),
-          backgroundColor: const Color(0xFF1D3557),
-        ),
-        onPressed: () {
-          if (isLastQuestion) {
-            //display score
-            setState(() {
-              grandMean = totalScore / 36;
-              categoryNonacceptanceMEAN = categoryNonacceptance / 6;
-              categoryGoalsMEAN = categoryGoals / 5;
-              categoryImpulseMEAN = categoryImpulseMEAN / 6;
-              categoryAwarenessMEAN = categoryAwareness / 6;
-              categoryStrategiesMEAN = categoryStrategies / 8;
-              categoryClarityMEAN = categoryClarity / 5;
-            });
-          } else {
-            //next question
-            setState(() {
-              selectedAnswer = null;
-              currentQuestionIndex++;
-            });
-          }
-        },
-        child: Text(isLastQuestion ? "Submit" : "Next"),
       ),
     );
   }

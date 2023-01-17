@@ -1,7 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:student_mental_health/screens/auth/signup_phone.dart';
+import 'package:student_mental_health/screens/auth/signup_user_info.dart';
+import 'package:student_mental_health/screens/questionnaire_screen/from_yes_or_no.dart';
+import 'package:student_mental_health/screens/questionnaire_screen/need_to_take_quest_to_proceed.dart';
 import 'package:student_mental_health/screens/welcome_screen/welcome.dart';
+import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 import 'package:student_mental_health/helper/helper_function.dart';
 import 'package:student_mental_health/screens/auth/onboarding.dart';
@@ -15,35 +21,57 @@ class Splash extends StatefulWidget {
 }
 
 class _SplashState extends State<Splash> {
-  bool _isPhoneNotVerified = false;
+  bool _isDoneWithChatbot = false;
+  bool _isSingedUpUsingEmailOnly = false;
   bool _isSignedIn = false;
+  String? currentUser = FirebaseAuth.instance.currentUser?.uid;
 
   @override
   void initState() {
     super.initState();
     getUserLoggedInStatus();
-    Future.delayed(const Duration(milliseconds: 2500))
-        .then((value) => nextScreenReplace(
-            context,
-            _isSignedIn
-                ? const Welcome()
-                : _isPhoneNotVerified
-                    ? const SignUpPhone()
-                    : const Onboarding()));
+    Future.delayed(const Duration(milliseconds: 2500)).then((value) {
+      if (_isSignedIn && _isDoneWithChatbot && _isSingedUpUsingEmailOnly) {
+        nextScreen(context, const NeedToTakeQuestionnaireToProceed());
+      } else if (_isSignedIn && _isSingedUpUsingEmailOnly) {
+        nextScreen(context, const Welcome());
+      } else if (_isSingedUpUsingEmailOnly) {
+        nextScreen(context, const SignUpPhone());
+      } else {
+        nextScreen(context, const Onboarding());
+      }
+    });
   }
 
   getUserLoggedInStatus() async {
+    if (currentUser != null) {
+      await DatabaseService(uid: currentUser)
+          .getUserDoneChatbot()
+          .then((value) {
+        print(value);
+        if (value != null) {
+          setState(() {
+            _isDoneWithChatbot = value;
+          });
+        }
+      });
+      await DatabaseService(uid: currentUser)
+          .getUsersSignedInUsingEmailOnly()
+          .then((value) {
+        if (value != null) {
+          setState(() {
+            _isSingedUpUsingEmailOnly = value;
+          });
+        }
+      });
+      
+      print(_isSingedUpUsingEmailOnly);
+      print(_isDoneWithChatbot);
+    }
     await HelperFunctions.getUserLoggedInStatus().then((value) {
       if (value != null) {
         setState(() {
           _isSignedIn = value;
-        });
-      }
-    });
-    await HelperFunctions.getUserSignedUpUsingEmail().then((value) {
-      if (value != null) {
-        setState(() {
-          _isPhoneNotVerified = value;
         });
       }
     });

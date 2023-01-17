@@ -16,11 +16,6 @@ class FromYesOrNo extends StatelessWidget {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
-        centerTitle: true,
-        title: Image.asset(
-          'assets/logo-violet.png',
-          fit: BoxFit.cover,
-        ),
         //TODO - disable back button
         //automaticallyImplyLeading: false,
       ),

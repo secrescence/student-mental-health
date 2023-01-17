@@ -5,6 +5,8 @@ import 'package:student_mental_health/screens/auth/otp_screen.dart';
 import 'package:student_mental_health/screens/auth/signup_phone.dart';
 import 'package:student_mental_health/screens/welcome_screen/welcome.dart';
 import 'package:student_mental_health/service/database_service.dart';
+import 'package:student_mental_health/splash.dart';
+import 'package:student_mental_health/widgets/utils/loading.dart';
 import 'package:student_mental_health/widgets/widgets/custom_snackbar.dart';
 import 'package:student_mental_health/widgets/widgets/widgets.dart';
 
@@ -19,25 +21,23 @@ class AuthService {
   }) async {
     try {
       await firebaseAuth.verifyPhoneNumber(
-          phoneNumber: phoneNumber,
-          timeout: const Duration(seconds: 20),
-          verificationCompleted: (AuthCredential phoneAuthCredential) async {
-            await firebaseAuth.currentUser!
-                .linkWithCredential(phoneAuthCredential);
-          },
-          verificationFailed: (error) {
-            throw Exception(error.message);
-          },
-          codeSent: (verificationId, forceResendingToken) {
-            nextScreen(
-                context,
-                OtpScreen(
-                    verificationId: verificationId, phoneNumber: phoneNumber));
-          },
-          codeAutoRetrievalTimeout: (verificationId) {
-            // errorSnackbar(
-            //     context, 'Oh Snap!', 'you need can now resend the code again');
-          });
+        phoneNumber: phoneNumber,
+        timeout: const Duration(seconds: 20),
+        verificationCompleted: (AuthCredential phoneAuthCredential) async {
+          await firebaseAuth.currentUser!
+              .linkWithCredential(phoneAuthCredential);
+        },
+        verificationFailed: (error) {
+          throw Exception(error.message);
+        },
+        codeSent: (verificationId, forceResendingToken) {
+          nextScreen(
+              context,
+              OtpScreen(
+                  verificationId: verificationId, phoneNumber: phoneNumber));
+        },
+        codeAutoRetrievalTimeout: (verificationId) {},
+      );
     } on FirebaseAuthException catch (e) {
       errorSnackbar(context, 'Oh Snap!', e.message);
     }
@@ -54,16 +54,18 @@ class AuthService {
           verificationId: verificationId, smsCode: userOtp);
       await firebaseAuth.currentUser!.linkWithCredential(phoneAuthCredential);
       if (!mounted) return;
-      nextScreenReplace(context, const Welcome());
+      nextScreenReplace(
+          context, const LoadingWidget(thenMoveToThisWidget: Welcome()));
     } on FirebaseAuthException catch (e) {
       if (e.code == 'invalid-verification-code' ||
           e.code == 'invalid-verfication-id') {
         errorSnackbar(context, 'Oh Snap!',
             'The sms verification code you entered is invalid. Please resend the verification code and try again.');
-      } else if (e.code == 'credential-already-in-use') {
+      } /* else if (e.code == 'credential-already-in-use') {
         errorSnackbar(context, 'Uh-oh!', 'Phone number already in use');
-      } else {
-        // errorSnackbar(context, 'Oh Snap!', e.message!);
+      }  */
+      else {
+        errorSnackbar(context, 'Oh Snap!', e.message!);
       }
     }
   }
@@ -90,7 +92,7 @@ class AuthService {
           .user;
       if (user != null) {
         if (!mounted) return;
-        nextScreen(context, const Welcome());
+        nextScreen(context, const Splash());
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found' || e.code == 'wrong-password') {
@@ -143,9 +145,6 @@ class AuthService {
   Future signOut() async {
     try {
       await HelperFunctions.saveUserLoggedInStatus(false);
-      await HelperFunctions.saveUserSignedUpUsingEmail(false);
-      await HelperFunctions.saveUserEmailSF('');
-      await HelperFunctions.saveUserNameSF('');
       await firebaseAuth.signOut();
     } catch (e) {
       return null;

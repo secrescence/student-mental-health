@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:student_mental_health/screens/auth/onboarding.dart';
 import 'package:student_mental_health/screens/welcome_screen/your_privacy_matters.dart';
+import 'package:student_mental_health/service/auth_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 import 'package:student_mental_health/widgets/widgets/custom_button.dart';
 import 'package:student_mental_health/widgets/widgets/widgets.dart';
@@ -19,7 +21,25 @@ class _WelcomeState extends State<Welcome> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
-        automaticallyImplyLeading: false,
+        // automaticallyImplyLeading: false,
+        leading: IconButton(
+          onPressed: () {
+            AuthService().signOut().then(
+                (value) => nextScreenReplace(context, const Onboarding()));
+          },
+          icon: const Icon(
+            Icons.logout,
+            color: Color(0xFF000000),
+          ),
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              nextScreen(context, const YourPrivacyMatters());
+            },
+            icon: const Icon(Icons.close),
+          )
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 30),

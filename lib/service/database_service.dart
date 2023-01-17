@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 
 class DatabaseService {
   final String? uid;
@@ -24,18 +25,73 @@ class DatabaseService {
       'section': section,
       'studentID': studentId,
       'uid': uid,
+      'isUserSingedInUsingEmailOnly': true,
+      'isUserDoneWithChatbot': false,
+      'isUserDoneAreYouGonnaTakeItYesOrNo': false,
     });
   }
 
-  Future gettingUserEmail(String email) async {
+  Future getUserPhoneNumber(String phoneNumber) async {
     QuerySnapshot? snapshot =
-        await userCollection.where('phoneNumber', isEqualTo: email).get();
-    return snapshot;
+        await userCollection.where('phoneNumber', isEqualTo: phoneNumber).get();
+    return snapshot.docs.isNotEmpty;
   }
 
   Future savePhoneNumberToDB(String phoneNumber) async {
     return await phoneNumbersCollection.doc(uid).set({
       'phoneNumber': phoneNumber,
+    });
+  }
+
+  //to check user log in status
+  Future userWithDoneChatbot() async {
+    return await userCollection.doc(uid).update({
+      'isUserDoneWithChatbot': true,
+    });
+  }
+
+  Future userDoneAreYouGonnaTakeItYesOrNo() async {
+    return await userCollection.doc(uid).update({
+      'isUserDoneAreYouGonnaTakeItYesOrNo': true,
+    });
+  }
+
+  Future getUsersSignedInUsingEmailOnly() async {
+    DocumentReference d = userCollection.doc(uid);
+    DocumentSnapshot documentSnapshot = await d.get();
+    return documentSnapshot['isUserSingedInUsingEmailOnly'];
+  }
+
+  Future getUserDoneChatbot() async {
+    DocumentReference d = userCollection.doc(uid);
+    DocumentSnapshot documentSnapshot = await d.get();
+    return documentSnapshot['isUserDoneWithChatbot'];
+  }
+
+  // Future getUserDoneAreYouGonnaTakeItYesOrNo() async {
+  //   DocumentReference d = userCollection.doc(uid);
+  //   DocumentSnapshot documentSnapshot = await d.get();
+  //   return documentSnapshot['isUserDoneAreYouGonnaTakeItYesOrNo'];
+  // }
+
+  //questionnaire result
+  Future questionnaireResult(
+    double grandMean,
+    double categoryNonacceptanceMEAN,
+    double categoryGoalsMEAN,
+    double categoryImpulseMEAN,
+    double categoryAwarenessMEAN,
+    double categoryStrategiesMEAN,
+    double categoryClarityMEAN,
+  ) async {
+    userCollection.doc(uid).collection('questionnaireResult').doc(uid).set({
+      'grandMean': grandMean,
+      'categoryNonacceptanceMEAN': categoryNonacceptanceMEAN,
+      'categoryGoalsMEAN': categoryGoalsMEAN,
+      'categoryImpulseMEAN': categoryImpulseMEAN,
+      'categoryAwarenessMEAN': categoryAwarenessMEAN,
+      'categoryStrategiesMEAN': categoryStrategiesMEAN,
+      'categoryClarityMEAN': categoryClarityMEAN,
     });
   }
 
@@ -102,36 +158,5 @@ class DatabaseService {
     return documents.length == 1;
   }
 
-// questionnaire result
-  questionnaireResult(
-    double grandMean,
-    double categoryNonacceptanceMEAN,
-    double categoryGoalsMEAN,
-    double categoryImpulseMEAN,
-    double categoryAwarenessMEAN,
-    double categoryStrategiesMEAN,
-    double categoryClarityMEAN,
-  ) async {
-    userCollection.doc(uid).collection('questionnaire').doc('result').set({
-      'grandMean': grandMean,
-      'categoryNonacceptanceMEAN': categoryNonacceptanceMEAN,
-      'categoryGoalsMEAN': categoryGoalsMEAN,
-      'categoryImpulseMEAN': categoryImpulseMEAN,
-      'categoryAwarenessMEAN': categoryAwarenessMEAN,
-      'categoryStrategiesMEAN': categoryStrategiesMEAN,
-      'categoryClarityMEAN': categoryClarityMEAN,
-    });
-  }
-
-  Future<bool> checkExistingUser() async {
-    DocumentSnapshot snapshot = await phoneNumbersCollection.doc(uid).get();
-    if (snapshot.exists) {
-      print("USER EXISTS");
-      return true;
-    } else {
-      print("NEW USER");
-      return false;
-    }
-  }
   //end of db service class
 }

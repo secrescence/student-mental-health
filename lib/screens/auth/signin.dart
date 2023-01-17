@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:student_mental_health/helper/helper_function.dart';
-import 'package:student_mental_health/screens/welcome_screen/welcome.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 import 'package:student_mental_health/service/auth_service.dart';
 import 'package:student_mental_health/widgets/widgets/custom_button.dart';

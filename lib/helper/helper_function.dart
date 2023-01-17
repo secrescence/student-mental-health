@@ -7,7 +7,9 @@ class HelperFunctions {
   static String userEmailKey = 'USEREMAILKEY';
   static String userChatIdKey = 'USERCHATID';
   static String userPhoneNumberKey = 'USERPHONENUMBERKEY';
-  static String userSignedUpUsingEmail = 'USERSIGNEDUPUSINGEMAIL';
+  static String userSignedUpUsingEmailOnlyKey = 'USERSIGNEDUPUSINGEMAILONLY';
+  static String yesOrNoKey = 'YESORNO';
+  static String userDoneWithChatbotKey = 'USERDONEWITHCHATBOT';
 
   // saving the data to Shared Preferences
 
@@ -31,10 +33,21 @@ class HelperFunctions {
     return await sf.setString(userPhoneNumberKey, userPhoneNumber);
   }
 
-  static Future<bool> saveUserSignedUpUsingEmail(
-      bool isSignedUpUsingEmail) async {
+  static Future<bool> saveUserSignedUpUsingEmailOnly(
+      bool isSignedUpUsingEmailOnly) async {
     SharedPreferences sf = await SharedPreferences.getInstance();
-    return await sf.setBool(userSignedUpUsingEmail, isSignedUpUsingEmail);
+    return await sf.setBool(
+        userSignedUpUsingEmailOnlyKey, isSignedUpUsingEmailOnly);
+  }
+
+  static Future<bool> saveYesOrNo(String yesOrNo) async {
+    SharedPreferences sf = await SharedPreferences.getInstance();
+    return await sf.setString(yesOrNo, yesOrNo);
+  }
+
+  static Future<bool> saveUserDoneWithChatbot(bool isDoneWithChatbot) async {
+    SharedPreferences sf = await SharedPreferences.getInstance();
+    return await sf.setBool(userDoneWithChatbotKey, isDoneWithChatbot);
   }
 
   // getting the data from Shared Preferences
@@ -59,8 +72,18 @@ class HelperFunctions {
     return sf.getString(userPhoneNumberKey);
   }
 
-  static Future<bool?> getUserSignedUpUsingEmail() async {
+  static Future<bool?> getUserSignedUpUsingEmailOnly() async {
     SharedPreferences sf = await SharedPreferences.getInstance();
-    return sf.getBool(userSignedUpUsingEmail);
+    return sf.getBool(userSignedUpUsingEmailOnlyKey);
+  }
+
+  static Future<String?> getYesOrNo() async {
+    SharedPreferences sf = await SharedPreferences.getInstance();
+    return sf.getString(yesOrNoKey);
+  }
+
+  static Future<bool?> getUserDoneWithChatbot() async {
+    SharedPreferences sf = await SharedPreferences.getInstance();
+    return sf.getBool(userDoneWithChatbotKey);
   }
 }

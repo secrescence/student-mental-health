@@ -1,6 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:student_mental_health/helper/helper_function.dart';
 import 'package:student_mental_health/screens/questionnaire_screen/from_yes_or_no.dart';
+import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart' show toBeginningOfSentenceCase;
@@ -205,8 +209,11 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                       children: [
                         ElevatedButton(
                           //yes button
-                          onPressed: () {
-                            //TODO : add sf to save 'done with chatbot'
+                          onPressed: () async {
+                            await DatabaseService(
+                                    uid: FirebaseAuth.instance.currentUser!.uid)
+                                .userWithDoneChatbot();
+                            if (!mounted) return;
                             nextScreenReplace(
                                 context,
                                 const LoadingWidget(
@@ -234,8 +241,11 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                         const SizedBox(width: 30),
                         ElevatedButton(
                           //no button
-                          onPressed: () {
-                            //TODO : add sf to save 'done with chatbot'
+                          onPressed: () async {
+                            await DatabaseService(
+                                    uid: FirebaseAuth.instance.currentUser!.uid)
+                                .userWithDoneChatbot();
+                            if (!mounted) return;
                             nextScreenReplace(
                                 context,
                                 const LoadingWidget(
@@ -261,7 +271,6 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                                   fontSize: 20, fontFamily: 'Sofia Pro')),
                         ),
                       ],
-                      //TODO end
                     ),
                     child: ElevatedButton(
                       // next button for before we proceed
