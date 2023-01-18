@@ -1,10 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:student_mental_health/screens/auth/signup_phone.dart';
-import 'package:student_mental_health/screens/auth/signup_user_info.dart';
-import 'package:student_mental_health/screens/questionnaire_screen/from_yes_or_no.dart';
 import 'package:student_mental_health/screens/questionnaire_screen/need_to_take_quest_to_proceed.dart';
 import 'package:student_mental_health/screens/welcome_screen/welcome.dart';
 import 'package:student_mental_health/service/database_service.dart';
@@ -30,7 +27,7 @@ class _SplashState extends State<Splash> {
   void initState() {
     super.initState();
     getUserLoggedInStatus();
-    Future.delayed(const Duration(milliseconds: 2500)).then((value) {
+    Future.delayed(const Duration(milliseconds: 2300)).then((value) {
       if (_isSignedIn && _isDoneWithChatbot && _isSingedUpUsingEmailOnly) {
         nextScreen(context, const NeedToTakeQuestionnaireToProceed());
       } else if (_isSignedIn && _isSingedUpUsingEmailOnly) {
@@ -48,7 +45,6 @@ class _SplashState extends State<Splash> {
       await DatabaseService(uid: currentUser)
           .getUserDoneChatbot()
           .then((value) {
-        print(value);
         if (value != null) {
           setState(() {
             _isDoneWithChatbot = value;
@@ -64,9 +60,6 @@ class _SplashState extends State<Splash> {
           });
         }
       });
-      
-      print(_isSingedUpUsingEmailOnly);
-      print(_isDoneWithChatbot);
     }
     await HelperFunctions.getUserLoggedInStatus().then((value) {
       if (value != null) {

@@ -233,7 +233,7 @@ class _OtpScreenState extends State<OtpScreen> {
         userOtp: userOtp!);
     await HelperFunctions.saveUserLoggedInStatus(true);
     await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
-        .savePhoneNumberToDB(widget.phoneNumber);
+        .addPhoneNumber(widget.phoneNumber);
   }
 
   void resendOtpTimer() {

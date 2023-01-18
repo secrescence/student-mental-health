@@ -25,9 +25,6 @@ class _SignUpPhoneState extends State<SignUpPhone> {
     dialCode: '+63',
   );
 
-  //otp code timeout
-  bool _smsTimeout = false;
-
   @override
   void dispose() {
     phoneController.dispose();

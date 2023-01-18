@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 
 class DatabaseService {
   final String? uid;
@@ -8,10 +7,6 @@ class DatabaseService {
   // reference for the collection
   final CollectionReference userCollection =
       FirebaseFirestore.instance.collection('users');
-  final CollectionReference questionnaireCollection =
-      FirebaseFirestore.instance.collection('questionnaire');
-  final CollectionReference phoneNumbersCollection =
-      FirebaseFirestore.instance.collection('phoneNumbers');
 
   // saving the user data from sign up
   Future savingUserData(String firstName, String lastName, String email,
@@ -25,9 +20,18 @@ class DatabaseService {
       'section': section,
       'studentID': studentId,
       'uid': uid,
+      'phoneNumber': '',
       'isUserSingedInUsingEmailOnly': true,
       'isUserDoneWithChatbot': false,
-      'isUserDoneAreYouGonnaTakeItYesOrNo': false,
+      //TODO: i dont know
+      // 'isUserDoneAreYouGonnaTakeItYesOrNo': false,
+    });
+  }
+
+  //saving user phone number
+  Future addPhoneNumber(String phoneNumber) async {
+    return await userCollection.doc(uid).update({
+      'phoneNumber': phoneNumber,
     });
   }
 
@@ -35,12 +39,6 @@ class DatabaseService {
     QuerySnapshot? snapshot =
         await userCollection.where('phoneNumber', isEqualTo: phoneNumber).get();
     return snapshot.docs.isNotEmpty;
-  }
-
-  Future savePhoneNumberToDB(String phoneNumber) async {
-    return await phoneNumbersCollection.doc(uid).set({
-      'phoneNumber': phoneNumber,
-    });
   }
 
   //to check user log in status
