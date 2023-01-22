@@ -210,7 +210,7 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                           onPressed: () async {
                             await DatabaseService(
                                     uid: FirebaseAuth.instance.currentUser!.uid)
-                                .userWithDoneChatbot();
+                                .userDoneWithChatbot();
                             if (!mounted) return;
                             nextScreenReplace(
                                 context,
@@ -242,7 +242,7 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                           onPressed: () async {
                             await DatabaseService(
                                     uid: FirebaseAuth.instance.currentUser!.uid)
-                                .userWithDoneChatbot();
+                                .userDoneWithChatbot();
                             if (!mounted) return;
                             nextScreenReplace(
                                 context,

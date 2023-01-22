@@ -8,6 +8,11 @@ class DatabaseService {
   final CollectionReference userCollection =
       FirebaseFirestore.instance.collection('users');
 
+  //delete user
+  Future deleteUser() async {
+    return await userCollection.doc(uid).delete();
+  }
+
   // saving the user data from sign up
   Future savingUserData(String firstName, String lastName, String email,
       String department, String year, String section, String studentId) async {
@@ -18,14 +23,34 @@ class DatabaseService {
       'department': department,
       'year': year,
       'section': section,
-      'studentID': studentId,
+      'studentId': studentId,
       'uid': uid,
       'phoneNumber': '',
       'isUserSingedInUsingEmailOnly': true,
       'isUserDoneWithChatbot': false,
+      'isUserDoneWithQuestionnaire': false,
       //TODO: i dont know
       // 'isUserDoneAreYouGonnaTakeItYesOrNo': false,
     });
+  }
+
+  //check user student id for log in
+  Future getUserStudentId() async {
+    DocumentReference d = userCollection.doc(uid);
+    DocumentSnapshot documentSnapshot = await d.get();
+    if (documentSnapshot.exists) {
+      return documentSnapshot['studentId'];
+    } else {
+      return null;
+    }
+  }
+
+  //check user student id for sign up
+  Future<bool> checkStudentIdExists(String studentId) async {
+    final QuerySnapshot result =
+        await userCollection.where("studentId", isEqualTo: studentId).get();
+    final List<DocumentSnapshot> documents = result.docs;
+    return documents.isEmpty;
   }
 
   //saving user phone number
@@ -35,14 +60,14 @@ class DatabaseService {
     });
   }
 
-  Future getUserPhoneNumber(String phoneNumber) async {
-    QuerySnapshot? snapshot =
-        await userCollection.where('phoneNumber', isEqualTo: phoneNumber).get();
-    return snapshot.docs.isNotEmpty;
+  Future getUserPhoneNumber() async {
+    DocumentReference d = userCollection.doc(uid);
+    DocumentSnapshot documentSnapshot = await d.get();
+    return documentSnapshot['phoneNumber'];
   }
 
   //to check user log in status
-  Future userWithDoneChatbot() async {
+  Future userDoneWithChatbot() async {
     return await userCollection.doc(uid).update({
       'isUserDoneWithChatbot': true,
     });
@@ -51,6 +76,12 @@ class DatabaseService {
   Future userDoneAreYouGonnaTakeItYesOrNo() async {
     return await userCollection.doc(uid).update({
       'isUserDoneAreYouGonnaTakeItYesOrNo': true,
+    });
+  }
+
+  Future userDoneWithQuestionnaire() async {
+    return await userCollection.doc(uid).update({
+      'isUserDoneWithQuestionnaire': true,
     });
   }
 
@@ -64,6 +95,12 @@ class DatabaseService {
     DocumentReference d = userCollection.doc(uid);
     DocumentSnapshot documentSnapshot = await d.get();
     return documentSnapshot['isUserDoneWithChatbot'];
+  }
+
+  Future getDoneWithQuestionnaire() async {
+    DocumentReference d = userCollection.doc(uid);
+    DocumentSnapshot documentSnapshot = await d.get();
+    return documentSnapshot['isUserDoneWithQuestionnaire'];
   }
 
   // Future getUserDoneAreYouGonnaTakeItYesOrNo() async {
@@ -91,6 +128,20 @@ class DatabaseService {
       'categoryStrategiesMEAN': categoryStrategiesMEAN,
       'categoryClarityMEAN': categoryClarityMEAN,
     });
+  }
+
+  //get all questionnaire result
+  Future fetchQuestionnaireResult() async {
+    final DocumentSnapshot snapshot = await userCollection
+        .doc(uid)
+        .collection('questionnaireResult')
+        .doc(uid)
+        .get();
+    if (snapshot.exists) {
+      return snapshot.data() as Map<String, dynamic>;
+    } else {
+      return null;
+    }
   }
 
 // used to display chats of both chatbot and user

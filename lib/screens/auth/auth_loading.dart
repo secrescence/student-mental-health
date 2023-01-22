@@ -1,11 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:student_mental_health/screens/auth/signin.dart';
 import 'package:student_mental_health/screens/auth/signup_phone.dart';
-import 'package:student_mental_health/screens/auth/signup_user_info.dart';
 import 'package:student_mental_health/screens/questionnaire_screen/need_to_take_quest_to_proceed.dart';
-import 'package:student_mental_health/screens/questionnaire_screen/result.dart';
 import 'package:student_mental_health/screens/welcome_screen/welcome.dart';
 import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
@@ -13,15 +10,14 @@ import 'package:student_mental_health/helper/helper_function.dart';
 import 'package:student_mental_health/screens/auth/onboarding.dart';
 import 'package:student_mental_health/widgets/widgets/widgets.dart';
 
-class Splash extends StatefulWidget {
-  const Splash({super.key});
+class AuthLoading extends StatefulWidget {
+  const AuthLoading({super.key});
 
   @override
-  State<Splash> createState() => _SplashState();
+  State<AuthLoading> createState() => _AuthLoadingState();
 }
 
-class _SplashState extends State<Splash> {
-  bool _isDoneWithQuestionnaire = false;
+class _AuthLoadingState extends State<AuthLoading> {
   bool _isDoneWithChatbot = false;
   bool _isSingedUpUsingEmailOnly = false;
   bool _isSignedIn = false;
@@ -31,15 +27,8 @@ class _SplashState extends State<Splash> {
   void initState() {
     super.initState();
     getUserLoggedInStatus();
-    Future.delayed(const Duration(milliseconds: 2300)).then((value) {
-      if (_isSignedIn &&
-          _isDoneWithChatbot &&
-          _isSingedUpUsingEmailOnly &&
-          _isDoneWithQuestionnaire) {
-        nextScreen(context, const Result());
-      } else if (_isSignedIn &&
-          _isDoneWithChatbot &&
-          _isSingedUpUsingEmailOnly) {
+    Future.delayed(const Duration(milliseconds: 1500)).then((value) {
+      if (_isSignedIn && _isDoneWithChatbot && _isSingedUpUsingEmailOnly) {
         nextScreen(context, const NeedToTakeQuestionnaireToProceed());
       } else if (_isSignedIn && _isSingedUpUsingEmailOnly) {
         nextScreen(context, const Welcome());
@@ -53,15 +42,6 @@ class _SplashState extends State<Splash> {
 
   getUserLoggedInStatus() async {
     if (currentUser != null) {
-      await DatabaseService(uid: currentUser)
-          .getDoneWithQuestionnaire()
-          .then((value) {
-        if (value != null) {
-          setState(() {
-            _isDoneWithQuestionnaire = value;
-          });
-        }
-      });
       await DatabaseService(uid: currentUser)
           .getUserDoneChatbot()
           .then((value) {
@@ -93,27 +73,12 @@ class _SplashState extends State<Splash> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: primaryColor,
-      body: SizedBox(
-        width: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Expanded(
-              flex: 5,
-              child: Image.asset(
-                'assets/logo-white-splash.png',
-              ),
-            ),
-            const Expanded(
-              child: SpinKitSpinningLines(
-                color: Colors.white,
-                size: 50,
-              ),
-            )
-          ],
-        ),
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
       ),
+      body: const Center(child: SpinKitSpinningLines(color: primaryColor)),
     );
   }
 }

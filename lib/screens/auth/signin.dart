@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:student_mental_health/helper/helper_function.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 import 'package:student_mental_health/service/auth_service.dart';
 import 'package:student_mental_health/widgets/widgets/custom_button.dart';
@@ -263,9 +262,9 @@ class _SignInState extends State<SignIn> {
                   SizedBox(
                     child: CustomButton(
                         text: 'Sign In',
-                        onPressed: (() {
+                        onPressed: () {
                           signIn();
-                        }),
+                        },
                         color: phoneFieldButtonColor),
                   ),
                 ],
@@ -277,12 +276,16 @@ class _SignInState extends State<SignIn> {
     );
   }
 
-  void signIn() {
+  void signIn() async {
     String email = emailController.text.trim();
     String password = passwordController.text.trim();
+    String studentId = studentIdController.text.trim();
     if (formKey.currentState!.validate()) {
-      HelperFunctions.saveUserLoggedInStatus(true);
-      AuthService().signIn(email: email, password: password, context: context);
+      await AuthService().signIn(
+          email: email,
+          studentId: studentId,
+          password: password,
+          context: context);
     } else {
       errorSnackbar(context, 'Oops!', 'Please fill all the fields correctly');
     }

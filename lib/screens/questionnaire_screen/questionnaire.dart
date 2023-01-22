@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:student_mental_health/screens/questionnaire_screen/question.dart';
+import 'package:student_mental_health/screens/questionnaire_screen/result.dart';
 import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
+import 'package:student_mental_health/widgets/widgets/widgets.dart';
 
 class Questionnaire extends StatefulWidget {
   const Questionnaire({super.key});
@@ -183,7 +185,7 @@ class _QuestionnaireState extends State<Questionnaire> {
             if (selectedAnswer != null) {
               print(
                   'selectedAnswer: ${selectedAnswer!.answerText} and category: ${answer.category} and score: ${answer.score} and total scrore is: $totalScore');
-              
+
               //if last question
               if (currentQuestionIndex == questionList.length - 1) {
                 setState(() {
@@ -213,6 +215,11 @@ class _QuestionnaireState extends State<Questionnaire> {
                   categoryStrategiesMEAN,
                   categoryClarityMEAN,
                 );
+                await DatabaseService(
+                        uid: FirebaseAuth.instance.currentUser!.uid)
+                    .userDoneWithQuestionnaire();
+                if (!mounted) return;
+                nextScreenReplace(context, const Result());
               } else {
                 Future.delayed(const Duration(milliseconds: 800), () {
                   setState(() {

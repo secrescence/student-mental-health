@@ -2,16 +2,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:student_mental_health/helper/helper_function.dart';
 import 'package:student_mental_health/screens/auth/otp_screen.dart';
+import 'package:student_mental_health/screens/auth/auth_loading.dart';
 import 'package:student_mental_health/screens/auth/signup_phone.dart';
 import 'package:student_mental_health/screens/welcome_screen/welcome.dart';
 import 'package:student_mental_health/service/database_service.dart';
-import 'package:student_mental_health/splash.dart';
 import 'package:student_mental_health/widgets/utils/loading.dart';
 import 'package:student_mental_health/widgets/widgets/custom_snackbar.dart';
 import 'package:student_mental_health/widgets/widgets/widgets.dart';
 
 class AuthService {
-  bool isLoading = false;
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
   //phone auth
@@ -19,27 +18,39 @@ class AuthService {
     required BuildContext context,
     required String phoneNumber,
   }) async {
-    try {
-      await firebaseAuth.verifyPhoneNumber(
-        phoneNumber: phoneNumber,
-        timeout: const Duration(seconds: 20),
-        verificationCompleted: (AuthCredential phoneAuthCredential) async {
-          await firebaseAuth.currentUser!
-              .linkWithCredential(phoneAuthCredential);
-        },
-        verificationFailed: (error) {
-          throw Exception(error.message);
-        },
-        codeSent: (verificationId, forceResendingToken) {
-          nextScreen(
-              context,
-              OtpScreen(
-                  verificationId: verificationId, phoneNumber: phoneNumber));
-        },
-        codeAutoRetrievalTimeout: (verificationId) {},
-      );
-    } on FirebaseAuthException catch (e) {
-      errorSnackbar(context, 'Oh Snap!', e.message);
+    bool mounted = false;
+    final checkPhoneNumber =
+        await DatabaseService(uid: firebaseAuth.currentUser!.uid)
+            .getUserPhoneNumber();
+
+    if (checkPhoneNumber == phoneNumber) {
+      if (!mounted) {}
+      errorSnackbar(
+          context, 'Oops!', 'Phone number already used by other user');
+    } else {
+      try {
+        await firebaseAuth.verifyPhoneNumber(
+          phoneNumber: phoneNumber,
+          timeout: const Duration(seconds: 20),
+          verificationCompleted: (AuthCredential phoneAuthCredential) async {
+            await firebaseAuth.currentUser!
+                .linkWithCredential(phoneAuthCredential);
+          },
+          verificationFailed: (error) {
+            throw Exception(error.message);
+          },
+          codeSent: (verificationId, forceResendingToken) {
+            nextScreen(
+                context,
+                OtpScreen(
+                    verificationId: verificationId, phoneNumber: phoneNumber));
+          },
+          codeAutoRetrievalTimeout: (verificationId) {},
+        );
+      } on FirebaseAuthException catch (e) {
+        if (!mounted) {}
+        errorSnackbar(context, 'Oh Snap!', e.message);
+      }
     }
   }
 
@@ -83,6 +94,7 @@ class AuthService {
   // sign in with email and password
   Future signIn(
       {required String email,
+      required String studentId,
       required String password,
       required BuildContext context,
       bool mounted = true}) async {
@@ -90,9 +102,21 @@ class AuthService {
       User? user = (await firebaseAuth.signInWithEmailAndPassword(
               email: email, password: password))
           .user;
+
       if (user != null) {
-        if (!mounted) return;
-        nextScreen(context, const Splash());
+        final checkStudentId =
+            await DatabaseService(uid: FirebaseAuth.instance.currentUser?.uid)
+                .getUserStudentId();
+        if (checkStudentId == studentId) {
+          await HelperFunctions.saveUserLoggedInStatus(true);
+          if (!mounted) return;
+          nextScreen(context, const AuthLoading());
+        } else {
+          await signOut();
+          if (!mounted) return;
+          errorSnackbar(
+              context, 'Oops!', 'Please enter the correct Student ID');
+        }
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found' || e.code == 'wrong-password') {
@@ -121,20 +145,28 @@ class AuthService {
       User? user = (await firebaseAuth.createUserWithEmailAndPassword(
               email: email, password: password))
           .user;
-
       if (user != null) {
-        await DatabaseService(uid: firebaseAuth.currentUser!.uid)
-            .savingUserData(
-          firstName,
-          lastName,
-          email,
-          department,
-          year,
-          section,
-          studentId,
-        );
-        if (!mounted) return;
-        nextScreenReplace(context, const SignUpPhone());
+        final studentIdExist =
+            await DatabaseService().checkStudentIdExists(studentId);
+        if (!studentIdExist) {
+          user.delete();
+          if (!mounted) return;
+          errorSnackbar(context, 'Oops!', 'Student ID already in use');
+        } else {
+          await DatabaseService(uid: firebaseAuth.currentUser!.uid)
+              .savingUserData(
+            firstName,
+            lastName,
+            email,
+            department,
+            year,
+            section,
+            studentId,
+          );
+          await HelperFunctions.saveUserSignedUpUsingEmailOnly(true);
+          if (!mounted) return;
+          nextScreenReplace(context, const SignUpPhone());
+        }
       }
     } on FirebaseAuthException catch (e) {
       errorSnackbar(context, 'Oops!', e.message!);
