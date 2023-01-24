@@ -131,7 +131,7 @@ class DatabaseService {
   }
 
   //get all questionnaire result
-  Future fetchQuestionnaireResult() async {
+  Future getQuestionnaireResult() async {
     final DocumentSnapshot snapshot = await userCollection
         .doc(uid)
         .collection('questionnaireResult')
@@ -139,6 +139,42 @@ class DatabaseService {
         .get();
     if (snapshot.exists) {
       return snapshot.data() as Map<String, dynamic>;
+    } else {
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> getHighestResult() async {
+    final DocumentSnapshot snapshot = await userCollection
+        .doc(uid)
+        .collection('questionnaireResult')
+        .doc(uid)
+        .get();
+
+    if (snapshot.exists) {
+      Map<String, dynamic> results = snapshot.data() as Map<String, dynamic>;
+      double maxValue = double.negativeInfinity;
+      String? maxKey;
+
+      results.forEach((key, value) {
+        if (value > maxValue) {
+          maxValue = value;
+          maxKey = key;
+        }
+      });
+
+      return {maxKey!: maxValue};
+    } else {
+      return null;
+    }
+  }
+
+  //get what should i call you
+  Future whatShouldICallYou() async {
+    DocumentReference d = userCollection.doc(uid);
+    DocumentSnapshot documentSnapshot = await d.get();
+    if (documentSnapshot.exists) {
+      return documentSnapshot['whatShouldICallYou'];
     } else {
       return null;
     }

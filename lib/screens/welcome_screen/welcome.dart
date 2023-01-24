@@ -32,14 +32,6 @@ class _WelcomeState extends State<Welcome> {
             color: Color(0xFF000000),
           ),
         ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              nextScreen(context, const YourPrivacyMatters());
-            },
-            icon: const Icon(Icons.close),
-          )
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 30),
