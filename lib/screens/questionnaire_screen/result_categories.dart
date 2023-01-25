@@ -1,3 +1,4 @@
+import 'package:expandable/expandable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:student_mental_health/screens/auth/onboarding.dart';
@@ -22,6 +23,19 @@ class _ResultCategoriesState extends State<ResultCategories> {
   List<QuestionnaireResult>? _results;
   TooltipBehavior? _tooltipBehavior;
   String? highestCategory;
+
+  //category description
+  String nonAcceptanceDescription =
+      'tendency to have negative secondary emotional responses to one\'s negative emotions, or nonacceptingreactions to one\'s distress.';
+  String goalsDescription =
+      'difficulties concentrating and accomplishing tasks when experiencing negative emotions.';
+  String impulseDescription =
+      'difficulties remaining in control of one\'s behavior when experiencing negative emotions.';
+  String awarenessDescription = 'wqqweqweq';
+  String strategiesDescription =
+      'the belief that there is little that can be done to regulate emotions effectively, once an individual is upset.';
+  String clarityDescription =
+      'the extent to which individuals know (and are clear about) the emotions they are experiencing.';
 
   @override
   void initState() {
@@ -58,86 +72,254 @@ class _ResultCategoriesState extends State<ResultCategories> {
         //     ),
         //   ),
         // ),
-        body: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 40),
-              height: MediaQuery.of(context).size.height * 0.6,
-              child: SfCircularChart(
-                title: ChartTitle(
-                    text: 'Your Results',
-                    textStyle: const TextStyle(
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              const Padding(
+                padding: EdgeInsets.only(top: 30, bottom: 25),
+                child: Text('Results',
+                    style: TextStyle(
                       fontFamily: 'Sofia Pro',
-                      fontSize: 25,
-                      fontWeight: FontWeight.w500,
+                      fontSize: 28,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
                     )),
-                legend: Legend(
-                  textStyle: const TextStyle(
-                      fontFamily: 'Sofia Pro',
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500),
-                  isVisible: true,
-                  overflowMode: LegendItemOverflowMode.wrap,
-                  iconHeight: 19,
-                  iconWidth: 19,
-                  position: LegendPosition.right,
-                  padding: 7,
-                  itemPadding: 12,
-                  isResponsive: true,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 30),
+                child: Column(
+                  children: [
+                    RichText(
+                      text: TextSpan(
+                          text:
+                              'This test measure the level of your awareness, acceptance of emotion, understanding and your ability to act in desired ways regardless of your emotional state. The highest score result in the category: ',
+                          style: const TextStyle(
+                            fontFamily: 'Sofia Pro',
+                            fontSize: 16,
+                            color: Colors.black87,
+                          ),
+                          children: <TextSpan>[
+                            const TextSpan(
+                              text: 'NONACCEPTANCE, ',
+                              style: TextStyle(
+                                fontFamily: 'Sofia Pro',
+                              ),
+                            ),
+                            const TextSpan(
+                              text: 'GOALS, ',
+                              style: TextStyle(
+                                fontFamily: 'Sofia Pro',
+                              ),
+                            ),
+                            const TextSpan(
+                              text: 'IMPULSE, ',
+                              style: TextStyle(
+                                fontFamily: 'Sofia Pro',
+                              ),
+                            ),
+                            const TextSpan(
+                              text: 'AWARENESS, ',
+                              style: TextStyle(
+                                fontFamily: 'Sofia Pro',
+                              ),
+                            ),
+                            const TextSpan(
+                              text: 'STRATEGIES, ',
+                              style: TextStyle(
+                                fontFamily: 'Sofia Pro',
+                              ),
+                            ),
+                            const TextSpan(
+                              text: 'CLARITY ',
+                              style: TextStyle(
+                                fontFamily: 'Sofia Pro',
+                              ),
+                            ),
+                            const TextSpan(
+                              text: 'is the certain area you should work on.',
+                              style: TextStyle(
+                                fontFamily: 'Sofia Pro',
+                              ),
+                            ),
+                            const TextSpan(text: '\n\n'),
+                            const TextSpan(
+                                text: 'In your case your highest category is '),
+                            TextSpan(
+                              text: highestCategory?.toUpperCase(),
+                              style: const TextStyle(
+                                color: phoneNumberInOtpColor,
+                                fontFamily: 'Sofia Pro',
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const TextSpan(
+                              text:
+                                  '. We have gathered resources you can explore later on.',
+                              style: TextStyle(
+                                fontFamily: 'Sofia Pro',
+                              ),
+                            ),
+                          ]),
+                    ),
+                  ],
                 ),
-                tooltipBehavior: _tooltipBehavior,
-                onTooltipRender: (tooltipArgs) {
-                  tooltipArgs.text = tooltipArgs.text!.split(' ')[0];
-                },
-                margin: const EdgeInsets.symmetric(horizontal: 10),
-                series: <CircularSeries>[
-                  RadialBarSeries<QuestionnaireResult, String>(
-                    dataSource: _results,
-                    xValueMapper: (QuestionnaireResult result, _) =>
-                        result.category,
-                    yValueMapper: (QuestionnaireResult result, _) =>
-                        result.score,
-                    dataLabelSettings: DataLabelSettings(
-                        isVisible: true,
-                        textStyle: TextStyle(
+              ),
+              Container(
+                padding: const EdgeInsets.only(top: 20, left: 10, bottom: 0),
+                child: SfCircularChart(
+                  margin: const EdgeInsets.symmetric(horizontal: 10),
+                  tooltipBehavior: _tooltipBehavior,
+                  onTooltipRender: (tooltipArgs) {
+                    tooltipArgs.text = tooltipArgs.text!.split(' ')[0];
+                  },
+                  title: ChartTitle(
+                      borderWidth: 8,
+                      text: 'Visual Summary',
+                      alignment: ChartAlignment.near,
+                      textStyle: const TextStyle(
                           fontFamily: 'Sofia Pro',
                           fontSize: 18,
-                          color: Colors.black.withOpacity(0.8),
-                        )),
-                    enableTooltip: true,
-                    maximumValue: 5,
-                    radius: '100%',
-                    innerRadius: '10%',
-                    cornerStyle: CornerStyle.bothCurve,
-                    trackOpacity: 0.7,
-                    gap: '3%',
-                    selectionBehavior:
-                        SelectionBehavior(enable: true, unselectedOpacity: 0.4),
-                    onPointTap: (pointInteractionDetails) {},
-                  )
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30),
-              child: Text(
-                '$highestCategory is your highest category',
-                style: const TextStyle(
-                  fontFamily: 'Sofia Pro',
-                  fontSize: 19,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black)),
+                  legend: Legend(
+                    textStyle: const TextStyle(
+                        fontFamily: 'Sofia Pro',
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500),
+                    isVisible: true,
+                    overflowMode: LegendItemOverflowMode.wrap,
+                    iconHeight: 19,
+                    iconWidth: 19,
+                    position: LegendPosition.right,
+                    padding: 7,
+                    itemPadding: 12,
+                    isResponsive: true,
+                  ),
+                  series: <CircularSeries>[
+                    RadialBarSeries<QuestionnaireResult, String>(
+                      dataSource: _results,
+                      xValueMapper: (QuestionnaireResult result, _) =>
+                          result.category,
+                      yValueMapper: (QuestionnaireResult result, _) =>
+                          result.score,
+                      dataLabelSettings: DataLabelSettings(
+                          isVisible: true,
+                          textStyle: TextStyle(
+                            fontFamily: 'Sofia Pro',
+                            fontSize: 16,
+                            color: Colors.black.withOpacity(0.8),
+                          )),
+                      enableTooltip: true,
+                      maximumValue: 5,
+                      radius: '100%',
+                      innerRadius: '10%',
+                      cornerStyle: CornerStyle.bothCurve,
+                      trackOpacity: 0.7,
+                      gap: '3%',
+                      selectionBehavior: SelectionBehavior(
+                          enable: true, unselectedOpacity: 0.4),
+                      onPointTap: (pointInteractionDetails) {},
+                    )
+                  ],
                 ),
               ),
-            ),
-            const SizedBox(height: 100),
-            CustomButton(
-              text: 'Next',
-              onPressed: () {
-                nextScreen(context, const ResultOverall());
-              },
-              color: phoneFieldButtonColor,
-            )
-          ],
+              Container(
+                alignment: Alignment.centerLeft,
+                padding: const EdgeInsets.only(left: 35, bottom: 20, top: 20),
+                child: const Text('Find out more about the categories:',
+                    style: TextStyle(
+                      fontFamily: 'Sofia Pro',
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    )),
+              ),
+              ExpandableNotifier(
+                child: Card(
+                  elevation: 0,
+                  margin: const EdgeInsets.symmetric(horizontal: 25),
+                  child: ScrollOnExpand(
+                    child: ExpandablePanel(
+                        theme: const ExpandableThemeData(
+                          iconSize: 30,
+                          iconColor: primaryColor,
+                          expandIcon: Icons.arrow_right,
+                          collapseIcon: Icons.arrow_drop_down,
+                          headerAlignment:
+                              ExpandablePanelHeaderAlignment.center,
+                          tapBodyToCollapse: true,
+                          tapBodyToExpand: true,
+                        ),
+                        header: const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          child: Text('Category Description',
+                              style: TextStyle(
+                                fontFamily: 'Sofia Pro',
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              )),
+                        ),
+                        collapsed: const SizedBox.shrink(),
+                        expanded: SingleChildScrollView(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                categoryDescription('Nonacceptance\n\n',
+                                    '$nonAcceptanceDescription\n'),
+                                categoryDescription(
+                                    'Goals\n\n', '$goalsDescription\n'),
+                                categoryDescription(
+                                    'Impulse\n\n', '$impulseDescription\n'),
+                                categoryDescription(
+                                    'Awareness\n\n', '$awarenessDescription\n'),
+                                categoryDescription('Strategies\n\n',
+                                    '$strategiesDescription\n'),
+                                categoryDescription(
+                                    'Clarity\n\n', '$clarityDescription\n'),
+                              ],
+                            ),
+                          ),
+                        )),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 50),
+              CustomButton(
+                text: 'Next',
+                onPressed: () {
+                  nextScreen(context, const ResultOverall());
+                },
+                color: phoneFieldButtonColor,
+              )
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget categoryDescription(String title, String description) {
+    return Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(
+            text: title,
+            style: const TextStyle(
+              fontFamily: 'Sofia Pro',
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          TextSpan(
+            text: description,
+            style: const TextStyle(
+              fontFamily: 'Sofia Pro',
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -210,6 +392,8 @@ class _ResultCategoriesState extends State<ResultCategories> {
     double cutDouble = double.parse(cut);
     return cutDouble;
   }
+
+  //end of class
 }
 
 class MaxValueWithCategory {

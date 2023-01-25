@@ -7,6 +7,7 @@ import 'package:student_mental_health/widgets/utils/colors.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart' show toBeginningOfSentenceCase;
 import 'package:student_mental_health/widgets/utils/loading.dart';
+import 'package:student_mental_health/widgets/widgets/bottom_sheet_widget.dart';
 import 'package:student_mental_health/widgets/widgets/widgets.dart';
 
 class ResultOverall extends StatefulWidget {
@@ -18,31 +19,48 @@ class ResultOverall extends StatefulWidget {
 
 class _ResultOverallState extends State<ResultOverall> {
   final TextEditingController _chatController = TextEditingController();
+  //overall score
+  double? overallScore;
 
-  //bot lottie visible
-  bool isBotVisible = true;
-  bool isRepeat = false;
-
-  //hello im chatbot...
-  bool helloImChatbotVisible = true;
-  bool hideHelloImChatbot = true;
-
-  //nice to meet you...
-  bool niceToMeetYouVisible = true;
-  bool hideNiceToMeetYou = false;
-
-  //before we proceed i would like you to answer...
-  bool beforeWeProceedVisible = true;
-  bool hideBeforeWeProceed = false;
-
-  //are you going to take it?
-  bool areYouGoingToTakeItVisible = true;
-  bool hideAreYouGoingToTakeIt = false;
-
-  bool nextButtonVisible = true;
-  bool nextButtonVisible2 = true;
-  bool textFieldVisible = true;
+  //what should i call you
   String whatShouldICallYou = '';
+
+  //lottie chatbot
+  bool isBotVisible = true;
+  bool isRepeat = true;
+
+  //priority dialog
+  String highPriority1 =
+      'As a result, I strongly encourage you\nto talk with our school\'s guidance\ncounselor. Our expert will help and\ngive the necessary support that you\nneed.';
+  String highPriority2 = 'Click next to continue';
+  String midPriority1 =
+      'As a result, I would like you to check\nout some articles and videos that we\ngathered just for you! You can also reach\nout to our school\'s guidance counselor\nAanytime you want.';
+  String midPriority2 = 'I hope you enjoy 🙂';
+  String lowPriority1 =
+      'As a result, I would like you to\ncheck out some articles and\nvideos that we gathered just\nfor you!';
+  String lowPriority2 = 'I hope you enjoy 🙂';
+
+  //first chat
+  bool firstChatVisible = true;
+  bool wholeFirstChatVisible = false;
+  //second chat
+  bool secondChatVisible = true;
+  bool wholeSecondChatVisible = false;
+  //third chat
+  bool thirdChatVisible = true;
+  bool wholeThirdChatVisible = false;
+  //fourth chat
+  bool fourthChatVisible = true;
+  bool wholeFourthChatVisible = false;
+
+  //third dialog
+  String thirdDialog = '';
+  //fourth dialog
+  String fourthDialog = '';
+
+  //is high mid/low priority
+  bool isHighPriority = false;
+  bool isLowAndMidPriority = false;
 
   @override
   void dispose() {
@@ -52,21 +70,73 @@ class _ResultOverallState extends State<ResultOverall> {
 
   @override
   void initState() {
-    getWhatShouldICallYou();
+    getUserData();
+    setState(() {
+      wholeFirstChatVisible = true;
+    });
     Future.delayed(const Duration(milliseconds: 3500)).then((value) {
       setState(() {
-        helloImChatbotVisible = false;
+        firstChatVisible = false;
+        isRepeat = false;
+      });
+    }).then((value) {
+      setState(() {
+        wholeSecondChatVisible = true;
+      });
+      Future.delayed(const Duration(milliseconds: 2000)).then((value) {
+        setState(() {
+          secondChatVisible = false;
+        });
+      }).then((value) {
+        setState(() {
+          wholeThirdChatVisible = true;
+        });
+        Future.delayed(const Duration(milliseconds: 2000)).then((value) {
+          setState(() {
+            thirdChatVisible = false;
+          });
+        }).then((value) {
+          setState(() {
+            wholeFourthChatVisible = true;
+          });
+          Future.delayed(const Duration(milliseconds: 2000)).then((value) {
+            setState(() {
+              fourthChatVisible = false;
+            });
+            _showBottomSheet(context);
+          });
+        });
       });
     });
     super.initState();
   }
 
-  getWhatShouldICallYou() async {
+  getUserData() async {
     await DatabaseService(uid: FirebaseAuth.instance.currentUser?.uid)
-        .whatShouldICallYou()
+        .getUserWhatShouldICallYou()
         .then((value) {
       setState(() {
         whatShouldICallYou = toBeginningOfSentenceCase(value)!;
+      });
+    });
+    await DatabaseService(uid: FirebaseAuth.instance.currentUser?.uid)
+        .getOverallScore()
+        .then((value) {
+      setState(() {
+        overallScore = value;
+        if (overallScore! > 4) {
+          thirdDialog = highPriority1;
+          fourthDialog = highPriority2;
+          isHighPriority = true;
+        } else if (overallScore! >= 3.5 && overallScore! <= 3.9) {
+          thirdDialog = midPriority1;
+          fourthDialog = midPriority2;
+          isLowAndMidPriority = true;
+        } else if (overallScore! < 3.49) {
+          thirdDialog = lowPriority1;
+          fourthDialog = lowPriority2;
+          isLowAndMidPriority = true;
+        }
       });
     });
   }
@@ -82,325 +152,161 @@ class _ResultOverallState extends State<ResultOverall> {
           'assets/logo-violet.png',
           fit: BoxFit.cover,
         ),
+        leading: IconButton(
+            onPressed: (() {
+              nextScreenPop(context);
+            }),
+            icon: const Icon(
+              Icons.arrow_back_ios,
+              color: Color(0xFF000000),
+            )),
         //TODO - disable back button
         //automaticallyImplyLeading: false,
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          //hello im chatbot
-          Visibility(
-            visible: hideHelloImChatbot,
-            replacement: const SizedBox.shrink(),
-            child: Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: Visibility(
-                    visible: helloImChatbotVisible,
-                    replacement:
-                        _chatBubble(text: 'Hello again $whatShouldICallYou'),
-                    child: Container(
-                      width: 100,
-                      height: 100,
-                      alignment: Alignment.bottomLeft,
-                      child: Lottie.asset(
-                        'assets/lottie/chat_typing.json',
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          //first chat
+          _visibleChat(
+              isVisibleChat: firstChatVisible,
+              wholeChatVisible: wholeFirstChatVisible,
+              text: 'Hello again $whatShouldICallYou.'),
           const SizedBox(height: 10),
-          //nice to meet you
-          Visibility(
-            visible: hideNiceToMeetYou,
-            replacement: const SizedBox.shrink(),
-            child: Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: Visibility(
-                    visible: niceToMeetYouVisible,
-                    replacement: _chatBubble(
-                        text: 'Nice to meet you $whatShouldICallYou 😊'),
-                    child: Container(
-                      width: 100,
-                      height: 100,
-                      alignment: Alignment.bottomLeft,
-                      child: Lottie.asset(
-                        'assets/lottie/chat_typing.json',
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          //second chat
+          _visibleChat(
+              isVisibleChat: secondChatVisible,
+              wholeChatVisible: wholeSecondChatVisible,
+              text: 'I studied your result to understand\nand help you more. '),
           const SizedBox(height: 10),
-          //before we proceed
-          Visibility(
-            visible: hideBeforeWeProceed,
-            replacement: const SizedBox.shrink(),
-            child: Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: Visibility(
-                    visible: beforeWeProceedVisible,
-                    replacement: _chatBubble(
-                      text: 'Before we proceed, I would like\n'
-                          'you to answer a 36 items\n'
-                          'questionnaire.',
-                    ),
-                    child: Container(
-                      width: 100,
-                      height: 100,
-                      alignment: Alignment.bottomLeft,
-                      child: Lottie.asset(
-                        'assets/lottie/chat_typing.json',
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          _visibleChat(
+              isVisibleChat: thirdChatVisible,
+              wholeChatVisible: wholeThirdChatVisible,
+              text: thirdDialog),
           const SizedBox(height: 10),
-          //are you going to take it
-          Visibility(
-            visible: hideAreYouGoingToTakeIt,
-            replacement: const SizedBox.shrink(),
-            child: Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: Visibility(
-                    visible: areYouGoingToTakeItVisible,
-                    replacement: _chatBubble(
-                      text: 'This questionnaire will help me\n'
-                          'know you more. Are you going\n'
-                          'to take it?',
-                    ),
-                    child: Container(
-                      width: 100,
-                      height: 100,
-                      alignment: Alignment.bottomLeft,
-                      child: Lottie.asset(
-                        'assets/lottie/chat_typing.json',
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          _visibleChat(
+              isVisibleChat: fourthChatVisible,
+              wholeChatVisible: wholeFourthChatVisible,
+              text: fourthDialog),
+          const SizedBox(height: 20),
           _lottieChatbot(
             context: context,
             isLottieChatbotVisible: isBotVisible,
             repeat: isRepeat,
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 15, right: 15, bottom: 23),
-            child: SizedBox(
-              height: 55,
-              child: Visibility(
-                visible: textFieldVisible,
-                replacement: Visibility(
-                  visible: nextButtonVisible,
-                  replacement: Visibility(
-                    //for are you to take it
-                    visible: nextButtonVisible2,
-                    replacement: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ElevatedButton(
-                          //yes button
-                          onPressed: () async {
-                            await DatabaseService(
-                                    uid: FirebaseAuth.instance.currentUser!.uid)
-                                .userDoneWithChatbot();
-                            if (!mounted) return;
-                            nextScreenReplace(
-                                context,
-                                const LoadingWidget(
-                                    thenMoveToThisWidget:
-                                        FromYesOrNo(yesOrNo: 'yes')));
-                          },
-                          style: ButtonStyle(
-                            fixedSize: MaterialStateProperty.all<Size>(
-                                const Size(100, 48)),
-                            foregroundColor:
-                                MaterialStateProperty.all<Color>(Colors.white),
-                            backgroundColor: MaterialStateProperty.all<Color>(
-                                phoneFieldButtonColor),
-                            shape: MaterialStateProperty.all<
-                                RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(7),
-                              ),
-                            ),
-                          ),
-                          child: const Text('Yes',
-                              style: TextStyle(
-                                  fontSize: 20, fontFamily: 'Sofia Pro')),
-                        ),
-                        const SizedBox(width: 30),
-                        ElevatedButton(
-                          //no button
-                          onPressed: () async {
-                            await DatabaseService(
-                                    uid: FirebaseAuth.instance.currentUser!.uid)
-                                .userDoneWithChatbot();
-                            if (!mounted) return;
-                            nextScreenReplace(
-                                context,
-                                const LoadingWidget(
-                                    thenMoveToThisWidget:
-                                        FromYesOrNo(yesOrNo: 'no')));
-                          },
-                          style: ButtonStyle(
-                            fixedSize: MaterialStateProperty.all<Size>(
-                                const Size(100, 48)),
-                            foregroundColor:
-                                MaterialStateProperty.all<Color>(Colors.white),
-                            backgroundColor: MaterialStateProperty.all<Color>(
-                                phoneFieldButtonColor),
-                            shape: MaterialStateProperty.all<
-                                RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(7),
-                              ),
-                            ),
-                          ),
-                          child: const Text('No',
-                              style: TextStyle(
-                                  fontSize: 20, fontFamily: 'Sofia Pro')),
-                        ),
-                      ],
-                    ),
-                    child: ElevatedButton(
-                      // next button for before we proceed
-                      onPressed: () {
-                        setState(() {
-                          nextButtonVisible2 = false; //hide the next button
-                          hideAreYouGoingToTakeIt = true;
-                          isRepeat = false;
-                        });
-                        Future.delayed(const Duration(milliseconds: 1500))
-                            .then((value) {
-                          setState(() {
-                            areYouGoingToTakeItVisible = false;
-                          });
-                        });
-                      },
-                      style: ButtonStyle(
-                        fixedSize: MaterialStateProperty.all<Size>(
-                            const Size(350, 48)),
-                        foregroundColor:
-                            MaterialStateProperty.all<Color>(Colors.white),
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                            phoneFieldButtonColor),
-                        shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(7),
-                          ),
-                        ),
-                      ),
-                      child: const Text('Next',
-                          style:
-                              TextStyle(fontSize: 20, fontFamily: 'Sofia Pro')),
-                    ),
-                  ),
-                  child: ElevatedButton(
-                    //next button for nice to meet you
-                    onPressed: () {
-                      setState(() {
-                        hideBeforeWeProceed = true; //show the before we proceed
-                        nextButtonVisible = false; //hide the next button
-                      });
-                      Future.delayed(const Duration(milliseconds: 1500))
-                          .then((value) {
-                        setState(() {
-                          beforeWeProceedVisible = false;
-                        });
-                      });
-                    },
-                    style: ButtonStyle(
-                      fixedSize:
-                          MaterialStateProperty.all<Size>(const Size(350, 48)),
-                      foregroundColor:
-                          MaterialStateProperty.all<Color>(Colors.white),
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                          phoneFieldButtonColor),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(7),
-                        ),
-                      ),
-                    ),
-                    child: const Text('Next',
-                        style:
-                            TextStyle(fontSize: 20, fontFamily: 'Sofia Pro')),
-                  ),
-                ),
-                child: TextField(
-                  controller: _chatController,
-                  decoration: InputDecoration(
-                    hintText: 'You can call me...',
-                    hintStyle: const TextStyle(
-                      fontFamily: 'Sofia Pro',
-                      fontSize: 16,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(
-                          color: Color(0xFF1D3557), width: 1.8),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    focusedBorder: const OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Color(0xFF1D3557), width: 1.8),
-                        borderRadius: BorderRadius.all(Radius.circular(10))),
-                    suffixIcon: GestureDetector(
-                      onTap: () {
-                        FocusScope.of(context).unfocus();
-                        _onChatSend();
-                      },
-                      child: const Icon(
-                        Icons.send,
-                        color: primaryColor,
-                      ),
+          Visibility(
+            visible: isHighPriority,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 15, right: 15, bottom: 23),
+              child: ElevatedButton(
+                onPressed: () {},
+                style: ButtonStyle(
+                  fixedSize:
+                      MaterialStateProperty.all<Size>(const Size(350, 48)),
+                  foregroundColor:
+                      MaterialStateProperty.all<Color>(Colors.white),
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(phoneFieldButtonColor),
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(7),
                     ),
                   ),
                 ),
+                child: const Text('Next',
+                    style: TextStyle(fontSize: 20, fontFamily: 'Sofia Pro')),
               ),
             ),
           ),
+          Visibility(
+              child: SizedBox(
+                height: 80,
+              ),
+              visible: isHighPriority),
         ],
       ),
     );
   }
 
-  void _onChatSend() {
-    String? fromChatController =
-        toBeginningOfSentenceCase(_chatController.text.trim());
-    if (_chatController.text.isNotEmpty) {
-      setState(() {
-        //userCallName = fromChatController!; //to show the name of the user
-        isRepeat = true; //repeat the animation of the chatbot
-        textFieldVisible = false; //hide textfield and show the [Next] button
-        hideHelloImChatbot = false; //false coz the default value of is true
-        hideNiceToMeetYou = true; //show the nice to meet you
-      });
-      Future.delayed(const Duration(milliseconds: 1500)).then((value) {
-        setState(() {
-          niceToMeetYouVisible = false;
-        });
-      });
-    }
+  _showBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      barrierColor: Colors.transparent,
+      isDismissible: false,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+      ),
+      builder: (context) => DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 0.2,
+        maxChildSize: 0.9,
+        minChildSize: 0.1,
+        builder: (context, scrollController) => SingleChildScrollView(
+          child: _bottomSheetUI(),
+        ),
+      ),
+    );
+  }
+
+  Widget _bottomSheetUI() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextButton(
+              onPressed: (() {}),
+              child: const Text(
+                'Articles',
+                style: TextStyle(
+                  color: Color(0xFF000000),
+                  fontSize: 15,
+                  fontFamily: 'Sofia Pro',
+                  fontWeight: FontWeight.w500,
+                ),
+              )),
+          TextButton(
+              onPressed: (() {}),
+              child: const Text(
+                'Videos',
+                style: TextStyle(
+                  color: Color(0xFF000000),
+                  fontSize: 15,
+                  fontFamily: 'Sofia Pro',
+                  fontWeight: FontWeight.w500,
+                ),
+              )),
+        ],
+      ),
+    );
+  }
+
+  Widget _visibleChat(
+      {required bool isVisibleChat,
+      required bool wholeChatVisible,
+      required String text}) {
+    return Visibility(
+      visible: wholeChatVisible,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        child: Row(
+          children: [
+            Visibility(
+              visible: isVisibleChat,
+              replacement: _chatBubble(text: text),
+              child: Container(
+                width: 100,
+                height: 100,
+                alignment: Alignment.bottomLeft,
+                child: Lottie.asset(
+                  'assets/lottie/chat_typing.json',
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _lottieChatbot(

@@ -29,6 +29,7 @@ class DatabaseService {
       'isUserSingedInUsingEmailOnly': true,
       'isUserDoneWithChatbot': false,
       'isUserDoneWithQuestionnaire': false,
+      'whatShouldICallYou': '',
       //TODO: i dont know
       // 'isUserDoneAreYouGonnaTakeItYesOrNo': false,
     });
@@ -144,6 +145,7 @@ class DatabaseService {
     }
   }
 
+  //get highest result of categories
   Future<Map<String, dynamic>?> getHighestResult() async {
     final DocumentSnapshot snapshot = await userCollection
         .doc(uid)
@@ -169,8 +171,29 @@ class DatabaseService {
     }
   }
 
+  //get Grand Mean/Overall Score
+  Future getOverallScore() async {
+    final DocumentSnapshot snapshot = await userCollection
+        .doc(uid)
+        .collection('questionnaireResult')
+        .doc(uid)
+        .get();
+    if (snapshot.exists) {
+      return snapshot['grandMean'];
+    } else {
+      return null;
+    }
+  }
+
+  //add what should i call you
+  Future userWhatShouldICallYou(String whatShouldICallYou) async {
+    return await userCollection.doc(uid).update({
+      'whatShouldICallYou': whatShouldICallYou,
+    });
+  }
+
   //get what should i call you
-  Future whatShouldICallYou() async {
+  Future getUserWhatShouldICallYou() async {
     DocumentReference d = userCollection.doc(uid);
     DocumentSnapshot documentSnapshot = await d.get();
     if (documentSnapshot.exists) {

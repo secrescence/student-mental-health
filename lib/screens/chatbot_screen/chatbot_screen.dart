@@ -373,7 +373,7 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
     );
   }
 
-  void _onChatSend() {
+  void _onChatSend() async {
     String? fromChatController =
         toBeginningOfSentenceCase(_chatController.text.trim());
     if (_chatController.text.isNotEmpty) {
@@ -389,6 +389,8 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
           niceToMeetYouVisible = false;
         });
       });
+      await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
+          .userWhatShouldICallYou(fromChatController!);
     }
   }
 
