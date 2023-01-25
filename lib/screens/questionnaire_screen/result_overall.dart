@@ -1,13 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:student_mental_health/screens/questionnaire_screen/from_yes_or_no.dart';
 import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart' show toBeginningOfSentenceCase;
-import 'package:student_mental_health/widgets/utils/loading.dart';
-import 'package:student_mental_health/widgets/widgets/bottom_sheet_widget.dart';
 import 'package:student_mental_health/widgets/widgets/widgets.dart';
 
 class ResultOverall extends StatefulWidget {
@@ -218,10 +215,10 @@ class _ResultOverallState extends State<ResultOverall> {
             ),
           ),
           Visibility(
-              child: SizedBox(
+              visible: isHighPriority,
+              child: const SizedBox(
                 height: 80,
-              ),
-              visible: isHighPriority),
+              )),
         ],
       ),
     );

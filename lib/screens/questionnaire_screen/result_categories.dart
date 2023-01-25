@@ -1,10 +1,7 @@
 import 'package:expandable/expandable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:student_mental_health/screens/auth/onboarding.dart';
 import 'package:student_mental_health/screens/questionnaire_screen/result_overall.dart';
-import 'package:student_mental_health/screens/welcome_screen/your_privacy_matters.dart';
-import 'package:student_mental_health/service/auth_service.dart';
 import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 import 'package:student_mental_health/widgets/widgets/custom_button.dart';

@@ -30,8 +30,6 @@ class DatabaseService {
       'isUserDoneWithChatbot': false,
       'isUserDoneWithQuestionnaire': false,
       'whatShouldICallYou': '',
-      //TODO: i dont know
-      // 'isUserDoneAreYouGonnaTakeItYesOrNo': false,
     });
   }
 

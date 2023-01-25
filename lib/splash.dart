@@ -1,9 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:student_mental_health/screens/auth/signin.dart';
 import 'package:student_mental_health/screens/auth/signup_phone.dart';
-import 'package:student_mental_health/screens/auth/signup_user_info.dart';
 import 'package:student_mental_health/screens/questionnaire_screen/need_to_take_quest_to_proceed.dart';
 import 'package:student_mental_health/screens/questionnaire_screen/result_categories.dart';
 import 'package:student_mental_health/screens/welcome_screen/welcome.dart';
