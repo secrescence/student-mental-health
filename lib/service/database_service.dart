@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DatabaseService {
@@ -29,6 +31,7 @@ class DatabaseService {
       'isUserSingedInUsingEmailOnly': true,
       'isUserDoneWithChatbot': false,
       'isUserDoneWithQuestionnaire': false,
+      'isUserDoneWithResults': false,
       'whatShouldICallYou': '',
     });
   }
@@ -72,15 +75,15 @@ class DatabaseService {
     });
   }
 
-  Future userDoneAreYouGonnaTakeItYesOrNo() async {
-    return await userCollection.doc(uid).update({
-      'isUserDoneAreYouGonnaTakeItYesOrNo': true,
-    });
-  }
-
   Future userDoneWithQuestionnaire() async {
     return await userCollection.doc(uid).update({
       'isUserDoneWithQuestionnaire': true,
+    });
+  }
+
+  Future userDoneWithResults() async {
+    return await userCollection.doc(uid).update({
+      'isUserDoneWithResults': true,
     });
   }
 
@@ -102,11 +105,11 @@ class DatabaseService {
     return documentSnapshot['isUserDoneWithQuestionnaire'];
   }
 
-  // Future getUserDoneAreYouGonnaTakeItYesOrNo() async {
-  //   DocumentReference d = userCollection.doc(uid);
-  //   DocumentSnapshot documentSnapshot = await d.get();
-  //   return documentSnapshot['isUserDoneAreYouGonnaTakeItYesOrNo'];
-  // }
+  Future getUserDoneWithResults() async {
+    DocumentReference d = userCollection.doc(uid);
+    DocumentSnapshot documentSnapshot = await d.get();
+    return documentSnapshot['isUserDoneWithResults'];
+  }
 
   //questionnaire result
   Future questionnaireResult(
@@ -199,6 +202,45 @@ class DatabaseService {
     } else {
       return null;
     }
+  }
+
+  //add appointment schedule
+  Future addSchedule(
+      Map<String, dynamic> schedule, int incrementForDateOfAppointment) async {
+    var now = DateTime.now();
+    var documentId =
+        "${now.month}-${now.day}-${now.year}-$incrementForDateOfAppointment";
+    await FirebaseFirestore.instance
+        .collection("counseling")
+        .doc(documentId)
+        .set(schedule);
+  }
+
+  //get appointment schedule
+  Future getSchedulesOfDateNow() async {
+    List<String> documentIds = [];
+    await FirebaseFirestore.instance
+        .collection("counseling")
+        .get()
+        .then((QuerySnapshot snapshot) {
+      documentIds = snapshot.docs.map((doc) => doc.id).toList();
+    });
+    List<String> filteredIds = documentIds
+        .where((element) => element.startsWith(
+            "${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year}"))
+        .toList();
+    return filteredIds;
+  }
+
+  Future getAllSchedules() async {
+    List<String> documentIds = [];
+    await FirebaseFirestore.instance
+        .collection("counseling")
+        .get()
+        .then((QuerySnapshot snapshot) {
+      documentIds = snapshot.docs.map((doc) => doc.id).toList();
+    });
+    return documentIds;
   }
 
 // used to display chats of both chatbot and user

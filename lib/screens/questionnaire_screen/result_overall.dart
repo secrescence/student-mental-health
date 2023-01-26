@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:student_mental_health/screens/appointment_screen/appointment.dart';
 import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 // ignore: depend_on_referenced_packages
@@ -57,7 +59,9 @@ class _ResultOverallState extends State<ResultOverall> {
 
   //is high mid/low priority
   bool isHighPriority = false;
+  bool showHighPriority = false;
   bool isLowAndMidPriority = false;
+  bool showLowAndMidPriority = false;
 
   @override
   void dispose() {
@@ -100,7 +104,16 @@ class _ResultOverallState extends State<ResultOverall> {
             setState(() {
               fourthChatVisible = false;
             });
-            _showBottomSheet(context);
+            if (isLowAndMidPriority) {
+              setState(() {
+                showLowAndMidPriority = true;
+              });
+              _showBottomSheet(context);
+            } else if (isHighPriority) {
+              setState(() {
+                showHighPriority = true;
+              });
+            }
           });
         });
       });
@@ -149,14 +162,6 @@ class _ResultOverallState extends State<ResultOverall> {
           'assets/logo-violet.png',
           fit: BoxFit.cover,
         ),
-        leading: IconButton(
-            onPressed: (() {
-              nextScreenPop(context);
-            }),
-            icon: const Icon(
-              Icons.arrow_back_ios,
-              color: Color(0xFF000000),
-            )),
         //TODO - disable back button
         //automaticallyImplyLeading: false,
       ),
@@ -184,18 +189,26 @@ class _ResultOverallState extends State<ResultOverall> {
               isVisibleChat: fourthChatVisible,
               wholeChatVisible: wholeFourthChatVisible,
               text: fourthDialog),
-          const SizedBox(height: 20),
           _lottieChatbot(
             context: context,
             isLottieChatbotVisible: isBotVisible,
             repeat: isRepeat,
           ),
+          //next button
           Visibility(
-            visible: isHighPriority,
+            visible: showHighPriority,
             child: Padding(
               padding: const EdgeInsets.only(left: 15, right: 15, bottom: 23),
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  setState(() {
+                    showLowAndMidPriority = true;
+                    showHighPriority = false;
+                  });
+                  _showBottomSheet(context);
+                  nextScreen(context, const Appointment());
+                  _showBottomSheet(context);
+                },
                 style: ButtonStyle(
                   fixedSize:
                       MaterialStateProperty.all<Size>(const Size(350, 48)),
@@ -215,9 +228,9 @@ class _ResultOverallState extends State<ResultOverall> {
             ),
           ),
           Visibility(
-              visible: isHighPriority,
+              visible: showLowAndMidPriority,
               child: const SizedBox(
-                height: 80,
+                height: 145,
               )),
         ],
       ),
@@ -230,13 +243,14 @@ class _ResultOverallState extends State<ResultOverall> {
       barrierColor: Colors.transparent,
       isDismissible: false,
       isScrollControlled: true,
+      backgroundColor: Colors.grey[200],
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
       ),
       builder: (context) => DraggableScrollableSheet(
         expand: false,
         initialChildSize: 0.2,
-        maxChildSize: 0.9,
+        maxChildSize: 0.2,
         minChildSize: 0.1,
         builder: (context, scrollController) => SingleChildScrollView(
           child: _bottomSheetUI(),
@@ -246,35 +260,116 @@ class _ResultOverallState extends State<ResultOverall> {
   }
 
   Widget _bottomSheetUI() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          TextButton(
-              onPressed: (() {}),
-              child: const Text(
-                'Articles',
-                style: TextStyle(
-                  color: Color(0xFF000000),
-                  fontSize: 15,
-                  fontFamily: 'Sofia Pro',
-                  fontWeight: FontWeight.w500,
+    return Stack(
+      alignment: AlignmentDirectional.topCenter,
+      clipBehavior: Clip.none,
+      children: [
+        Positioned(
+            top: 15,
+            child: Container(
+              height: 7,
+              width: 70,
+              decoration: BoxDecoration(
+                color: Colors.grey[400],
+                borderRadius: BorderRadius.circular(20),
+              ),
+            )),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 35),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  print('Articles');
+                },
+                child: const SizedBox(
+                  width: double.infinity,
+                  child: Text(
+                    'Articles',
+                    style: TextStyle(
+                        color: Colors.black54,
+                        fontSize: 17,
+                        fontFamily: 'Sofia Pro'),
+                  ),
                 ),
-              )),
-          TextButton(
-              onPressed: (() {}),
-              child: const Text(
-                'Videos',
-                style: TextStyle(
-                  color: Color(0xFF000000),
-                  fontSize: 15,
-                  fontFamily: 'Sofia Pro',
-                  fontWeight: FontWeight.w500,
+              ),
+              const SizedBox(height: 12),
+              GestureDetector(
+                onTap: () {
+                  print('Videos');
+                },
+                child: const SizedBox(
+                  width: double.infinity,
+                  child: Text(
+                    'Videos',
+                    style: TextStyle(
+                        color: Colors.black54,
+                        fontSize: 17,
+                        fontFamily: 'Sofia Pro'),
+                  ),
                 ),
-              )),
-        ],
-      ),
+              ),
+              const SizedBox(height: 12),
+              GestureDetector(
+                onTap: () {
+                  nextScreen(context, const Appointment());
+                },
+                child: const SizedBox(
+                  width: double.infinity,
+                  child: Text('Appointment',
+                      style: TextStyle(
+                          color: Colors.black54,
+                          fontSize: 17,
+                          fontFamily: 'Sofia Pro')),
+                ),
+              ),
+              const SizedBox(height: 12),
+              GestureDetector(
+                onTap: () {
+                  print('Journal');
+                },
+                child: const SizedBox(
+                  width: double.infinity,
+                  child: Text('Journal',
+                      style: TextStyle(
+                          color: Colors.black54,
+                          fontSize: 17,
+                          fontFamily: 'Sofia Pro')),
+                ),
+              ),
+              const SizedBox(height: 12),
+              GestureDetector(
+                onTap: () {
+                  print('Mood Tracker');
+                },
+                child: const SizedBox(
+                  width: double.infinity,
+                  child: Text('Mood Tracker',
+                      style: TextStyle(
+                          color: Colors.black54,
+                          fontSize: 17,
+                          fontFamily: 'Sofia Pro')),
+                ),
+              ),
+              const SizedBox(height: 12),
+              GestureDetector(
+                onTap: () {
+                  print('Questionnaire');
+                },
+                child: const SizedBox(
+                  width: double.infinity,
+                  child: Text('Questionnaire',
+                      style: TextStyle(
+                          color: Colors.black54,
+                          fontSize: 17,
+                          fontFamily: 'Sofia Pro')),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 

@@ -284,7 +284,11 @@ class _ResultCategoriesState extends State<ResultCategories> {
               const SizedBox(height: 50),
               CustomButton(
                 text: 'Next',
-                onPressed: () {
+                onPressed: () async {
+                  await DatabaseService(
+                          uid: FirebaseAuth.instance.currentUser?.uid)
+                      .userDoneWithResults();
+                  if (!mounted) return;
                   nextScreen(context, const ResultOverall());
                 },
                 color: phoneFieldButtonColor,

@@ -49,6 +49,7 @@ dependencies:
   syncfusion_flutter_charts: ^20.4.44
   expandable: ^5.0.1
 
+
 dev_dependencies:
   flutter_lints: ^2.0.0
   flutter_test:
