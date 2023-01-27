@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 import 'package:student_mental_health/widgets/widgets/widgets.dart';
@@ -12,17 +13,35 @@ class Appointment extends StatefulWidget {
 
 class _AppointmentState extends State<Appointment> {
   Map<String, dynamic> schedule = {
-    "date": "12-23-20",
-    "time": "14:00",
-    "availability": true,
+    "date": "8-23-20",
+    "time": "1:00",
+    "availability": false,
   };
-
   int incrementForDateOfAppointment = 1;
+  List<Map<String, dynamic>> listOfSchedule = [];
+  bool scheduleIsNotEmpty = true;
 
   @override
   void initState() {
-    // TODO: implement initState
+    getListOfSchedule();
     super.initState();
+  }
+
+  getListOfSchedule() async {
+    await DatabaseService().getSchedulesOfDateNow().then((value) {
+      print(value);
+      if (value == null) {
+        setState(() {
+          listOfSchedule = value;
+        });
+        print('schedule is not empty');
+      } else {
+        setState(() {
+          scheduleIsNotEmpty = false;
+        });
+        print('schedule is empty');
+      }
+    });
   }
 
   @override
@@ -71,11 +90,101 @@ class _AppointmentState extends State<Appointment> {
             height: 400,
             margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
             child: Card(
-              elevation: 3,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
+                elevation: 3,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 15, vertical: 15),
+                      alignment: Alignment.topLeft,
+                      child: const Text('Schedule',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'Sofia Pro',
+                            fontWeight: FontWeight.w500,
+                          )),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 40),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: const [
+                          Text('Date',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontFamily: 'Sofia Pro',
+                                fontWeight: FontWeight.w400,
+                              )),
+                          Spacer(),
+                          Text('Time',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontFamily: 'Sofia Pro',
+                                fontWeight: FontWeight.w400,
+                              )),
+                          Spacer(),
+                          Text('Availability',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontFamily: 'Sofia Pro',
+                                fontWeight: FontWeight.w400,
+                              )),
+                        ],
+                      ),
+                    ),
+                    Visibility(
+                      visible: scheduleIsNotEmpty,
+                      replacement: Container(
+                        height: 300,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 30, vertical: 10),
+                        child: const Center(
+                          child: Text(
+                            'No schedule available',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontFamily: 'Sofia Pro',
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ),
+                      ),
+                      child: SizedBox(
+                        height: 300,
+                        child: ListView.builder(
+                            itemCount: listOfSchedule.length,
+                            itemBuilder: (context, index) {
+                              return Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 30, vertical: 10),
+                                    child: Row(
+                                      children: [
+                                        Text(listOfSchedule[index]["date"]),
+                                        const SizedBox(width: 55),
+                                        Text(listOfSchedule[index]["time"]),
+                                        listOfSchedule[index]['availability']
+                                            ? const SizedBox(width: 65)
+                                            : const SizedBox(width: 85),
+                                        Text(listOfSchedule[index]
+                                                ["availability"]
+                                            ? "Available"
+                                            : "Full"),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }),
+                      ),
+                    ),
+                  ],
+                )),
           ),
           const SizedBox(height: 40),
           Padding(
@@ -86,7 +195,7 @@ class _AppointmentState extends State<Appointment> {
                 ElevatedButton(
                   onPressed: () async {
                     await DatabaseService()
-                        .getSchedulesOfDateNow()
+                        .getUidScheduleOfDateNow()
                         .then((value) async {
                       if (!value.toString().contains(
                           "${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year}")) {
@@ -101,8 +210,12 @@ class _AppointmentState extends State<Appointment> {
                         });
                         await DatabaseService().addSchedule(
                             schedule, incrementForDateOfAppointment);
+                        print('w');
                       }
                     });
+                    // await DatabaseService()
+                    //     .getAllSchedules()
+                    //     .then((value) => print(value));
                   },
                   style: ButtonStyle(
                     fixedSize:

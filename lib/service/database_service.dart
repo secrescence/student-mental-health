@@ -217,7 +217,7 @@ class DatabaseService {
   }
 
   //get appointment schedule
-  Future getSchedulesOfDateNow() async {
+  Future getUidScheduleOfDateNow() async {
     List<String> documentIds = [];
     await FirebaseFirestore.instance
         .collection("counseling")
@@ -230,6 +230,32 @@ class DatabaseService {
             "${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year}"))
         .toList();
     return filteredIds;
+  }
+
+  Future getSchedulesOfDateNow() async {
+    List<String> documentIds = [];
+    await FirebaseFirestore.instance
+        .collection("counseling")
+        .get()
+        .then((QuerySnapshot snapshot) {
+      documentIds = snapshot.docs.map((doc) => doc.id).toList();
+    });
+    List<String> filteredIds = documentIds
+        .where((element) => element.startsWith(
+            "${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year}"))
+        .toList();
+
+    List<Map<String, dynamic>> schedules = [];
+    for (var i = 0; i < filteredIds.length; i++) {
+      await FirebaseFirestore.instance
+          .collection("counseling")
+          .doc(filteredIds[i])
+          .get()
+          .then((DocumentSnapshot snapshot) {
+        schedules.add(snapshot.data() as Map<String, dynamic>);
+      });
+    }
+    return schedules;
   }
 
   Future getAllSchedules() async {

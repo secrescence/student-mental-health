@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:student_mental_health/admin_splash.dart';
 import 'package:student_mental_health/splash.dart';
 
 void main() async {
@@ -22,7 +23,7 @@ void main() async {
     await Firebase.initializeApp();
   }
 
-  runApp(const MyApp());
+  runApp(kIsWeb ? const AdminApp() : const MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -39,6 +40,24 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(scaffoldBackgroundColor: Colors.white),
       debugShowCheckedModeBanner: false,
       home: const Splash(),
+    );
+  }
+}
+
+class AdminApp extends StatefulWidget {
+  const AdminApp({super.key});
+
+  @override
+  State<AdminApp> createState() => _AdminAppState();
+}
+
+class _AdminAppState extends State<AdminApp> {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      theme: ThemeData(scaffoldBackgroundColor: Colors.white),
+      debugShowCheckedModeBanner: false,
+      home: const AdminSplash(),
     );
   }
 }
