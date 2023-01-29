@@ -84,16 +84,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
             ),
           ),
           Expanded(
-            child: Container(
-              color: Colors.green[500],
-              child: IndexedStack(
-                index: _currentIndex,
-                children: const [
-                  Dashboard(),
-                  Schedule(),
-                  Notes(),
-                ],
-              ),
+            child: IndexedStack(
+              index: _currentIndex,
+              children: const [
+                Dashboard(),
+                Schedule(),
+                Notes(),
+              ],
             ),
           ),
         ],

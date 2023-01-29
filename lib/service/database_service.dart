@@ -206,14 +206,15 @@ class DatabaseService {
 
   //add appointment schedule
   Future addSchedule(
-      Map<String, dynamic> schedule, int incrementForDateOfAppointment) async {
-    var now = DateTime.now();
-    var documentId =
-        "${now.month}-${now.day}-${now.year}-$incrementForDateOfAppointment";
+      String date, String time, int incrementForDateOfAppointment) async {
+    String documentId = "$date-$incrementForDateOfAppointment";
     await FirebaseFirestore.instance
-        .collection("counseling")
+        .collection("schedules")
         .doc(documentId)
-        .set(schedule);
+        .set({
+      'date': date,
+      'time': time,
+    });
   }
 
   //get appointment schedule

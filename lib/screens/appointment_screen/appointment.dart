@@ -194,25 +194,25 @@ class _AppointmentState extends State<Appointment> {
               children: [
                 ElevatedButton(
                   onPressed: () async {
-                    await DatabaseService()
-                        .getUidScheduleOfDateNow()
-                        .then((value) async {
-                      if (!value.toString().contains(
-                          "${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year}")) {
-                        setState(() {
-                          incrementForDateOfAppointment = 1;
-                        });
-                        await DatabaseService().addSchedule(
-                            schedule, incrementForDateOfAppointment);
-                      } else {
-                        setState(() {
-                          incrementForDateOfAppointment++;
-                        });
-                        await DatabaseService().addSchedule(
-                            schedule, incrementForDateOfAppointment);
-                        print('w');
-                      }
-                    });
+                    // await DatabaseService()
+                    //     .getUidScheduleOfDateNow()
+                    //     .then((value) async {
+                    //   if (!value.toString().contains(
+                    //       "${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year}")) {
+                    //     setState(() {
+                    //       incrementForDateOfAppointment = 1;
+                    //     });
+                    //     await DatabaseService().addSchedule(
+                    //         schedule, incrementForDateOfAppointment);
+                    //   } else {
+                    //     setState(() {
+                    //       incrementForDateOfAppointment++;
+                    //     });
+                    //     await DatabaseService().addSchedule(
+                    //         schedule, incrementForDateOfAppointment);
+                    //     print('w');
+                    //   }
+                    // });
                     // await DatabaseService()
                     //     .getAllSchedules()
                     //     .then((value) => print(value));
