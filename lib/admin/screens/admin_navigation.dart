@@ -20,7 +20,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       body: Row(
         children: [
           Container(
-            width: 250,
+            width: 380,
             color: Colors.white,
             child: Column(
               children: [
@@ -39,6 +39,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 ),
                 const SizedBox(height: 20),
                 Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   color: _currentIndex == 0 ? adminListTileSelectedColor : null,
                   child: ListTile(
                     leading: const Icon(Icons.dashboard),
@@ -53,6 +54,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   ),
                 ),
                 Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   color: _currentIndex == 1 ? adminListTileSelectedColor : null,
                   child: ListTile(
                     leading: const Icon(Icons.schedule),
@@ -67,6 +69,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   ),
                 ),
                 Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   color: _currentIndex == 2 ? adminListTileSelectedColor : null,
                   child: ListTile(
                     leading: const Icon(Icons.note),

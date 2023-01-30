@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:student_mental_health/admin/screens/admin_navigation.dart';
 import 'package:student_mental_health/helper/helper_function.dart';
 import 'package:student_mental_health/screens/auth/otp_screen.dart';
 import 'package:student_mental_health/screens/auth/auth_loading.dart';
@@ -117,6 +118,34 @@ class AuthService {
           errorSnackbar(
               context, 'Oops!', 'Please enter the correct Student ID');
         }
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found' || e.code == 'wrong-password') {
+        errorSnackbar(
+            context, 'Oh Snap!', 'Wrong email or password. Please try again');
+      } else {
+        errorSnackbar(context, 'Oh Snap!', e.message!);
+      }
+    }
+  }
+
+  // admin sign in
+  Future adminSignIn(
+      {required String email,
+      required String password,
+      required BuildContext context,
+      bool mounted = true}) async {
+    try {
+      const String adminEmail = 'admin@mail.com';
+      if (adminEmail == email) {
+        await firebaseAuth.signInWithEmailAndPassword(
+            email: email, password: password);
+        if (!mounted) return;
+        nextScreen(context,
+            const LoadingWidget(thenMoveToThisWidget: AdminDashboard()));
+      } else {
+        errorSnackbar(
+            context, 'Oops!', 'Wrong email or password. Please try again');
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found' || e.code == 'wrong-password') {

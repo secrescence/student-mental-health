@@ -29,17 +29,14 @@ class _AppointmentState extends State<Appointment> {
 
   getListOfSchedule() async {
     await DatabaseService().getSchedulesOfDateNow().then((value) {
-      print(value);
       if (value == null) {
         setState(() {
           listOfSchedule = value;
         });
-        print('schedule is not empty');
       } else {
         setState(() {
           scheduleIsNotEmpty = false;
         });
-        print('schedule is empty');
       }
     });
   }

@@ -218,7 +218,7 @@ class DatabaseService {
   }
 
   //get appointment schedule
-  Future getUidScheduleOfDateNow() async {
+  Future getUidScheduleOfDateNow(String date, int increment) async {
     List<String> documentIds = [];
     await FirebaseFirestore.instance
         .collection("counseling")
@@ -227,8 +227,7 @@ class DatabaseService {
       documentIds = snapshot.docs.map((doc) => doc.id).toList();
     });
     List<String> filteredIds = documentIds
-        .where((element) => element.startsWith(
-            "${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year}"))
+        .where((element) => element.startsWith('$date-$increment'))
         .toList();
     return filteredIds;
   }

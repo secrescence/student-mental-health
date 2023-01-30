@@ -14,7 +14,7 @@ class AdminSplash extends StatefulWidget {
 class _AdminSplashState extends State<AdminSplash> {
   @override
   void initState() {
-    Future.delayed(const Duration(milliseconds: 2300))
+    Future.delayed(const Duration(milliseconds: 2000))
         .then((value) => nextScreen(context, const AdminSignIn()));
     super.initState();
   }

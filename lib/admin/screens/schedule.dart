@@ -31,6 +31,26 @@ class _ScheduleState extends State<Schedule> {
     super.dispose();
   }
 
+  //   @override
+  // void initState() {
+  //   getListOfSchedule();
+  //   super.initState();
+  // }
+
+  // getListOfSchedule() async {
+  //   await DatabaseService().getSchedulesOfDateNow().then((value) {
+  //     if (value == null) {
+  //       setState(() {
+  //         listOfSchedule = value;
+  //       });
+  //     } else {
+  //       setState(() {
+  //         scheduleIsNotEmpty = false;
+  //       });
+  //     }
+  //   });
+  // }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -109,7 +129,7 @@ class _ScheduleState extends State<Schedule> {
               child: Column(
                 children: [
                   SizedBox(
-                    height: 500,
+                    height: 700,
                     child: Card(
                       child: Column(
                         children: [
@@ -185,6 +205,7 @@ class _ScheduleState extends State<Schedule> {
   void _addScheduleForm() {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text(
@@ -199,8 +220,8 @@ class _ScheduleState extends State<Schedule> {
           content: Form(
             key: _formKey,
             child: SizedBox(
-              height: 180,
-              width: 250,
+              height: 400,
+              width: 700,
               child: Column(
                 children: <Widget>[
                   Row(
@@ -214,10 +235,31 @@ class _ScheduleState extends State<Schedule> {
                           width: 150,
                           child: TextFormField(
                             decoration: textInputDeco.copyWith(
-                                suffixIcon: const Icon(Icons.date_range)),
+                              suffixIcon: const Padding(
+                                padding: EdgeInsets.only(
+                                    top: 0, right: 7, bottom: 0, left: 7),
+                                child: Icon(Icons.date_range),
+                              ),
+                              errorMaxLines: 1,
+                              errorStyle: const TextStyle(
+                                  height: 0,
+                                  color: Colors.transparent,
+                                  fontSize: 0),
+                              contentPadding: const EdgeInsets.all(0),
+                              suffixIconConstraints:
+                                  const BoxConstraints(maxHeight: 35),
+                            ),
                             controller: dateController,
                             readOnly: true,
                             onTap: () => _selectDate(context),
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return '';
+                              }
+                              return null;
+                            },
                           ),
                         ),
                       ),
@@ -233,39 +275,92 @@ class _ScheduleState extends State<Schedule> {
                         height: 50,
                         width: 150,
                         child: TextFormField(
-                            decoration: textInputDeco.copyWith(
-                                suffixIcon: const Icon(Icons.more_time)),
-                            controller: timeController,
-                            readOnly: true,
-                            onTap: () {
-                              _selectTime(context);
-                            }),
+                          decoration: textInputDeco.copyWith(
+                            suffixIcon: const Padding(
+                              padding: EdgeInsets.only(
+                                  top: 0, right: 7, bottom: 0, left: 7),
+                              child: Icon(Icons.more_time),
+                            ),
+                            errorMaxLines: 1,
+                            errorStyle: const TextStyle(
+                                height: 0,
+                                color: Colors.transparent,
+                                fontSize: 0),
+                            contentPadding: const EdgeInsets.all(0),
+                            suffixIconConstraints:
+                                const BoxConstraints(maxHeight: 35),
+                          ),
+                          controller: timeController,
+                          readOnly: true,
+                          onTap: () {
+                            _selectTime(context);
+                          },
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return '';
+                            }
+                            return null;
+                          },
+                        ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 30),
-                  Container(
-                      alignment: Alignment.bottomRight,
-                      child: ElevatedButton(
-                        onPressed: () => _submitButton(),
-                        style: ButtonStyle(
-                          fixedSize: MaterialStateProperty.all<Size>(
-                              const Size(100, 35)),
-                          foregroundColor:
-                              MaterialStateProperty.all<Color>(Colors.white),
-                          backgroundColor: MaterialStateProperty.all<Color>(
-                              phoneFieldButtonColor),
-                          shape:
-                              MaterialStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(7),
+                  Row(
+                    children: [
+                      const SizedBox(width: 15),
+                      Container(
+                          alignment: Alignment.center,
+                          child: ElevatedButton(
+                            onPressed: () => _submitButton(),
+                            style: ButtonStyle(
+                              fixedSize: MaterialStateProperty.all<Size>(
+                                  const Size(100, 35)),
+                              foregroundColor: MaterialStateProperty.all<Color>(
+                                  Colors.white),
+                              backgroundColor: MaterialStateProperty.all<Color>(
+                                  primaryColor),
+                              shape: MaterialStateProperty.all<
+                                  RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(7),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                        child: const Text('Submit',
-                            style: TextStyle(
-                                fontSize: 14, fontFamily: 'Sofia Pro')),
-                      ))
+                            child: const Text('Submit',
+                                style: TextStyle(
+                                    fontSize: 14, fontFamily: 'Sofia Pro')),
+                          )),
+                      const SizedBox(width: 20),
+                      Container(
+                          alignment: Alignment.center,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              nextScreenPop(context);
+                              dateController.clear();
+                              timeController.clear();
+                            },
+                            style: ButtonStyle(
+                              fixedSize: MaterialStateProperty.all<Size>(
+                                  const Size(100, 35)),
+                              foregroundColor: MaterialStateProperty.all<Color>(
+                                  primaryColor),
+                              backgroundColor: MaterialStateProperty.all<Color>(
+                                  Colors.white),
+                              shape: MaterialStateProperty.all<
+                                  RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(7),
+                                ),
+                              ),
+                            ),
+                            child: const Text('Cancel',
+                                style: TextStyle(
+                                    fontSize: 14, fontFamily: 'Sofia Pro')),
+                          )),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -275,15 +370,36 @@ class _ScheduleState extends State<Schedule> {
     );
   }
 
-  _submitButton() {
+  _submitButton() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         incrementForDateOfAppointment++;
       });
-      DatabaseService().addSchedule(dateController.text, timeController.text,
-          incrementForDateOfAppointment);
-    } else {
-      errorSnackbar(context, 'Oops', 'Date and Time cannot be empty');
+
+      //  await DatabaseService()
+      //                     .getUidScheduleOfDateNow(dateController.text.trim(),incrementForDateOfAppointment)
+      //                     .then((value) async {
+      //                   if (value == null || value.isEmpty) {
+      //                     setState(() {
+      //                       incrementForDateOfAppointment = 1;
+      //                     });
+      //                     await DatabaseService().addSchedule(dateController.text,
+      //       timeController.text, incrementForDateOfAppointment);
+      //                   } else {
+      //                     setState(() {
+      //                       incrementForDateOfAppointment++;
+      //                     });
+      //                     await DatabaseService().addSchedule(
+      //                         schedule, incrementForDateOfAppointment);
+      //                     print('w');
+      //                   }
+      //                 });
+      //                 await DatabaseService()
+      //                     .getAllSchedules()
+      //                     .then((value) => print(value));
+
+      await DatabaseService().addSchedule(dateController.text,
+          timeController.text, incrementForDateOfAppointment);
     }
   }
 
@@ -312,7 +428,7 @@ class _ScheduleState extends State<Schedule> {
         );
       },
     );
-    if (picked != null && picked != _selectedTime) {
+    if (picked != null) {
       setState(() {
         _selectedTime = picked;
         timeController.text =

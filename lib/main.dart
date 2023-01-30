@@ -10,7 +10,7 @@ void main() async {
   if (kIsWeb) {
     await Firebase.initializeApp(
       options: const FirebaseOptions(
-        apiKey: "AIzaSyAyZO62IqC-vYtEa5eMclZgymaiLmEGAuc",
+        apiKey: "AIzaSyAJLrPJ6NGUikXqvhtg0VBTFk5ih6rV95k",
         authDomain: "students-mental-health-app.firebaseapp.com",
         projectId: "students-mental-health-app",
         storageBucket: "students-mental-health-app.appspot.com",
