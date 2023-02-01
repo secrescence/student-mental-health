@@ -11,7 +11,14 @@ class HelperFunctions {
   static String yesOrNoKey = 'YESORNO';
   static String userDoneWithChatbotKey = 'USERDONEWITHCHATBOT';
 
+  static String adminLoggedInKey = "ADMINLOGGEDINKEY";
+
   // saving the data to Shared Preferences
+
+  static Future<bool> saveAdminLoggedInStatus(bool isAdminLoggedIn) async {
+    SharedPreferences sf = await SharedPreferences.getInstance();
+    return await sf.setBool(adminLoggedInKey, isAdminLoggedIn);
+  }
 
   static Future<bool> saveUserLoggedInStatus(bool isUserLoggedIn) async {
     SharedPreferences sf = await SharedPreferences.getInstance();
@@ -51,6 +58,11 @@ class HelperFunctions {
   }
 
   // getting the data from Shared Preferences
+
+  static Future<bool?> getAdminLoggedInStatus() async {
+    SharedPreferences sf = await SharedPreferences.getInstance();
+    return sf.getBool(adminLoggedInKey);
+  }
 
   static Future<bool?> getUserLoggedInStatus() async {
     SharedPreferences sf = await SharedPreferences.getInstance();

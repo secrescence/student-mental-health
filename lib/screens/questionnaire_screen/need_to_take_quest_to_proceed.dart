@@ -20,7 +20,7 @@ class NeedToTakeQuestionnaireToProceed extends StatelessWidget {
         // automaticallyImplyLeading: false,
         leading: IconButton(
           onPressed: () {
-            AuthService().signOut().then(
+            AuthService().signOutUser().then(
                 (value) => nextScreenReplace(context, const Onboarding()));
           },
           icon: const Icon(

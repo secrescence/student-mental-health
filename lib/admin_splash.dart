@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:student_mental_health/admin/auth/admin_signin.dart';
+import 'package:student_mental_health/admin/screens/admin_navigation.dart';
+import 'package:student_mental_health/helper/helper_function.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 import 'package:student_mental_health/widgets/widgets/widgets.dart';
 
@@ -12,11 +14,26 @@ class AdminSplash extends StatefulWidget {
 }
 
 class _AdminSplashState extends State<AdminSplash> {
+  bool _isAdminSignedIn = false;
+
   @override
   void initState() {
-    Future.delayed(const Duration(milliseconds: 2000))
-        .then((value) => nextScreen(context, const AdminSignIn()));
+    getAdminLoggedInStatus();
+    Future.delayed(const Duration(milliseconds: 500)).then((value) =>
+        _isAdminSignedIn
+            ? nextScreen(context, const AdminNavigation())
+            : nextScreen(context, const AdminSignIn()));
     super.initState();
+  }
+
+  getAdminLoggedInStatus() async {
+    await HelperFunctions.getAdminLoggedInStatus().then((value) {
+      if (value != null) {
+        setState(() {
+          _isAdminSignedIn = value;
+        });
+      }
+    });
   }
 
   @override

@@ -9,6 +9,8 @@ class DatabaseService {
   // reference for the collection
   final CollectionReference userCollection =
       FirebaseFirestore.instance.collection('users');
+  final CollectionReference schedulesCollection =
+      FirebaseFirestore.instance.collection('schedules');
 
   //delete user
   Future deleteUser() async {
@@ -129,6 +131,19 @@ class DatabaseService {
       'categoryAwarenessMEAN': categoryAwarenessMEAN,
       'categoryStrategiesMEAN': categoryStrategiesMEAN,
       'categoryClarityMEAN': categoryClarityMEAN,
+      'isHighPriority': false,
+      'isMidPriority': false,
+      'isLowPriority': false,
+    });
+  }
+
+  Future isResultHighOrMidOrLow(String whatPriority) async {
+    return await userCollection
+        .doc(uid)
+        .collection('questionnaireResult')
+        .doc(uid)
+        .update({
+      whatPriority: true,
     });
   }
 
@@ -204,21 +219,37 @@ class DatabaseService {
     }
   }
 
+  //ADMIN
+
   //add appointment schedule
-  Future addSchedule(
-      String date, String time, int incrementForDateOfAppointment) async {
-    String documentId = "$date-$incrementForDateOfAppointment";
-    await FirebaseFirestore.instance
-        .collection("schedules")
-        .doc(documentId)
-        .set({
+  Future addSchedule(String date, String time) async {
+    int randomInt = Random().nextInt(10000000);
+    String documentId = "$date-$randomInt";
+
+    while (true) {
+      DocumentSnapshot documentSnapshot =
+          await schedulesCollection.doc(documentId).get();
+
+      if (!documentSnapshot.exists) {
+        break;
+      }
+
+      randomInt = Random().nextInt(10000000);
+      documentId = "$date-$randomInt";
+    }
+
+    await schedulesCollection.doc(documentId).set({
       'date': date,
       'time': time,
     });
   }
 
+  Future<Stream<QuerySnapshot>> getSchedules() async {
+    return schedulesCollection.orderBy('date').snapshots();
+  }
+
   //get appointment schedule
-  Future getUidScheduleOfDateNow(String date, int increment) async {
+  Future checkIfUidOfScheduleExist(String date, int increment) async {
     List<String> documentIds = [];
     await FirebaseFirestore.instance
         .collection("counseling")

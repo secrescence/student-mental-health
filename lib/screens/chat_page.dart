@@ -59,7 +59,7 @@ class _ChatPageState extends State<ChatPage> {
         actions: [
           IconButton(
               onPressed: () async {
-                await authService.signOut();
+                await authService.signOutUser();
                 // ignore: use_build_context_synchronously
                 Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(builder: (context) => const SignIn()),

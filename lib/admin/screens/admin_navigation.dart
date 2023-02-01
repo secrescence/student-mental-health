@@ -4,14 +4,14 @@ import 'package:student_mental_health/admin/screens/notes.dart';
 import 'package:student_mental_health/admin/screens/schedule.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 
-class AdminDashboard extends StatefulWidget {
-  const AdminDashboard({super.key});
+class AdminNavigation extends StatefulWidget {
+  const AdminNavigation({super.key});
 
   @override
-  State<AdminDashboard> createState() => _AdminDashboardState();
+  State<AdminNavigation> createState() => _AdminNavigationState();
 }
 
-class _AdminDashboardState extends State<AdminDashboard> {
+class _AdminNavigationState extends State<AdminNavigation> {
   int _currentIndex = 0;
 
   @override
@@ -38,49 +38,73 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  color: _currentIndex == 0 ? adminListTileSelectedColor : null,
-                  child: ListTile(
-                    leading: const Icon(Icons.dashboard),
-                    title: Text('Dashboard',
-                        style: TextStyle(
-                          fontFamily: 'Sofia Pro',
-                          fontWeight: _currentIndex == 0
-                              ? FontWeight.bold
-                              : FontWeight.normal,
-                        )),
-                    onTap: () => setState(() => _currentIndex = 0),
+                SizedBox(
+                  width: 300,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: _currentIndex == 0
+                          ? adminListTileSelectedColor
+                          : null,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: ListTile(
+                      leading: const Icon(Icons.dashboard),
+                      title: Text('Dashboard',
+                          style: TextStyle(
+                            fontFamily: 'Sofia Pro',
+                            fontWeight: _currentIndex == 0
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                          )),
+                      onTap: () => setState(() => _currentIndex = 0),
+                    ),
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  color: _currentIndex == 1 ? adminListTileSelectedColor : null,
-                  child: ListTile(
-                    leading: const Icon(Icons.schedule),
-                    title: Text('Schedule',
-                        style: TextStyle(
-                          fontFamily: 'Sofia Pro',
-                          fontWeight: _currentIndex == 1
-                              ? FontWeight.bold
-                              : FontWeight.normal,
-                        )),
-                    onTap: () => setState(() => _currentIndex = 1),
+                SizedBox(
+                  width: 300,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: _currentIndex == 1
+                          ? adminListTileSelectedColor
+                          : null,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: ListTile(
+                      leading: const Icon(Icons.schedule),
+                      title: Text('Schedule',
+                          style: TextStyle(
+                            fontFamily: 'Sofia Pro',
+                            fontWeight: _currentIndex == 1
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                          )),
+                      onTap: () => setState(() => _currentIndex = 1),
+                    ),
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  color: _currentIndex == 2 ? adminListTileSelectedColor : null,
-                  child: ListTile(
-                    leading: const Icon(Icons.note),
-                    title: Text('Notes',
-                        style: TextStyle(
-                          fontFamily: 'Sofia Pro',
-                          fontWeight: _currentIndex == 2
-                              ? FontWeight.bold
-                              : FontWeight.normal,
-                        )),
-                    onTap: () => setState(() => _currentIndex = 2),
+                SizedBox(
+                  width: 300,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: _currentIndex == 2
+                          ? adminListTileSelectedColor
+                          : null,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: ListTile(
+                      leading: const Icon(Icons.note),
+                      title: Text('Notes',
+                          style: TextStyle(
+                            fontFamily: 'Sofia Pro',
+                            fontWeight: _currentIndex == 2
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                          )),
+                      onTap: () => setState(() => _currentIndex = 2),
+                    ),
                   ),
                 ),
               ],

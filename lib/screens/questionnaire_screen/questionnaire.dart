@@ -197,13 +197,6 @@ class _QuestionnaireState extends State<Questionnaire> {
                   categoryStrategiesMEAN = categoryStrategies / 8;
                   categoryClarityMEAN = categoryClarity / 5;
                 });
-                print('grandMean: $grandMean');
-                print('categoryNonacceptanceMEAN: $categoryNonacceptanceMEAN');
-                print('categoryGoalsMEAN: $categoryGoalsMEAN');
-                print('categoryImpulseMEAN: $categoryImpulseMEAN');
-                print('categoryAwarenessMEAN: $categoryAwarenessMEAN');
-                print('categoryStrategiesMEAN: $categoryStrategiesMEAN');
-                print('categoryClarityMEAN: $categoryClarityMEAN');
                 await DatabaseService(
                         uid: FirebaseAuth.instance.currentUser!.uid)
                     .questionnaireResult(
@@ -218,6 +211,19 @@ class _QuestionnaireState extends State<Questionnaire> {
                 await DatabaseService(
                         uid: FirebaseAuth.instance.currentUser!.uid)
                     .userDoneWithQuestionnaire();
+                if (grandMean > 4) {
+                  await DatabaseService(
+                          uid: FirebaseAuth.instance.currentUser!.uid)
+                      .isResultHighOrMidOrLow('isHighPriority');
+                } else if (grandMean >= 3.5 && grandMean <= 3.9) {
+                  await DatabaseService(
+                          uid: FirebaseAuth.instance.currentUser!.uid)
+                      .isResultHighOrMidOrLow('isMidPriority');
+                } else if (grandMean < 3.49) {
+                  await DatabaseService(
+                          uid: FirebaseAuth.instance.currentUser!.uid)
+                      .isResultHighOrMidOrLow('isLowPriority');
+                }
                 if (!mounted) return;
                 nextScreenReplace(context, const ResultCategories());
               } else {

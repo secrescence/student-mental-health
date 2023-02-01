@@ -113,7 +113,7 @@ class AuthService {
           if (!mounted) return;
           nextScreen(context, const AuthLoading());
         } else {
-          await signOut();
+          await signOutUser();
           if (!mounted) return;
           errorSnackbar(
               context, 'Oops!', 'Please enter the correct Student ID');
@@ -140,9 +140,10 @@ class AuthService {
       if (adminEmail == email) {
         await firebaseAuth.signInWithEmailAndPassword(
             email: email, password: password);
+        await HelperFunctions.saveAdminLoggedInStatus(true);
         if (!mounted) return;
         nextScreen(context,
-            const LoadingWidget(thenMoveToThisWidget: AdminDashboard()));
+            const LoadingWidget(thenMoveToThisWidget: AdminNavigation()));
       } else {
         errorSnackbar(
             context, 'Oops!', 'Wrong email or password. Please try again');
@@ -203,9 +204,18 @@ class AuthService {
   }
 
   // sign out
-  Future signOut() async {
+  Future signOutUser() async {
     try {
       await HelperFunctions.saveUserLoggedInStatus(false);
+      await firebaseAuth.signOut();
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future signOutAdmin() async {
+    try {
+      await HelperFunctions.saveAdminLoggedInStatus(false);
       await firebaseAuth.signOut();
     } catch (e) {
       return null;

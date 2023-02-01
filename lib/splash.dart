@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:student_mental_health/screens/appointment_screen/appointment.dart';
 import 'package:student_mental_health/screens/auth/signup_phone.dart';
 import 'package:student_mental_health/screens/questionnaire_screen/need_to_take_quest_to_proceed.dart';
 import 'package:student_mental_health/screens/questionnaire_screen/result_categories.dart';
@@ -37,7 +38,8 @@ class _SplashState extends State<Splash> {
           _isSingedUpUsingEmailOnly &&
           _isDoneWithQuestionnaire &&
           _isDoneWithResults) {
-        nextScreen(context, const ResultOverall());
+        //TODO change this to result overall
+        nextScreen(context, const Appointment());
       } else if (_isSignedIn &&
           _isDoneWithChatbot &&
           _isSingedUpUsingEmailOnly &&

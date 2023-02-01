@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 import 'package:student_mental_health/widgets/widgets/custom_snackbar.dart';
@@ -18,7 +20,7 @@ class _ScheduleState extends State<Schedule> {
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
 
-  int incrementForDateOfAppointment = 1;
+  Stream<QuerySnapshot>? scheduleStream;
 
   // controllers
   TextEditingController dateController = TextEditingController();
@@ -31,25 +33,19 @@ class _ScheduleState extends State<Schedule> {
     super.dispose();
   }
 
-  //   @override
-  // void initState() {
-  //   getListOfSchedule();
-  //   super.initState();
-  // }
+  @override
+  void initState() {
+    getListOfSchedule();
+    super.initState();
+  }
 
-  // getListOfSchedule() async {
-  //   await DatabaseService().getSchedulesOfDateNow().then((value) {
-  //     if (value == null) {
-  //       setState(() {
-  //         listOfSchedule = value;
-  //       });
-  //     } else {
-  //       setState(() {
-  //         scheduleIsNotEmpty = false;
-  //       });
-  //     }
-  //   });
-  // }
+  getListOfSchedule() async {
+    await DatabaseService().getSchedules().then((snapshot) {
+      setState(() {
+        scheduleStream = snapshot;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -89,110 +85,250 @@ class _ScheduleState extends State<Schedule> {
         ),
         body: TabBarView(
           children: [
-            // Container(
-            //   width: 100,
-            //   child: Card(
-            //     child: Column(
-            //       children: [
-            //         Container(
-            //           padding: const EdgeInsets.all(8),
-            //           alignment: Alignment.centerLeft,
-            //           child: Text('Schedule'),
-            //         ),
-            //         Table(
-            //           children: [
-            //             TableRow(
-            //               children: [
-            //                 SizedBox(width: 20),
-            //                 Padding(
-            //                   padding: const EdgeInsets.all(8.0),
-            //                   child: Text("Date"),
+            // Padding(
+            //   padding:
+            //       const EdgeInsets.symmetric(horizontal: 50, vertical: 100),
+            //   child: SizedBox(
+            //     height: 700,
+            //     child: Card(
+            //       child: Column(
+            //         children: [
+            //           Container(
+            //             padding: const EdgeInsets.symmetric(
+            //                 horizontal: 30, vertical: 10),
+            //             alignment: Alignment.centerLeft,
+            //             child: const Text('Schedule',
+            //                 style: TextStyle(
+            //                   fontSize: 25,
+            //                   fontFamily: 'Sofia Pro',
+            //                   fontWeight: FontWeight.w600,
+            //                 )),
+            //           ),
+            //           Row(
+            //             children: [
+            //               const Spacer(),
+            //               Expanded(
+            //                 child: Padding(
+            //                   padding: EdgeInsets.all(10.0),
+            //                   child: Text("Date",
+            //                       style: TextStyle(
+            //                           fontFamily: 'Sofia Pro', fontSize: 16)),
             //                 ),
-            //                 Padding(
-            //                   padding: const EdgeInsets.all(8.0),
-            //                   child: Text("Time"),
+            //               ),
+            //               Expanded(
+            //                 child: Padding(
+            //                   padding: EdgeInsets.all(10.0),
+            //                   child: Text("Time",
+            //                       style: TextStyle(
+            //                           fontFamily: 'Sofia Pro', fontSize: 16)),
             //                 ),
-            //                 Padding(
-            //                   padding: const EdgeInsets.all(8.0),
-            //                   child: Text("Status"),
+            //               ),
+            //               Expanded(
+            //                 child: Padding(
+            //                   padding: EdgeInsets.all(10.0),
+            //                   child: Text("Status",
+            //                       style: TextStyle(
+            //                           fontFamily: 'Sofia Pro', fontSize: 16)),
             //                 ),
-            //               ],
+            //               ),
+            //               Spacer(),
+            //             ],
+            //           ),
+            //           // const Spacer(),
+            //           StreamBuilder(
+            //             stream: scheduleStream,
+            //             builder: (context, snapshot) {
+            //               return snapshot.hasData
+            //                   ? ListView.builder(
+            //                       shrinkWrap: true,
+            //                       itemCount: snapshot.data!.docs.length,
+            //                       itemBuilder: (context, index) {
+            //                         DocumentSnapshot schedule =
+            //                             snapshot.data!.docs[index];
+            //                         return Row(
+            //                           children: [
+            //                             Expanded(
+            //                               child: Padding(
+            //                                 padding: const EdgeInsets.all(10.0),
+            //                                 child: Text(schedule[index]['date'],
+            //                                     style: TextStyle(
+            //                                         fontFamily: 'Sofia Pro',
+            //                                         fontSize: 16)),
+            //                               ),
+            //                             ),
+            //                             Expanded(
+            //                               child: Padding(
+            //                                 padding: EdgeInsets.all(10.0),
+            //                                 child: Text(schedule[index]['time'],
+            //                                     style: TextStyle(
+            //                                         fontFamily: 'Sofia Pro',
+            //                                         fontSize: 16)),
+            //                               ),
+            //                             ),
+            //                             Expanded(
+            //                               child: Padding(
+            //                                 padding: EdgeInsets.all(10.0),
+            //                                 child: Text(schedule['status'],
+            //                                     style: TextStyle(
+            //                                         fontFamily: 'Sofia Pro',
+            //                                         fontSize: 16)),
+            //                               ),
+            //                             ),
+            //                           ],
+            //                         );
+            //                       })
+            //                   : const Center(
+            //                       child: CircularProgressIndicator(),
+            //                     );
+            //             },
+            //           ),
+            //           Container(
+            //             padding: const EdgeInsets.symmetric(
+            //                 horizontal: 10, vertical: 10),
+            //             alignment: Alignment.bottomRight,
+            //             child: FloatingActionButton(
+            //               splashColor: primaryColor,
+            //               backgroundColor: primaryColor,
+            //               elevation: 5,
+            //               onPressed: () => _addScheduleForm(),
+            //               child: const Icon(Icons.add),
             //             ),
-            //           ],
-            //         ),
-            //       ],
+            //           ),
+            //         ],
+            //       ),
             //     ),
             //   ),
             // ),
-            Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: 700,
-                    child: Card(
-                      child: Column(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 30, vertical: 10),
-                            alignment: Alignment.centerLeft,
-                            child: const Text('Schedule',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontFamily: 'Sofia Pro',
-                                  fontWeight: FontWeight.w600,
-                                )),
-                          ),
-                          Table(
-                            children: const [
-                              TableRow(
-                                children: [
-                                  SizedBox(width: 20),
-                                  Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: Text("Date",
-                                        style: TextStyle(
-                                          fontFamily: 'Sofia Pro',
-                                        )),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: Text("Time",
-                                        style: TextStyle(
-                                          fontFamily: 'Sofia Pro',
-                                        )),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: Text("Status",
-                                        style: TextStyle(
-                                          fontFamily: 'Sofia Pro',
-                                        )),
-                                  ),
-                                ],
-                              ),
-                              // TableRow(
-                              //   children: [],
-                              // ),
-                            ],
-                          ),
+            Container(
+              width: double.infinity,
+              // height: 200,
+              margin: const EdgeInsets.symmetric(horizontal: 50, vertical: 100),
+              child: Card(
+                elevation: 3,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 20),
+                      alignment: Alignment.topLeft,
+                      child: const Text('Schedule',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontFamily: 'Sofia Pro',
+                            fontWeight: FontWeight.w500,
+                          )),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 40),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: const [
+                          Spacer(),
+                          SizedBox(width: 30),
+                          Text('Date',
+                              style: TextStyle(
+                                fontSize: 17,
+                                fontFamily: 'Sofia Pro',
+                                fontWeight: FontWeight.w400,
+                              )),
+                          Spacer(),
+                          Text('Time',
+                              style: TextStyle(
+                                fontSize: 17,
+                                fontFamily: 'Sofia Pro',
+                                fontWeight: FontWeight.w400,
+                              )),
+                          SizedBox(width: 30),
+                          Spacer(),
                         ],
                       ),
                     ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.only(top: 40, right: 10),
-                    alignment: Alignment.bottomRight,
-                    child: FloatingActionButton(
-                      splashColor: primaryColor,
-                      backgroundColor: primaryColor,
-                      elevation: 5,
-                      onPressed: () => _addScheduleForm(),
-                      child: const Icon(Icons.add),
+                    SizedBox(
+                      height: 420,
+                      child: StreamBuilder<QuerySnapshot>(
+                        stream: scheduleStream,
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData ||
+                              snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                            return const Center(
+                              child: SpinKitSpinningLines(
+                                color: primaryColor,
+                                size: 50,
+                              ),
+                            );
+                          }
+                          List<DocumentSnapshot> schedule = snapshot.data!.docs;
+                          if (schedule.isEmpty) {
+                            return const Center(
+                              child: Text(
+                                'No schedule available',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontFamily: 'Sofia Pro',
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            );
+                          }
+                          return ListView.builder(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            itemCount: schedule.length,
+                            itemBuilder: (context, index) {
+                              Map<String, dynamic> data = schedule[index].data()
+                                  as Map<String, dynamic>;
+                              return Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 30, vertical: 10),
+                                    child: Row(
+                                      children: [
+                                        const Spacer(),
+                                        const SizedBox(width: 35),
+                                        Text(data['date'],
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              fontFamily: 'Sofia Pro',
+                                              fontWeight: FontWeight.w400,
+                                            )),
+                                        const Spacer(),
+                                        Text(data['time'],
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              fontFamily: 'Sofia Pro',
+                                              fontWeight: FontWeight.w400,
+                                            )),
+                                        const SizedBox(width: 40),
+                                        const Spacer(),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                      ),
                     ),
-                  )
-                ],
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 10),
+                      alignment: Alignment.bottomRight,
+                      child: FloatingActionButton(
+                        splashColor: primaryColor,
+                        backgroundColor: primaryColor,
+                        elevation: 5,
+                        onPressed: () => _addScheduleForm(),
+                        child: const Icon(Icons.add),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
             Center(child: Text('Pending Appointments Content')),
@@ -212,7 +348,7 @@ class _ScheduleState extends State<Schedule> {
             "Add Schedule",
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 28,
               fontFamily: 'Sofia Pro',
               fontWeight: FontWeight.w600,
             ),
@@ -223,22 +359,28 @@ class _ScheduleState extends State<Schedule> {
               height: 400,
               width: 700,
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text('Select Date:',
                           style: TextStyle(fontFamily: 'Sofia Pro')),
                       const SizedBox(width: 10),
                       SizedBox(
                         child: SizedBox(
-                          height: 50,
-                          width: 150,
+                          height: 70,
+                          width: 300,
                           child: TextFormField(
                             decoration: textInputDeco.copyWith(
                               suffixIcon: const Padding(
                                 padding: EdgeInsets.only(
-                                    top: 0, right: 7, bottom: 0, left: 7),
+                                    top: 0, right: 7, bottom: 0, left: 8),
                                 child: Icon(Icons.date_range),
+                              ),
+                              suffixIconColor: primaryColor,
+                              prefixIcon: const Padding(
+                                padding: EdgeInsets.only(left: 8),
                               ),
                               errorMaxLines: 1,
                               errorStyle: const TextStyle(
@@ -267,20 +409,22 @@ class _ScheduleState extends State<Schedule> {
                   ),
                   const SizedBox(height: 15),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text('Select Time:',
                           style: TextStyle(fontFamily: 'Sofia Pro')),
                       const SizedBox(width: 10),
                       SizedBox(
-                        height: 50,
-                        width: 150,
+                        height: 70,
+                        width: 300,
                         child: TextFormField(
                           decoration: textInputDeco.copyWith(
                             suffixIcon: const Padding(
                               padding: EdgeInsets.only(
-                                  top: 0, right: 7, bottom: 0, left: 7),
+                                  top: 0, right: 7, bottom: 0, left: 8),
                               child: Icon(Icons.more_time),
                             ),
+                            suffixIconColor: primaryColor,
                             errorMaxLines: 1,
                             errorStyle: const TextStyle(
                                 height: 0,
@@ -306,8 +450,9 @@ class _ScheduleState extends State<Schedule> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 60),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const SizedBox(width: 15),
                       Container(
@@ -372,34 +517,11 @@ class _ScheduleState extends State<Schedule> {
 
   _submitButton() async {
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        incrementForDateOfAppointment++;
-      });
-
-      //  await DatabaseService()
-      //                     .getUidScheduleOfDateNow(dateController.text.trim(),incrementForDateOfAppointment)
-      //                     .then((value) async {
-      //                   if (value == null || value.isEmpty) {
-      //                     setState(() {
-      //                       incrementForDateOfAppointment = 1;
-      //                     });
-      //                     await DatabaseService().addSchedule(dateController.text,
-      //       timeController.text, incrementForDateOfAppointment);
-      //                   } else {
-      //                     setState(() {
-      //                       incrementForDateOfAppointment++;
-      //                     });
-      //                     await DatabaseService().addSchedule(
-      //                         schedule, incrementForDateOfAppointment);
-      //                     print('w');
-      //                   }
-      //                 });
-      //                 await DatabaseService()
-      //                     .getAllSchedules()
-      //                     .then((value) => print(value));
-
-      await DatabaseService().addSchedule(dateController.text,
-          timeController.text, incrementForDateOfAppointment);
+      nextScreenPop(context);
+      await DatabaseService()
+          .addSchedule(dateController.text, timeController.text);
+      dateController.clear();
+      timeController.clear();
     }
   }
 
@@ -409,7 +531,7 @@ class _ScheduleState extends State<Schedule> {
         initialDate: _selectedDate,
         firstDate: DateTime(2019),
         lastDate: DateTime(2030));
-    if (picked != null && picked != _selectedDate) {
+    if (picked != null) {
       setState(() {
         _selectedDate = picked;
         dateController.text = DateFormat('MM-dd-yyyy').format(picked);

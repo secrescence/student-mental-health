@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:student_mental_health/screens/appointment_screen/your_appointment.dart';
 import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 import 'package:student_mental_health/widgets/widgets/widgets.dart';
@@ -17,9 +20,10 @@ class _AppointmentState extends State<Appointment> {
     "time": "1:00",
     "availability": false,
   };
-  int incrementForDateOfAppointment = 1;
   List<Map<String, dynamic>> listOfSchedule = [];
   bool scheduleIsNotEmpty = true;
+
+  Stream<QuerySnapshot>? scheduleStream;
 
   @override
   void initState() {
@@ -38,6 +42,12 @@ class _AppointmentState extends State<Appointment> {
           scheduleIsNotEmpty = false;
         });
       }
+    });
+
+    await DatabaseService().getSchedules().then((snapshot) {
+      setState(() {
+        scheduleStream = snapshot;
+      });
     });
   }
 
@@ -96,11 +106,11 @@ class _AppointmentState extends State<Appointment> {
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 15, vertical: 15),
+                          horizontal: 20, vertical: 20),
                       alignment: Alignment.topLeft,
                       child: const Text('Schedule',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 17,
                             fontFamily: 'Sofia Pro',
                             fontWeight: FontWeight.w500,
                           )),
@@ -110,51 +120,57 @@ class _AppointmentState extends State<Appointment> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: const [
+                          SizedBox(width: 30),
                           Text('Date',
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 15.5,
                                 fontFamily: 'Sofia Pro',
                                 fontWeight: FontWeight.w400,
                               )),
                           Spacer(),
                           Text('Time',
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 15.5,
                                 fontFamily: 'Sofia Pro',
                                 fontWeight: FontWeight.w400,
                               )),
-                          Spacer(),
-                          Text('Availability',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontFamily: 'Sofia Pro',
-                                fontWeight: FontWeight.w400,
-                              )),
+                          SizedBox(width: 30),
                         ],
                       ),
                     ),
-                    Visibility(
-                      visible: scheduleIsNotEmpty,
-                      replacement: Container(
-                        height: 300,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 30, vertical: 10),
-                        child: const Center(
-                          child: Text(
-                            'No schedule available',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontFamily: 'Sofia Pro',
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ),
-                      ),
-                      child: SizedBox(
-                        height: 300,
-                        child: ListView.builder(
-                            itemCount: listOfSchedule.length,
+                    SizedBox(
+                      height: 300,
+                      child: StreamBuilder<QuerySnapshot>(
+                        stream: scheduleStream,
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData ||
+                              snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                            return const Center(
+                              child: SpinKitSpinningLines(
+                                color: primaryColor,
+                                size: 50,
+                              ),
+                            );
+                          }
+                          List<DocumentSnapshot> schedule = snapshot.data!.docs;
+                          if (schedule.isEmpty) {
+                            return const Center(
+                              child: Text(
+                                'No schedule available',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontFamily: 'Sofia Pro',
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            );
+                          }
+                          return ListView.builder(
+                            itemCount: schedule.length,
                             itemBuilder: (context, index) {
+                              Map<String, dynamic> data = schedule[index].data()
+                                  as Map<String, dynamic>;
                               return Column(
                                 children: [
                                   Padding(
@@ -162,22 +178,29 @@ class _AppointmentState extends State<Appointment> {
                                         horizontal: 30, vertical: 10),
                                     child: Row(
                                       children: [
-                                        Text(listOfSchedule[index]["date"]),
-                                        const SizedBox(width: 55),
-                                        Text(listOfSchedule[index]["time"]),
-                                        listOfSchedule[index]['availability']
-                                            ? const SizedBox(width: 65)
-                                            : const SizedBox(width: 85),
-                                        Text(listOfSchedule[index]
-                                                ["availability"]
-                                            ? "Available"
-                                            : "Full"),
+                                        const SizedBox(width: 35),
+                                        Text(data['date'],
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              fontFamily: 'Sofia Pro',
+                                              fontWeight: FontWeight.w400,
+                                            )),
+                                        const Spacer(),
+                                        Text(data['time'],
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              fontFamily: 'Sofia Pro',
+                                              fontWeight: FontWeight.w400,
+                                            )),
+                                        const SizedBox(width: 40),
                                       ],
                                     ),
                                   ),
                                 ],
                               );
-                            }),
+                            },
+                          );
+                        },
                       ),
                     ),
                   ],
@@ -213,6 +236,7 @@ class _AppointmentState extends State<Appointment> {
                     // await DatabaseService()
                     //     .getAllSchedules()
                     //     .then((value) => print(value));
+                    await DatabaseService().addSchedule('3-4-23', '1:23');
                   },
                   style: ButtonStyle(
                     fixedSize:
@@ -233,19 +257,19 @@ class _AppointmentState extends State<Appointment> {
               ],
             ),
           ),
-          Container(
-            width: double.infinity,
-            height: 70,
-            margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-            child: Card(
-              elevation: 3,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: GestureDetector(
-                onTap: () {
-                  print('Videos');
-                },
+          GestureDetector(
+            onTap: () {
+              nextScreen(context, const YourAppointment());
+            },
+            child: Container(
+              width: double.infinity,
+              height: 70,
+              margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+              child: Card(
+                elevation: 3,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
                 child: Container(
                   alignment: Alignment.centerLeft,
                   width: double.infinity,
