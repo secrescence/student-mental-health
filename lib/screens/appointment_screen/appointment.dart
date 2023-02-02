@@ -236,7 +236,7 @@ class _AppointmentState extends State<Appointment> {
                     // await DatabaseService()
                     //     .getAllSchedules()
                     //     .then((value) => print(value));
-                    await DatabaseService().addSchedule('3-4-23', '1:23');
+                    await DatabaseService().addSchedule('01-01-2023', '11:23');
                   },
                   style: ButtonStyle(
                     fixedSize:

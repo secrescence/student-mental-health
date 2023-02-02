@@ -147,6 +147,28 @@ class DatabaseService {
     });
   }
 
+  Future<String> checkPriority() async {
+    DocumentSnapshot snapshot = await userCollection
+        .doc(uid)
+        .collection('questionnaireResult')
+        .doc(uid)
+        .get();
+    if (snapshot.exists) {
+      Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+      if (data['isHighPriority']) {
+        return 'High Priority';
+      } else if (data['isMidPriority']) {
+        return 'Mid Priority';
+      } else if (data['isLowPriority']) {
+        return 'Low Priority';
+      } else {
+        return 'None';
+      }
+    } else {
+      return 'Document does not exist';
+    }
+  }
+
   //get all questionnaire result
   Future getQuestionnaireResult() async {
     final DocumentSnapshot snapshot = await userCollection
@@ -241,11 +263,40 @@ class DatabaseService {
     await schedulesCollection.doc(documentId).set({
       'date': date,
       'time': time,
+      // 'usersAppointed': [],
+    });
+  }
+
+  Future appointUserWithHighPriority(String schedUid) async {
+    return await schedulesCollection.doc(schedUid).set({
+      'usersAppointed': [uid],
     });
   }
 
   Future<Stream<QuerySnapshot>> getSchedules() async {
     return schedulesCollection.orderBy('date').snapshots();
+  }
+
+  Future<String> getAllSchedules() async {
+    List<String> documentIds = [];
+    await FirebaseFirestore.instance
+        .collection("schedules")
+        .get()
+        .then((QuerySnapshot snapshot) {
+      documentIds = snapshot.docs.map((doc) => doc.id).toList();
+    });
+    return documentIds.first;
+  }
+
+  Future getClosestDate() async {
+    List<String> documentIds = [];
+    await FirebaseFirestore.instance
+        .collection("schedules")
+        .get()
+        .then((QuerySnapshot snapshot) {
+      documentIds = snapshot.docs.map((doc) => doc.id).toList();
+    });
+    return documentIds[0];
   }
 
   //get appointment schedule
@@ -287,17 +338,6 @@ class DatabaseService {
       });
     }
     return schedules;
-  }
-
-  Future getAllSchedules() async {
-    List<String> documentIds = [];
-    await FirebaseFirestore.instance
-        .collection("counseling")
-        .get()
-        .then((QuerySnapshot snapshot) {
-      documentIds = snapshot.docs.map((doc) => doc.id).toList();
-    });
-    return documentIds;
   }
 
 // used to display chats of both chatbot and user
