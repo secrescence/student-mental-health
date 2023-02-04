@@ -17,6 +17,14 @@ class DatabaseService {
     return await userCollection.doc(uid).delete();
   }
 
+  Future getAllUsersUid() async {
+    List<String> documentIds = [];
+    await userCollection.get().then((QuerySnapshot snapshot) {
+      documentIds = snapshot.docs.map((doc) => doc.id).toList();
+    });
+    return documentIds;
+  }
+
   // saving the user data from sign up
   Future savingUserData(String firstName, String lastName, String email,
       String department, String year, String section, String studentId) async {
@@ -263,7 +271,7 @@ class DatabaseService {
     await schedulesCollection.doc(documentId).set({
       'date': date,
       'time': time,
-      // 'usersAppointed': [],
+      'usersAppointed': [],
     });
   }
 
@@ -277,7 +285,7 @@ class DatabaseService {
     return schedulesCollection.orderBy('date').snapshots();
   }
 
-  Future<String> getAllSchedules() async {
+  Future getAllSchedules() async {
     List<String> documentIds = [];
     await FirebaseFirestore.instance
         .collection("schedules")
@@ -285,7 +293,7 @@ class DatabaseService {
         .then((QuerySnapshot snapshot) {
       documentIds = snapshot.docs.map((doc) => doc.id).toList();
     });
-    return documentIds.first;
+    return documentIds;
   }
 
   Future getClosestDate() async {
