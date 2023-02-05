@@ -14,11 +14,12 @@ class YourAppointment extends StatefulWidget {
 
 class _YourAppointmentState extends State<YourAppointment> {
   String? priority;
-
+  TabController? _tabController;
   bool ifLowAndMidPriority = false;
 
   @override
   void initState() {
+    // _tabController = TabController(length: 2, vsync: this);
     getPriority();
     super.initState();
   }
@@ -41,41 +42,35 @@ class _YourAppointmentState extends State<YourAppointment> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(),
-        body: Padding(
-          padding: const EdgeInsets.all(80.0),
+      body: DefaultTabController(
+        length: 2,
+        child: Card(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const Text(
-                'Your Appointment',
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: 'Sofia Pro'),
+              TabBar(
+                controller: _tabController,
+                tabs: [
+                  Tab(text: "Tab 1"),
+                  Tab(text: "Tab 2"),
+                ],
               ),
-              const SizedBox(
-                height: 20,
-              ),
-              Text(
-                priority ?? 'No Appointment',
-                style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: 'Sofia Pro'),
-              ),
-              const Spacer(),
-              Visibility(
-                visible: ifLowAndMidPriority,
-                replacement: const SizedBox.shrink(),
-                child: CustomButton(
-                  text: 'Add Appointment',
-                  onPressed: () {},
-                  color: phoneFieldButtonColor,
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    Container(
+                      child: Text("Content of Tab 1"),
+                    ),
+                    Container(
+                      child: Text("Content of Tab 2"),
+                    ),
+                  ],
                 ),
-              )
+              ),
             ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 }

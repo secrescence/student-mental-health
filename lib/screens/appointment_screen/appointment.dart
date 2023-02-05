@@ -110,17 +110,21 @@ class _AppointmentState extends State<Appointment> {
                       alignment: Alignment.topLeft,
                       child: const Text('Schedule',
                           style: TextStyle(
-                            fontSize: 17,
+                            fontSize: 19,
                             fontFamily: 'Sofia Pro',
                             fontWeight: FontWeight.w500,
                           )),
                     ),
+                    const Divider(
+                        thickness: 1, color: Color(0xFFE5E5E5), height: 0),
+                    const SizedBox(height: 5),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 40),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 40, vertical: 5),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: const [
-                          SizedBox(width: 30),
+                          SizedBox(width: 45),
                           Text('Date',
                               style: TextStyle(
                                 fontSize: 15.5,
@@ -134,7 +138,7 @@ class _AppointmentState extends State<Appointment> {
                                 fontFamily: 'Sofia Pro',
                                 fontWeight: FontWeight.w400,
                               )),
-                          SizedBox(width: 30),
+                          SizedBox(width: 28),
                         ],
                       ),
                     ),

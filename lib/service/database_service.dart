@@ -271,14 +271,70 @@ class DatabaseService {
     await schedulesCollection.doc(documentId).set({
       'date': date,
       'time': time,
-      'usersAppointed': [],
+      'appointedHighPriority': [],
+      'appointedMidPriority': [],
+      'appointedLowPriority': [],
     });
   }
 
   Future appointUserWithHighPriority(String schedUid) async {
     return await schedulesCollection.doc(schedUid).set({
-      'usersAppointed': [uid],
+      'appointedHighPriority': [uid],
     });
+  }
+
+  Future<List<String>> getAppointedHighPriority(String schedUid) async {
+    DocumentSnapshot snapshot = await schedulesCollection.doc(schedUid).get();
+    if (snapshot.exists) {
+      Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+      if (data.containsKey('appointedHighPriority')) {
+        return List<String>.from(data['appointedHighPriority']);
+      } else {
+        return [];
+      }
+    } else {
+      return [];
+    }
+  }
+
+  Future appointUserWithMidPriority(String schedUid) async {
+    return await schedulesCollection.doc(schedUid).set({
+      'appointedMidPriority': [uid],
+    });
+  }
+
+  Future<List<String>> getAppointedMidPriority(String schedUid) async {
+    DocumentSnapshot snapshot = await schedulesCollection.doc(schedUid).get();
+    if (snapshot.exists) {
+      Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+      if (data.containsKey('appointedMidPriority')) {
+        return List<String>.from(data['appointedMidPriority']);
+      } else {
+        return [];
+      }
+    } else {
+      return [];
+    }
+  }
+
+  Future appointUserWithLowPriority(String schedUid) async {
+    return await schedulesCollection.doc(schedUid).set({
+      'appointedLowPriority': [uid],
+    });
+  }
+
+  Future<List<String>> getAppointedLowPriority(String schedUid) async {
+    DocumentSnapshot snapshot = await schedulesCollection.doc(schedUid).get();
+    if (snapshot.exists) {
+      Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+      if (data.containsKey('appointedLowPriority')) {
+        return List<String>.from(data['appointedLowPriority']);
+      } else {
+        return [];
+      }
+    } else {
+      return [];
+    }
   }
 
   Future<Stream<QuerySnapshot>> getSchedules() async {

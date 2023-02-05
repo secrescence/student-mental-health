@@ -31,7 +31,7 @@ class _LoadingWidgetState extends State<LoadingWidget> {
         backgroundColor: Colors.transparent,
         automaticallyImplyLeading: false,
       ),
-      body: const Center(child: SpinKitSpinningLines(color: primaryColor)),
+      body: const Center(child: SpinKitChasingDots(color: primaryColor)),
     );
   }
 }

@@ -123,7 +123,7 @@ class _SplashState extends State<Splash> {
               ),
             ),
             const Expanded(
-              child: SpinKitSpinningLines(
+              child: SpinKitChasingDots(
                 color: Colors.white,
                 size: 50,
               ),
