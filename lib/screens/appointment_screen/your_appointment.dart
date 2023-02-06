@@ -15,7 +15,8 @@ class YourAppointment extends StatefulWidget {
 }
 
 class _YourAppointmentState extends State<YourAppointment> {
-  Stream<QuerySnapshot>? scheduleStream;
+  Stream<DocumentSnapshot>? scheduleStream;
+  String dateThatCurrentUserIsAppointed = '';
   String? priority;
   bool ifLowAndMidPriority = false;
 
@@ -28,13 +29,35 @@ class _YourAppointmentState extends State<YourAppointment> {
   getPriority() async {
     await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
         .checkPriority()
-        .then((value) {
+        .then((value) async {
       setState(() {
         priority = value;
       });
       if (priority == 'Low Priority') {
         setState(() {
           ifLowAndMidPriority = true;
+        });
+      } else if (priority == 'High Priority') {
+        await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
+            .getAppointedHighPriority('w')
+            .then((value) {});
+      }
+    });
+
+    await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
+        .whatDateTheCurrentUserIsAppointed()
+        .then((value) async {
+      if (value != null) {
+        setState(() {
+          dateThatCurrentUserIsAppointed = value;
+        });
+        await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
+            .getOnlySpecificScheduleDate(dateThatCurrentUserIsAppointed)
+            .then((value) {
+          setState(() {
+            scheduleStream = value;
+          });
+          print(value);
         });
       }
     });
@@ -76,10 +99,9 @@ class _YourAppointmentState extends State<YourAppointment> {
                       alignment: Alignment.topLeft,
                       child: const Text('Your Appointment',
                           style: TextStyle(
-                            fontSize: 19,
-                            fontFamily: 'Sofia Pro',
-                            fontWeight: FontWeight.w500,
-                          )),
+                              fontSize: 19,
+                              fontFamily: 'Sofia Pro',
+                              fontWeight: FontWeight.w500)),
                     ),
                     const Divider(
                         thickness: 1, color: Color(0xFFE5E5E5), height: 0),
@@ -117,7 +139,7 @@ class _YourAppointmentState extends State<YourAppointment> {
                     ),
                     SizedBox(
                       height: 300,
-                      child: StreamBuilder<QuerySnapshot>(
+                      child: StreamBuilder<DocumentSnapshot>(
                         stream: scheduleStream,
                         builder: (context, snapshot) {
                           if (!snapshot.hasData ||
@@ -130,8 +152,11 @@ class _YourAppointmentState extends State<YourAppointment> {
                               ),
                             );
                           }
-                          List<DocumentSnapshot> schedule = snapshot.data!.docs;
-                          if (schedule.isEmpty) {
+                          DocumentSnapshot document =
+                              snapshot.data as DocumentSnapshot;
+                          String date = document['date'];
+                          String time = document['time'];
+                          if (date.isEmpty || time.isEmpty) {
                             return const Center(
                               child: Text(
                                 'No schedule available',
@@ -143,39 +168,40 @@ class _YourAppointmentState extends State<YourAppointment> {
                               ),
                             );
                           }
-                          return ListView.builder(
-                            itemCount: schedule.length,
-                            itemBuilder: (context, index) {
-                              Map<String, dynamic> data = schedule[index].data()
-                                  as Map<String, dynamic>;
-                              return Column(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 30, vertical: 10),
-                                    child: Row(
-                                      children: [
-                                        const SizedBox(width: 35),
-                                        Text(data['date'],
-                                            style: const TextStyle(
-                                              fontSize: 15,
-                                              fontFamily: 'Sofia Pro',
-                                              fontWeight: FontWeight.w400,
-                                            )),
-                                        const Spacer(),
-                                        Text(data['time'],
-                                            style: const TextStyle(
-                                              fontSize: 15,
-                                              fontFamily: 'Sofia Pro',
-                                              fontWeight: FontWeight.w400,
-                                            )),
-                                        const SizedBox(width: 40),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
+                          return Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 30, vertical: 10),
+                                child: Row(
+                                  children: [
+                                    const SizedBox(width: 10),
+                                    Text(date,
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          fontFamily: 'Sofia Pro',
+                                          fontWeight: FontWeight.w400,
+                                        )),
+                                    const Spacer(),
+                                    Text(time,
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          fontFamily: 'Sofia Pro',
+                                          fontWeight: FontWeight.w400,
+                                        )),
+                                    const Spacer(),
+                                    //TODO: Change the status here
+                                    Text('Pending',
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          fontFamily: 'Sofia Pro',
+                                          fontWeight: FontWeight.w400,
+                                        )),
+                                    const SizedBox(width: 25),
+                                  ],
+                                ),
+                              ),
+                            ],
                           );
                         },
                       ),

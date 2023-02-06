@@ -48,6 +48,7 @@ class _AppointmentState extends State<Appointment> {
       setState(() {
         scheduleStream = snapshot;
       });
+      print(snapshot);
     });
   }
 

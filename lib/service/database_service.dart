@@ -277,6 +277,43 @@ class DatabaseService {
     });
   }
 
+  Future whatDateTheCurrentUserIsAppointed() async {
+    QuerySnapshot snapshot = await schedulesCollection
+        .where(
+          'appointedHighPriority',
+          arrayContains: uid,
+        )
+        .get();
+
+    if (snapshot.docs.isNotEmpty) {
+      return snapshot.docs.first.id;
+    }
+
+    snapshot = await schedulesCollection
+        .where(
+          'appointedMidPriority',
+          arrayContains: uid,
+        )
+        .get();
+
+    if (snapshot.docs.isNotEmpty) {
+      return snapshot.docs.first.id;
+    }
+
+    snapshot = await schedulesCollection
+        .where(
+          'appointedLowPriority',
+          arrayContains: uid,
+        )
+        .get();
+
+    if (snapshot.docs.isNotEmpty) {
+      return snapshot.docs.first.id;
+    }
+
+    return null;
+  }
+
   Future appointUserWithHighPriority(String schedUid) async {
     return await schedulesCollection.doc(schedUid).set({
       'appointedHighPriority': [uid],
@@ -340,6 +377,11 @@ class DatabaseService {
   //SteamBuilder
   Future<Stream<QuerySnapshot>> getSchedules() async {
     return schedulesCollection.orderBy('date').snapshots();
+  }
+
+  Future<Stream<DocumentSnapshot<Object?>>> getOnlySpecificScheduleDate(
+      String schedUid) async {
+    return schedulesCollection.doc(schedUid).snapshots();
   }
 
   //get all schedules
