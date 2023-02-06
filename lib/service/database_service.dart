@@ -337,8 +337,14 @@ class DatabaseService {
     }
   }
 
+  //SteamBuilder
   Future<Stream<QuerySnapshot>> getSchedules() async {
     return schedulesCollection.orderBy('date').snapshots();
+  }
+
+  //get all schedules
+  Future<Stream<QuerySnapshot>> getUserAppointment() async {
+    return schedulesCollection.snapshots();
   }
 
   Future getAllSchedules() async {

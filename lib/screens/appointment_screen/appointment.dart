@@ -54,7 +54,6 @@ class _AppointmentState extends State<Appointment> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: Colors.blueAccent,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
