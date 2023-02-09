@@ -37,10 +37,6 @@ class _YourAppointmentState extends State<YourAppointment> {
         setState(() {
           ifLowAndMidPriority = true;
         });
-      } else if (priority == 'High Priority') {
-        await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
-            .getAppointedHighPriority('w')
-            .then((value) {});
       }
     });
 
@@ -215,25 +211,30 @@ class _YourAppointmentState extends State<YourAppointment> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                ElevatedButton(
-                  onPressed: () async {
-                    await DatabaseService().addSchedule('01-01-2023', '11:23');
-                  },
-                  style: ButtonStyle(
-                    fixedSize:
-                        MaterialStateProperty.all<Size>(const Size(190, 48)),
-                    foregroundColor:
-                        MaterialStateProperty.all<Color>(Colors.white),
-                    backgroundColor:
-                        MaterialStateProperty.all<Color>(phoneFieldButtonColor),
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(7),
+                Visibility(
+                  visible: ifLowAndMidPriority,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      await DatabaseService()
+                          .addSchedule('01-01-2023', '11:23');
+                    },
+                    style: ButtonStyle(
+                      fixedSize:
+                          MaterialStateProperty.all<Size>(const Size(190, 48)),
+                      foregroundColor:
+                          MaterialStateProperty.all<Color>(Colors.white),
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                          phoneFieldButtonColor),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(7),
+                        ),
                       ),
                     ),
+                    child: const Text('Create Appointment',
+                        style:
+                            TextStyle(fontSize: 16, fontFamily: 'Sofia Pro')),
                   ),
-                  child: const Text('Create Appointment',
-                      style: TextStyle(fontSize: 16, fontFamily: 'Sofia Pro')),
                 ),
               ],
             ),
