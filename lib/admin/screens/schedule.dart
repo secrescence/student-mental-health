@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
-import 'package:student_mental_health/widgets/widgets/custom_snackbar.dart';
 import 'package:student_mental_health/widgets/widgets/widgets.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
@@ -22,14 +21,21 @@ class _ScheduleState extends State<Schedule> {
 
   Stream<QuerySnapshot>? scheduleStream;
 
+  //dropdown
+  final List<String> _timeList = [
+    '9:00 AM',
+    '10:00 AM',
+    '2:00 PM',
+    '3:00 PM',
+  ];
+  String? _selectedValue;
+
   // controllers
   TextEditingController dateController = TextEditingController();
-  TextEditingController timeController = TextEditingController();
 
   @override
   void dispose() {
     dateController.dispose();
-    timeController.dispose();
     super.dispose();
   }
 
@@ -114,7 +120,7 @@ class _ScheduleState extends State<Schedule> {
                 ),
               ),
               SizedBox(
-                height: MediaQuery.of(context).size.height * 0.08,
+                height: MediaQuery.of(context).size.height * 0.2,
                 child: StreamBuilder<QuerySnapshot>(
                   stream: scheduleStream,
                   builder: (context, snapshot) {
@@ -278,35 +284,68 @@ class _ScheduleState extends State<Schedule> {
                       SizedBox(
                         height: 70,
                         width: 300,
-                        child: TextFormField(
-                          decoration: textInputDeco.copyWith(
-                            suffixIcon: const Padding(
-                              padding: EdgeInsets.only(
-                                  top: 0, right: 7, bottom: 0, left: 8),
-                              child: Icon(Icons.more_time),
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              top: 0, right: 0, bottom: 0, left: 5),
+                          child: DropdownButtonFormField(
+                            icon: const Icon(Icons.schedule),
+                            iconEnabledColor: primaryColor,
+                            iconDisabledColor: primaryColor,
+                            focusColor: Colors.transparent,
+                            elevation: 0,
+                            decoration: textInputDeco.copyWith(
+                              contentPadding: const EdgeInsets.all(0),
+                              prefixIconConstraints:
+                                  const BoxConstraints(maxHeight: 20),
+                              suffixIconConstraints:
+                                  const BoxConstraints(maxHeight: 20),
+                              suffixIcon: const Padding(
+                                padding: EdgeInsets.only(
+                                    top: 0, right: 8, bottom: 0, left: 2),
+                              ),
+                              floatingLabelStyle: const TextStyle(
+                                  color: Colors.black,
+                                  fontFamily: 'Sofia Pro',
+                                  fontSize: 17),
+                              floatingLabelAlignment:
+                                  FloatingLabelAlignment.start,
+                              floatingLabelBehavior:
+                                  FloatingLabelBehavior.always,
+                              alignLabelWithHint: false,
+                              hintStyle: const TextStyle(
+                                  fontSize: 13, fontFamily: 'Sofia Pro'),
+                              prefixIcon: const Padding(
+                                padding: EdgeInsets.only(
+                                    top: 0, right: 10.5, bottom: 0, left: 2),
+                              ),
                             ),
-                            suffixIconColor: primaryColor,
-                            errorMaxLines: 1,
-                            errorStyle: const TextStyle(
-                                height: 0,
-                                color: Colors.transparent,
-                                fontSize: 0),
-                            contentPadding: const EdgeInsets.all(0),
-                            suffixIconConstraints:
-                                const BoxConstraints(maxHeight: 35),
+                            value: _selectedValue,
+                            items: _timeList
+                                .map((e) => DropdownMenuItem(
+                                      alignment: AlignmentDirectional.center,
+                                      value: e,
+                                      child: Container(
+                                        padding: const EdgeInsets.only(left: 4),
+                                        child: SizedBox(
+                                          child: Text(e),
+                                        ),
+                                      ),
+                                    ))
+                                .toList(),
+                            onChanged: ((value) {
+                              setState(() {
+                                _selectedValue = value;
+                              });
+                            }),
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return '';
+                              }
+                              return null;
+                            },
                           ),
-                          controller: timeController,
-                          readOnly: true,
-                          onTap: () {
-                            _selectTime(context);
-                          },
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return '';
-                            }
-                            return null;
-                          },
                         ),
                       ),
                     ],
@@ -345,7 +384,7 @@ class _ScheduleState extends State<Schedule> {
                             onPressed: () {
                               nextScreenPop(context);
                               dateController.clear();
-                              timeController.clear();
+                              _selectedValue = null;
                             },
                             style: ButtonStyle(
                               fixedSize: MaterialStateProperty.all<Size>(
@@ -379,10 +418,9 @@ class _ScheduleState extends State<Schedule> {
   _submitButton() async {
     if (_formKey.currentState!.validate()) {
       nextScreenPop(context);
-      await DatabaseService()
-          .addSchedule(dateController.text, timeController.text);
+      await DatabaseService().addSchedule(dateController.text, _selectedValue!);
       dateController.clear();
-      timeController.clear();
+      _selectedValue = null;
     }
   }
 
@@ -400,23 +438,23 @@ class _ScheduleState extends State<Schedule> {
     }
   }
 
-  _selectTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: _selectedTime,
-      builder: (context, child) {
-        return MediaQuery(
-          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-          child: child ?? Container(),
-        );
-      },
-    );
-    if (picked != null) {
-      setState(() {
-        _selectedTime = picked;
-        timeController.text =
-            '${_selectedTime.hour}:${_selectedTime.minute.toString().padLeft(2, '0')}';
-      });
-    }
-  }
+  // _selectTime(BuildContext context) async {
+  //   final TimeOfDay? picked = await showTimePicker(
+  //     context: context,
+  //     initialTime: _selectedTime,
+  //     builder: (context, child) {
+  //       return MediaQuery(
+  //         data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+  //         child: child ?? Container(),
+  //       );
+  //     },
+  //   );
+  //   if (picked != null) {
+  //     setState(() {
+  //       _selectedTime = picked;
+  //       timeController.text =
+  //           '${_selectedTime.hour}:${_selectedTime.minute.toString().padLeft(2, '0')}';
+  //     });
+  //   }
+  // }
 }

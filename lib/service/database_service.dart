@@ -11,6 +11,8 @@ class DatabaseService {
       FirebaseFirestore.instance.collection('users');
   final CollectionReference schedulesCollection =
       FirebaseFirestore.instance.collection('schedules');
+  final CollectionReference appointmentsCollection =
+      FirebaseFirestore.instance.collection('appointments');
 
   //delete user
   Future deleteUser() async {
@@ -271,9 +273,15 @@ class DatabaseService {
     await schedulesCollection.doc(documentId).set({
       'date': date,
       'time': time,
-      'appointedHighPriority': [],
-      'appointedMidPriority': [],
-      'appointedLowPriority': [],
+    });
+
+    await appointmentsCollection.doc(documentId).set({
+      '9am': '',
+      '10am': '',
+      '2pm': '',
+      '3pm': '',
+      'additional1': '',
+      'additional2': '',
     });
   }
 
