@@ -19,6 +19,7 @@ class DatabaseService {
     return await userCollection.doc(uid).delete();
   }
 
+  //get all users uid
   Future getAllUsersUid() async {
     List<String> documentIds = [];
     await userCollection.get().then((QuerySnapshot snapshot) {
@@ -40,6 +41,7 @@ class DatabaseService {
       'studentId': studentId,
       'uid': uid,
       'phoneNumber': '',
+      //user progress in the app by default
       'isUserSingedInUsingEmailOnly': true,
       'isUserDoneWithChatbot': false,
       'isUserDoneWithQuestionnaire': false,
@@ -48,7 +50,7 @@ class DatabaseService {
     });
   }
 
-  //check user student id for log in
+  //check if user student id is correct for log in
   Future getUserStudentId() async {
     DocumentReference d = userCollection.doc(uid);
     DocumentSnapshot documentSnapshot = await d.get();
@@ -59,7 +61,7 @@ class DatabaseService {
     }
   }
 
-  //check user student id for sign up
+  //check if user student id already used for sign up
   Future<bool> checkStudentIdExists(String studentId) async {
     final QuerySnapshot result =
         await userCollection.where("studentId", isEqualTo: studentId).get();
@@ -67,7 +69,7 @@ class DatabaseService {
     return documents.isEmpty;
   }
 
-  //saving user phone number
+  //save and get user phone number
   Future addPhoneNumber(String phoneNumber) async {
     return await userCollection.doc(uid).update({
       'phoneNumber': phoneNumber,
@@ -80,7 +82,7 @@ class DatabaseService {
     return documentSnapshot['phoneNumber'];
   }
 
-  //to check user log in status
+  //to check user progress in the app
   Future userDoneWithChatbot() async {
     return await userCollection.doc(uid).update({
       'isUserDoneWithChatbot': true,
@@ -123,7 +125,7 @@ class DatabaseService {
     return documentSnapshot['isUserDoneWithResults'];
   }
 
-  //questionnaire result
+  //save questionnaire result
   Future questionnaireResult(
     double grandMean,
     double categoryNonacceptanceMEAN,
@@ -251,7 +253,7 @@ class DatabaseService {
     }
   }
 
-  //ADMIN
+  // [ADMIN FUNCTIONS]
 
   //add appointment schedule
   Future addSchedule(String date, String time) async {
@@ -275,13 +277,15 @@ class DatabaseService {
       'time': time,
     });
 
+    //also create a collection for the appointments of the day
     await appointmentsCollection.doc(documentId).set({
       '9am': '',
       '10am': '',
+      '11am': '',
       '2pm': '',
       '3pm': '',
-      'additional1': '',
-      'additional2': '',
+      '4pm': '',
+      '5pm': '',
     });
   }
 
@@ -322,8 +326,9 @@ class DatabaseService {
     return null;
   }
 
+  //TODO : add a function that will check if the user is already appointed
   Future appointUserWithHighPriority(String schedUid) async {
-    return await schedulesCollection.doc(schedUid).set({
+    return await appointmentsCollection.doc(schedUid).update({
       'appointedHighPriority': [uid],
     });
   }
