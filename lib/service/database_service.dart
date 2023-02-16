@@ -274,19 +274,48 @@ class DatabaseService {
 
     await schedulesCollection.doc(documentId).set({
       'date': date,
-      'time': time,
     });
 
-    //also create a collection for the appointments of the day
-    await appointmentsCollection.doc(documentId).set({
-      '9am': '',
-      '10am': '',
-      '11am': '',
-      '2pm': '',
-      '3pm': '',
-      '4pm': '',
-      '5pm': '',
-    });
+    // //also create a collection for the appointments of the day
+    // await appointmentsCollection.doc(documentId).set({
+    //   '9am': '',
+    //   '10am': '',
+    //   '11am': '',
+    //   '2pm': '',
+    //   '3pm': '',
+    //   '4pm': '',
+    // });
+    //TODO
+    return documentId;
+  }
+
+  Future<void> updateAppointment(String date, String time, String uid) async {
+    // Get all schedule document ids
+    List<String> scheduleIds = await getAllSchedulesDocId();
+
+    // Check each schedule for empty appointment slots
+    List<String> timeSlots = [
+      '9am',
+      '10am',
+      '2pm',
+      '3pm',
+    ];
+    for (String scheduleId in scheduleIds) {
+      final DocumentSnapshot appointmentsDoc =
+          await appointmentsCollection.doc(scheduleId).get();
+      for (String slot in timeSlots) {
+        if (appointmentsDoc.get(slot) == '') {
+          // If the slot is empty, update it with the uid and return
+          await appointmentsCollection.doc(scheduleId).update({
+            slot: uid,
+          });
+          return;
+        }
+      }
+    }
+
+    // If no empty slot is found, throw an error
+    throw 'No available slots';
   }
 
   Future whatDateTheCurrentUserIsAppointed() async {
@@ -402,12 +431,9 @@ class DatabaseService {
     return schedulesCollection.snapshots();
   }
 
-  Future getAllSchedules() async {
+  Future getAllSchedulesDocId() async {
     List<String> documentIds = [];
-    await FirebaseFirestore.instance
-        .collection("schedules")
-        .get()
-        .then((QuerySnapshot snapshot) {
+    await schedulesCollection.get().then((QuerySnapshot snapshot) {
       documentIds = snapshot.docs.map((doc) => doc.id).toList();
     });
     return documentIds;
@@ -415,10 +441,7 @@ class DatabaseService {
 
   Future getClosestDate() async {
     List<String> documentIds = [];
-    await FirebaseFirestore.instance
-        .collection("schedules")
-        .get()
-        .then((QuerySnapshot snapshot) {
+    await appointmentsCollection.get().then((QuerySnapshot snapshot) {
       documentIds = snapshot.docs.map((doc) => doc.id).toList();
     });
     return documentIds[0];

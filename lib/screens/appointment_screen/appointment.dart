@@ -48,7 +48,10 @@ class _AppointmentState extends State<Appointment> {
       setState(() {
         scheduleStream = snapshot;
       });
-      print(snapshot);
+    });
+
+    await DatabaseService().getAllSchedulesDocId().then((value) {
+      print(value);
     });
   }
 
@@ -240,7 +243,8 @@ class _AppointmentState extends State<Appointment> {
                     // await DatabaseService()
                     //     .getAllSchedules()
                     //     .then((value) => print(value));
-                    await DatabaseService().addSchedule('01-01-2023', '11:23');
+                    await DatabaseService()
+                        .addSchedule('02-17-2023', '11:00 AM');
                   },
                   style: ButtonStyle(
                     fixedSize:

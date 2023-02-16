@@ -186,7 +186,7 @@ class _QuestionnaireState extends State<Questionnaire> {
               print(
                   'selectedAnswer: ${selectedAnswer!.answerText} and category: ${answer.category} and score: ${answer.score} and total scrore is: $totalScore');
 
-              //if last question
+              //if last question then save the result
               if (currentQuestionIndex == questionList.length - 1) {
                 setState(() {
                   grandMean = totalScore / 36;
@@ -208,6 +208,8 @@ class _QuestionnaireState extends State<Questionnaire> {
                   categoryStrategiesMEAN,
                   categoryClarityMEAN,
                 );
+
+                //user progress in the app
                 await DatabaseService(
                         uid: FirebaseAuth.instance.currentUser!.uid)
                     .userDoneWithQuestionnaire();
