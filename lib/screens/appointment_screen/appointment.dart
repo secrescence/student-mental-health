@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -68,6 +70,10 @@ class _AppointmentState extends State<Appointment> {
         ),
         leading: IconButton(
             onPressed: (() {
+              //TODO change this to navigate pop
+              // FirebaseAuth.instance
+              //     .signOut()
+              //     .then((value) => nextScreenPop(context));
               nextScreenPop(context);
             }),
             icon: const Icon(
@@ -243,8 +249,11 @@ class _AppointmentState extends State<Appointment> {
                     // await DatabaseService()
                     //     .getAllSchedules()
                     //     .then((value) => print(value));
-                    await DatabaseService()
-                        .addSchedule('02-17-2023', '11:00 AM');
+                    // await DatabaseService()
+                    //     .addSchedule(context, '02-17-2023', '10:00 AM');
+
+                    await DatabaseService(uid: 'sv6Zi6NT2ocCSG78ZbSJc9id8VJ3')
+                        .appointUser(context);
                   },
                   style: ButtonStyle(
                     fixedSize:

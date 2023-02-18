@@ -28,7 +28,9 @@ class _ScheduleState extends State<Schedule> {
     '2:00 PM',
     '3:00 PM',
   ];
-  String? _selectedValue;
+  String? _selectedTimeValue;
+
+  String time = '';
 
   // controllers
   TextEditingController dateController = TextEditingController();
@@ -319,7 +321,7 @@ class _ScheduleState extends State<Schedule> {
                                     top: 0, right: 10.5, bottom: 0, left: 2),
                               ),
                             ),
-                            value: _selectedValue,
+                            value: _selectedTimeValue,
                             items: _timeList
                                 .map((e) => DropdownMenuItem(
                                       alignment: AlignmentDirectional.center,
@@ -334,7 +336,7 @@ class _ScheduleState extends State<Schedule> {
                                 .toList(),
                             onChanged: ((value) {
                               setState(() {
-                                _selectedValue = value;
+                                _selectedTimeValue = value;
                               });
                             }),
                             autovalidateMode:
@@ -384,7 +386,7 @@ class _ScheduleState extends State<Schedule> {
                             onPressed: () {
                               nextScreenPop(context);
                               dateController.clear();
-                              _selectedValue = null;
+                              _selectedTimeValue = null;
                             },
                             style: ButtonStyle(
                               fixedSize: MaterialStateProperty.all<Size>(
@@ -418,9 +420,12 @@ class _ScheduleState extends State<Schedule> {
   _submitButton() async {
     if (_formKey.currentState!.validate()) {
       nextScreenPop(context);
-      await DatabaseService().addSchedule(dateController.text, _selectedValue!);
+
+      await DatabaseService()
+          .addSchedule(context, dateController.text, _selectedTimeValue!);
+
       dateController.clear();
-      _selectedValue = null;
+      _selectedTimeValue = null;
     }
   }
 

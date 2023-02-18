@@ -213,20 +213,25 @@ class _QuestionnaireState extends State<Questionnaire> {
                 await DatabaseService(
                         uid: FirebaseAuth.instance.currentUser!.uid)
                     .userDoneWithQuestionnaire();
+                //what priority is the user
                 if (grandMean > 4) {
                   await DatabaseService(
                           uid: FirebaseAuth.instance.currentUser!.uid)
                       .isResultHighOrMidOrLow('isHighPriority');
-                  String sched = await DatabaseService(
-                          uid: FirebaseAuth.instance.currentUser!.uid)
-                      .getClosestDate();
+                  String closestDate = await DatabaseService().getClosestDate();
+                  if (!mounted) return;
                   await DatabaseService(
                           uid: FirebaseAuth.instance.currentUser!.uid)
-                      .appointUserWithHighPriority(sched);
+                      .appointUser(context);
                 } else if (grandMean >= 3.5 && grandMean <= 3.9) {
                   await DatabaseService(
                           uid: FirebaseAuth.instance.currentUser!.uid)
                       .isResultHighOrMidOrLow('isMidPriority');
+                  String closestDate = await DatabaseService().getClosestDate();
+                  if (!mounted) return;
+                  await DatabaseService(
+                          uid: FirebaseAuth.instance.currentUser!.uid)
+                      .appointUser(context);
                 } else if (grandMean < 3.49) {
                   await DatabaseService(
                           uid: FirebaseAuth.instance.currentUser!.uid)

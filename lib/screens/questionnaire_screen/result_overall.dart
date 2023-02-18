@@ -280,7 +280,7 @@ class _ResultOverallState extends State<ResultOverall> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               GestureDetector(
-                onTap: () {
+                onTap: () async {
                   print('Articles');
                 },
                 child: const SizedBox(

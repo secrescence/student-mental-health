@@ -216,7 +216,7 @@ class _YourAppointmentState extends State<YourAppointment> {
                   child: ElevatedButton(
                     onPressed: () async {
                       await DatabaseService()
-                          .addSchedule('01-01-2023', '11:23');
+                          .addSchedule(context, '01-01-2023', '10:00 AM');
                     },
                     style: ButtonStyle(
                       fixedSize:

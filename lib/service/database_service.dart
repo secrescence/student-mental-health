@@ -1,6 +1,8 @@
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:student_mental_health/widgets/widgets/custom_snackbar.dart';
 
 class DatabaseService {
   final String? uid;
@@ -9,8 +11,6 @@ class DatabaseService {
   // reference for the collection
   final CollectionReference userCollection =
       FirebaseFirestore.instance.collection('users');
-  final CollectionReference schedulesCollection =
-      FirebaseFirestore.instance.collection('schedules');
   final CollectionReference appointmentsCollection =
       FirebaseFirestore.instance.collection('appointments');
 
@@ -256,13 +256,14 @@ class DatabaseService {
   // [ADMIN FUNCTIONS]
 
   //add appointment schedule
-  Future addSchedule(String date, String time) async {
+  Future addSchedule(BuildContext context, String date, String time,
+      {bool mounted = true}) async {
     int randomInt = Random().nextInt(10000000);
     String documentId = "$date-$randomInt";
 
     while (true) {
       DocumentSnapshot documentSnapshot =
-          await schedulesCollection.doc(documentId).get();
+          await appointmentsCollection.doc(documentId).get();
 
       if (!documentSnapshot.exists) {
         break;
@@ -272,54 +273,108 @@ class DatabaseService {
       documentId = "$date-$randomInt";
     }
 
-    await schedulesCollection.doc(documentId).set({
-      'date': date,
-    });
+    // Check if there are any schedules already for the given date and time
+    final QuerySnapshot querySnapshot = await appointmentsCollection
+        .where('date', isEqualTo: date)
+        .where('time', isEqualTo: time)
+        .get();
 
-    // //also create a collection for the appointments of the day
-    // await appointmentsCollection.doc(documentId).set({
-    //   '9am': '',
-    //   '10am': '',
-    //   '11am': '',
-    //   '2pm': '',
-    //   '3pm': '',
-    //   '4pm': '',
-    // });
-    //TODO
-    return documentId;
+    if (querySnapshot.docs.isNotEmpty) {
+      if (!mounted) return;
+      errorSnackbar(context, 'Oh Snap!', 'Time slot already taken');
+    } else {
+      await appointmentsCollection.doc(documentId).set({
+        'date': date,
+        'time': time,
+        'appointedUser': '',
+      });
+    }
   }
 
-  Future<void> updateAppointment(String date, String time, String uid) async {
-    // Get all schedule document ids
+  // Future addTimeSlots(String date, String time) async {
+  //   String docId = await addSchedule(date);
+  // }
+
+  //the system will automatically add the appointment to the first available slot
+  Future appointUser(BuildContext context, {bool mounted = true}) async {
     List<String> scheduleIds = await getAllSchedulesDocId();
 
-    // Check each schedule for empty appointment slots
-    List<String> timeSlots = [
-      '9am',
-      '10am',
-      '2pm',
-      '3pm',
-    ];
     for (String scheduleId in scheduleIds) {
       final DocumentSnapshot appointmentsDoc =
           await appointmentsCollection.doc(scheduleId).get();
-      for (String slot in timeSlots) {
-        if (appointmentsDoc.get(slot) == '') {
-          // If the slot is empty, update it with the uid and return
-          await appointmentsCollection.doc(scheduleId).update({
-            slot: uid,
-          });
-          return;
-        }
+      if (appointmentsDoc.get('appointedUser') == '') {
+        // If the slot is empty, update it with the uid and return
+        await appointmentsCollection.doc(scheduleId).update({
+          'appointedUser': uid,
+        });
+        return;
       }
     }
 
     // If no empty slot is found, throw an error
-    throw 'No available slots';
+    //TODO Create a no available slots dialog
+    print('No available slots');
+    errorSnackbar(context, 'Oh Snap!', 'Time slot already taken');
+  }
+
+  //add additional appointment for emergency cases
+  Future addAdditionalAppointment(
+      BuildContext context, String date, String time,
+      {bool mounted = true}) async {
+    int randomInt = Random().nextInt(10000000);
+    String documentId = "$date-$randomInt";
+
+    while (true) {
+      DocumentSnapshot documentSnapshot =
+          await appointmentsCollection.doc(documentId).get();
+
+      if (!documentSnapshot.exists) {
+        break;
+      }
+
+      randomInt = Random().nextInt(10000000);
+      documentId = "$date-$randomInt-additional";
+    }
+
+    // Check if there are any schedules already for the given date and time
+    final QuerySnapshot querySnapshot = await appointmentsCollection
+        .where('date', isEqualTo: date)
+        .where('time', isEqualTo: '11:00 AM')
+        .where('time', isEqualTo: '4:00 PM')
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      if (!mounted) return;
+      errorSnackbar(context, 'Oh Snap!', 'Time slot already taken');
+    } else {
+      await appointmentsCollection.doc(documentId).set({
+        'date': date,
+        'time': time,
+        'appointedUser': '',
+      });
+    }
+
+    // Get all schedule document ids
+    List<String> scheduleIds = await getAllSchedulesDocId();
+
+    for (String scheduleId in scheduleIds) {
+      final DocumentSnapshot appointmentsDoc =
+          await appointmentsCollection.doc(scheduleId).get();
+      if (appointmentsDoc.get('appointedUser') == '') {
+        // If the slot is empty, update it with the uid and return
+        await appointmentsCollection.doc(scheduleId).update({
+          'appointedUser': uid,
+        });
+        return;
+      }
+    }
+
+    // If no empty slot is found, throw an error
+    print('No available slots');
   }
 
   Future whatDateTheCurrentUserIsAppointed() async {
-    QuerySnapshot snapshot = await schedulesCollection
+    QuerySnapshot snapshot = await appointmentsCollection
         .where(
           'appointedHighPriority',
           arrayContains: uid,
@@ -330,7 +385,7 @@ class DatabaseService {
       return snapshot.docs.first.id;
     }
 
-    snapshot = await schedulesCollection
+    snapshot = await appointmentsCollection
         .where(
           'appointedMidPriority',
           arrayContains: uid,
@@ -341,7 +396,7 @@ class DatabaseService {
       return snapshot.docs.first.id;
     }
 
-    snapshot = await schedulesCollection
+    snapshot = await appointmentsCollection
         .where(
           'appointedLowPriority',
           arrayContains: uid,
@@ -362,78 +417,82 @@ class DatabaseService {
     });
   }
 
-  Future<List<String>> getAppointedHighPriority(String schedUid) async {
-    DocumentSnapshot snapshot = await schedulesCollection.doc(schedUid).get();
-    if (snapshot.exists) {
-      Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
-      if (data.containsKey('appointedHighPriority')) {
-        return List<String>.from(data['appointedHighPriority']);
-      } else {
-        return [];
-      }
-    } else {
-      return [];
-    }
-  }
+  // Future<List<String>> getAppointedHighPriority(String schedUid) async {
+  //   DocumentSnapshot snapshot =
+  //       await appointmentsCollection.doc(schedUid).get();
+  //   if (snapshot.exists) {
+  //     Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+  //     if (data.containsKey('appointedHighPriority')) {
+  //       return List<String>.from(data['appointedHighPriority']);
+  //     } else {
+  //       return [];
+  //     }
+  //   } else {
+  //     return [];
+  //   }
+  // }
 
-  Future appointUserWithMidPriority(String schedUid) async {
-    return await schedulesCollection.doc(schedUid).set({
-      'appointedMidPriority': [uid],
-    });
-  }
+  // Future appointUserWithMidPriority(String schedUid) async {
+  //   return await appointmentsCollection.doc(schedUid).set({
+  //     'appointedMidPriority': [uid],
+  //   });
+  // }
 
-  Future<List<String>> getAppointedMidPriority(String schedUid) async {
-    DocumentSnapshot snapshot = await schedulesCollection.doc(schedUid).get();
-    if (snapshot.exists) {
-      Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
-      if (data.containsKey('appointedMidPriority')) {
-        return List<String>.from(data['appointedMidPriority']);
-      } else {
-        return [];
-      }
-    } else {
-      return [];
-    }
-  }
+  // Future<List<String>> getAppointedMidPriority(String schedUid) async {
+  //   DocumentSnapshot snapshot =
+  //       await appointmentsCollection.doc(schedUid).get();
+  //   if (snapshot.exists) {
+  //     Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+  //     if (data.containsKey('appointedMidPriority')) {
+  //       return List<String>.from(data['appointedMidPriority']);
+  //     } else {
+  //       return [];
+  //     }
+  //   } else {
+  //     return [];
+  //   }
+  // }
 
-  Future appointUserWithLowPriority(String schedUid) async {
-    return await schedulesCollection.doc(schedUid).set({
-      'appointedLowPriority': [uid],
-    });
-  }
+  // Future appointUserWithLowPriority(String schedUid) async {
+  //   return await appointmentsCollection.doc(schedUid).set({
+  //     'appointedLowPriority': [uid],
+  //   });
+  // }
 
-  Future<List<String>> getAppointedLowPriority(String schedUid) async {
-    DocumentSnapshot snapshot = await schedulesCollection.doc(schedUid).get();
-    if (snapshot.exists) {
-      Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
-      if (data.containsKey('appointedLowPriority')) {
-        return List<String>.from(data['appointedLowPriority']);
-      } else {
-        return [];
-      }
-    } else {
-      return [];
-    }
-  }
+  // Future<List<String>> getAppointedLowPriority(String schedUid) async {
+  //   DocumentSnapshot snapshot =
+  //       await appointmentsCollection.doc(schedUid).get();
+  //   if (snapshot.exists) {
+  //     Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+  //     if (data.containsKey('appointedLowPriority')) {
+  //       return List<String>.from(data['appointedLowPriority']);
+  //     } else {
+  //       return [];
+  //     }
+  //   } else {
+  //     return [];
+  //   }
+  // }
 
   //SteamBuilder
   Future<Stream<QuerySnapshot>> getSchedules() async {
-    return schedulesCollection.orderBy('date').snapshots();
+    return appointmentsCollection.orderBy('date').snapshots();
   }
 
   Future<Stream<DocumentSnapshot<Object?>>> getOnlySpecificScheduleDate(
       String schedUid) async {
-    return schedulesCollection.doc(schedUid).snapshots();
+    return appointmentsCollection.doc(schedUid).snapshots();
   }
 
   //get all schedules
   Future<Stream<QuerySnapshot>> getUserAppointment() async {
-    return schedulesCollection.snapshots();
+    return appointmentsCollection.snapshots();
   }
 
+  //TODO this is okay
   Future getAllSchedulesDocId() async {
     List<String> documentIds = [];
-    await schedulesCollection.get().then((QuerySnapshot snapshot) {
+    await appointmentsCollection.get().then((QuerySnapshot snapshot) {
       documentIds = snapshot.docs.map((doc) => doc.id).toList();
     });
     return documentIds;
