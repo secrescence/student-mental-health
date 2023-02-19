@@ -104,12 +104,12 @@ class _ResultOverallState extends State<ResultOverall> {
             setState(() {
               fourthChatVisible = false;
             });
-            if (isLowAndMidPriority) {
+            if (isLowAndMidPriority == true) {
               setState(() {
                 showLowAndMidPriority = true;
               });
               _showBottomSheet(context);
-            } else if (isHighPriority) {
+            } else if (isHighPriority == true) {
               setState(() {
                 showHighPriority = true;
               });
@@ -194,6 +194,7 @@ class _ResultOverallState extends State<ResultOverall> {
             isLottieChatbotVisible: isBotVisible,
             repeat: isRepeat,
           ),
+
           //next button
           Visibility(
             visible: showHighPriority,
@@ -205,9 +206,14 @@ class _ResultOverallState extends State<ResultOverall> {
                     showLowAndMidPriority = true;
                     showHighPriority = false;
                   });
-                  _showBottomSheet(context);
-                  nextScreen(context, const Appointment());
-                  _showBottomSheet(context);
+                  Future.delayed(const Duration(milliseconds: 20))
+                      .then((value) {
+                    _showBottomSheet(context);
+                  });
+                  Future.delayed(const Duration(milliseconds: 50))
+                      .then((value) {
+                    nextScreen(context, const Appointment());
+                  });
                 },
                 style: ButtonStyle(
                   fixedSize:

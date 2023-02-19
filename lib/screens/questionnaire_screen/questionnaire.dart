@@ -218,7 +218,6 @@ class _QuestionnaireState extends State<Questionnaire> {
                   await DatabaseService(
                           uid: FirebaseAuth.instance.currentUser!.uid)
                       .isResultHighOrMidOrLow('isHighPriority');
-                  String closestDate = await DatabaseService().getClosestDate();
                   if (!mounted) return;
                   await DatabaseService(
                           uid: FirebaseAuth.instance.currentUser!.uid)
@@ -227,7 +226,6 @@ class _QuestionnaireState extends State<Questionnaire> {
                   await DatabaseService(
                           uid: FirebaseAuth.instance.currentUser!.uid)
                       .isResultHighOrMidOrLow('isMidPriority');
-                  String closestDate = await DatabaseService().getClosestDate();
                   if (!mounted) return;
                   await DatabaseService(
                           uid: FirebaseAuth.instance.currentUser!.uid)

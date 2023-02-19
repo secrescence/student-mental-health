@@ -28,7 +28,8 @@ class _ResultCategoriesState extends State<ResultCategories> {
       'difficulties concentrating and accomplishing tasks when experiencing negative emotions.';
   String impulseDescription =
       'difficulties remaining in control of one\'s behavior when experiencing negative emotions.';
-  String awarenessDescription = 'wqqweqweq';
+  String awarenessDescription =
+      'tendency to attend to and acknowledge emotions.';
   String strategiesDescription =
       'the belief that there is little that can be done to regulate emotions effectively, once an individual is upset.';
   String clarityDescription =

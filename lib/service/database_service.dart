@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:student_mental_health/widgets/widgets/custom_snackbar.dart';
@@ -13,6 +11,8 @@ class DatabaseService {
       FirebaseFirestore.instance.collection('users');
   final CollectionReference appointmentsCollection =
       FirebaseFirestore.instance.collection('appointments');
+  final CollectionReference additionalAppointmentsCollection =
+      FirebaseFirestore.instance.collection('additionalAppointments');
 
   //delete user
   Future deleteUser() async {
@@ -254,12 +254,28 @@ class DatabaseService {
   }
 
   // [ADMIN FUNCTIONS]
-
-  //add appointment schedule
   Future addSchedule(BuildContext context, String date, String time,
       {bool mounted = true}) async {
-    int randomInt = Random().nextInt(10000000);
-    String documentId = "$date-$randomInt";
+    // List of available times in ascending order
+    final List<String> availableTimes = [
+      '9:00 AM',
+      '10:00 AM',
+      '11:00 AM',
+      '2:00 PM',
+      '3:00 PM',
+      '4:00 PM'
+    ];
+
+    // Get the index of the selected time
+    int timeIndex = availableTimes.indexOf(time);
+
+    if (timeIndex == -1) {
+      if (!mounted) return;
+      errorSnackbar(context, 'Oh Snap!', 'Invalid time');
+      return;
+    }
+
+    String documentId = "$date-$timeIndex";
 
     while (true) {
       DocumentSnapshot documentSnapshot =
@@ -269,8 +285,18 @@ class DatabaseService {
         break;
       }
 
-      randomInt = Random().nextInt(10000000);
-      documentId = "$date-$randomInt";
+      if (timeIndex == 1) {
+        timeIndex += 2;
+      } else {
+        timeIndex++;
+      }
+      if (timeIndex >= availableTimes.length) {
+        if (!mounted) return;
+        errorSnackbar(context, 'Oh Snap!', 'No more available time slots');
+        return;
+      }
+
+      documentId = "$date-$timeIndex";
     }
 
     // Check if there are any schedules already for the given date and time
@@ -290,6 +316,42 @@ class DatabaseService {
       });
     }
   }
+
+  //add appointment schedule
+  // Future addSchedule(BuildContext context, String date, String time,
+  //     {bool mounted = true}) async {
+  //   int randomInt = Random().nextInt(10000000);
+  //   String documentId = "$date-$randomInt";
+
+  //   while (true) {
+  //     DocumentSnapshot documentSnapshot =
+  //         await appointmentsCollection.doc(documentId).get();
+
+  //     if (!documentSnapshot.exists) {
+  //       break;
+  //     }
+
+  //     randomInt = Random().nextInt(10000000);
+  //     documentId = "$date-$randomInt";
+  //   }
+
+  //   // Check if there are any schedules already for the given date and time
+  //   final QuerySnapshot querySnapshot = await appointmentsCollection
+  //       .where('date', isEqualTo: date)
+  //       .where('time', isEqualTo: time)
+  //       .get();
+
+  //   if (querySnapshot.docs.isNotEmpty) {
+  //     if (!mounted) return;
+  //     errorSnackbar(context, 'Oh Snap!', 'Time slot already taken');
+  //   } else {
+  //     await appointmentsCollection.doc(documentId).set({
+  //       'date': date,
+  //       'time': time,
+  //       'appointedUser': '',
+  //     });
+  //   }
+  // }
 
   // Future addTimeSlots(String date, String time) async {
   //   String docId = await addSchedule(date);
@@ -318,51 +380,79 @@ class DatabaseService {
   }
 
   //add additional appointment for emergency cases
-  Future addAdditionalAppointment(
-      BuildContext context, String date, String time,
+  Future additionalAppointment(BuildContext context, String date, String time,
       {bool mounted = true}) async {
-    int randomInt = Random().nextInt(10000000);
-    String documentId = "$date-$randomInt";
+    // List of available times in ascending order
+    final List<String> availableTimes = [
+      '9:00 AM',
+      '10:00 AM',
+      '11:00 AM',
+      '2:00 PM',
+      '3:00 PM',
+      '4:00 PM',
+    ];
+
+    // Get the index of the selected time
+    int timeIndex = availableTimes.indexOf(time);
+    if (timeIndex == -1) {
+      return;
+    }
+
+    String documentId = "$date-$timeIndex";
 
     while (true) {
       DocumentSnapshot documentSnapshot =
-          await appointmentsCollection.doc(documentId).get();
+          await additionalAppointmentsCollection.doc(documentId).get();
 
       if (!documentSnapshot.exists) {
         break;
       }
 
-      randomInt = Random().nextInt(10000000);
-      documentId = "$date-$randomInt-additional";
+      print(timeIndex);
+      if (timeIndex == 2) {
+        timeIndex += 3;
+      } else {
+        timeIndex += 2;
+      }
+
+      if (timeIndex >= availableTimes.length) {
+        if (!mounted) return;
+        errorSnackbar(context, 'Oh Snap!', 'No more available time slots');
+        return;
+      }
+
+      documentId = "$date-$timeIndex";
     }
 
     // Check if there are any schedules already for the given date and time
     final QuerySnapshot querySnapshot = await appointmentsCollection
         .where('date', isEqualTo: date)
-        .where('time', isEqualTo: '11:00 AM')
-        .where('time', isEqualTo: '4:00 PM')
+        .where('time', isEqualTo: time)
         .get();
 
     if (querySnapshot.docs.isNotEmpty) {
       if (!mounted) return;
       errorSnackbar(context, 'Oh Snap!', 'Time slot already taken');
     } else {
-      await appointmentsCollection.doc(documentId).set({
+      await additionalAppointmentsCollection.doc(documentId).set({
         'date': date,
         'time': time,
         'appointedUser': '',
       });
     }
 
-    // Get all schedule document ids
-    List<String> scheduleIds = await getAllSchedulesDocId();
+    //appoint user
+    List<String> scheduleIds = [];
+    await additionalAppointmentsCollection.get().then((QuerySnapshot snapshot) {
+      scheduleIds = snapshot.docs.map((doc) => doc.id).toList();
+    });
 
     for (String scheduleId in scheduleIds) {
       final DocumentSnapshot appointmentsDoc =
-          await appointmentsCollection.doc(scheduleId).get();
+          await additionalAppointmentsCollection.doc(scheduleId).get();
       if (appointmentsDoc.get('appointedUser') == '') {
         // If the slot is empty, update it with the uid and return
-        await appointmentsCollection.doc(scheduleId).update({
+        await additionalAppointmentsCollection.doc(scheduleId).update({
           'appointedUser': uid,
         });
         return;
@@ -370,7 +460,9 @@ class DatabaseService {
     }
 
     // If no empty slot is found, throw an error
+    //TODO Create a no available slots dialog
     print('No available slots');
+    errorSnackbar(context, 'Oh Snap!', 'Time slot already taken');
   }
 
   Future whatDateTheCurrentUserIsAppointed() async {
@@ -482,6 +574,11 @@ class DatabaseService {
   Future<Stream<DocumentSnapshot<Object?>>> getOnlySpecificScheduleDate(
       String schedUid) async {
     return appointmentsCollection.doc(schedUid).snapshots();
+  }
+
+  //get all users data
+  Future<Stream<QuerySnapshot>> usersList() async {
+    return userCollection.snapshots();
   }
 
   //get all schedules
