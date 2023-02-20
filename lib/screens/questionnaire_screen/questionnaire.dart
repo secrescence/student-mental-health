@@ -192,7 +192,7 @@ class _QuestionnaireState extends State<Questionnaire> {
                   grandMean = totalScore / 36;
                   categoryNonacceptanceMEAN = categoryNonacceptance / 6;
                   categoryGoalsMEAN = categoryGoals / 5;
-                  categoryImpulseMEAN = categoryImpulseMEAN / 6;
+                  categoryImpulseMEAN = categoryImpulse / 6;
                   categoryAwarenessMEAN = categoryAwareness / 6;
                   categoryStrategiesMEAN = categoryStrategies / 8;
                   categoryClarityMEAN = categoryClarity / 5;

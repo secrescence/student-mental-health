@@ -227,13 +227,18 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   void verifyOTP() async {
-    await AuthService().verifyOtp(
-        context: context,
-        verificationId: widget.verificationId,
-        userOtp: userOtp!);
+    await AuthService()
+        .verifyOtp(
+            context: context,
+            verificationId: widget.verificationId,
+            userOtp: userOtp!)
+        .then((value) async {
+      if (value != null) {
+        await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
+            .addPhoneNumber(widget.phoneNumber);
+      }
+    });
     await HelperFunctions.saveUserLoggedInStatus(true);
-    await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
-        .addPhoneNumber(widget.phoneNumber);
   }
 
   void resendOtpTimer() {

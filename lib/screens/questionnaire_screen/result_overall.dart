@@ -33,7 +33,7 @@ class _ResultOverallState extends State<ResultOverall> {
       'As a result, I strongly encourage you\nto talk with our school\'s guidance\ncounselor. Our expert will help and\ngive the necessary support that you\nneed.';
   String highPriority2 = 'Click next to continue';
   String midPriority1 =
-      'As a result, I would like you to check\nout some articles and videos that we\ngathered just for you! You can also reach\nout to our school\'s guidance counselor\nAanytime you want.';
+      'As a result, I would like you to check\nout some articles and videos that we\ngathered just for you! You can also reach\nout to our school\'s guidance counselor\nAnytime you want.';
   String midPriority2 = 'I hope you enjoy 🙂';
   String lowPriority1 =
       'As a result, I would like you to\ncheck out some articles and\nvideos that we gathered just\nfor you!';

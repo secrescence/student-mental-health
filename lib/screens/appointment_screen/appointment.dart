@@ -28,9 +28,12 @@ class _AppointmentState extends State<Appointment> {
 
   Stream<QuerySnapshot>? scheduleStream;
 
+  bool isCreateAppointmentButtonVisible = true;
+
   @override
   void initState() {
     getListOfSchedule();
+    checkPriority();
     super.initState();
   }
 
@@ -52,9 +55,19 @@ class _AppointmentState extends State<Appointment> {
         scheduleStream = snapshot;
       });
     });
+    //TODO remove this
+    await DatabaseService().getAllSchedulesDocId().then((value) {});
+  }
 
-    await DatabaseService().getAllSchedulesDocId().then((value) {
-      print(value);
+  checkPriority() async {
+    await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
+        .checkPriority()
+        .then((value) async {
+      if (value == 'High Priority' || value == 'Mid Priority') {
+        setState(() {
+          isCreateAppointmentButtonVisible = false;
+        });
+      }
     });
   }
 
@@ -221,61 +234,65 @@ class _AppointmentState extends State<Appointment> {
                 )),
           ),
           const SizedBox(height: 40),
-          Padding(
-            padding: const EdgeInsets.only(right: 30),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ElevatedButton(
-                  onPressed: () async {
-                    // await DatabaseService()
-                    //     .getUidScheduleOfDateNow()
-                    //     .then((value) async {
-                    //   if (!value.toString().contains(
-                    //       "${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year}")) {
-                    //     setState(() {
-                    //       incrementForDateOfAppointment = 1;
-                    //     });
-                    //     await DatabaseService().addSchedule(
-                    //         schedule, incrementForDateOfAppointment);
-                    //   } else {
-                    //     setState(() {
-                    //       incrementForDateOfAppointment++;
-                    //     });
-                    //     await DatabaseService().addSchedule(
-                    //         schedule, incrementForDateOfAppointment);
-                    //     print('w');
-                    //   }
-                    // });
-                    // await DatabaseService()
-                    //     .getAllSchedules()
-                    //     .then((value) => print(value));
-                    // await DatabaseService()
-                    //     .addSchedule(context, '02-17-2023', '10:00 AM');
+          Visibility(
+            visible: isCreateAppointmentButtonVisible,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 30),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ElevatedButton(
+                    onPressed: () async {
+                      // await DatabaseService()
+                      //     .getUidScheduleOfDateNow()
+                      //     .then((value) async {
+                      //   if (!value.toString().contains(
+                      //       "${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year}")) {
+                      //     setState(() {
+                      //       incrementForDateOfAppointment = 1;
+                      //     });
+                      //     await DatabaseService().addSchedule(
+                      //         schedule, incrementForDateOfAppointment);
+                      //   } else {
+                      //     setState(() {
+                      //       incrementForDateOfAppointment++;
+                      //     });
+                      //     await DatabaseService().addSchedule(
+                      //         schedule, incrementForDateOfAppointment);
+                      //     print('w');
+                      //   }
+                      // });
+                      // await DatabaseService()
+                      //     .getAllSchedules()
+                      //     .then((value) => print(value));
+                      // await DatabaseService()
+                      //     .addSchedule(context, '02-17-2023', '10:00 AM');
 
-                    // await DatabaseService(uid: 'sv6Zi6NT2ocCSG78ZbSJc9id8VJ3')
-                    //     .appointUser(context);
-                    await DatabaseService(uid: 'GRuBovrHQqVdhikUkYNxKnthVti2')
-                        .additionalAppointment(
-                            context, '02-19-2023', '11:00 AM');
-                  },
-                  style: ButtonStyle(
-                    fixedSize:
-                        MaterialStateProperty.all<Size>(const Size(190, 48)),
-                    foregroundColor:
-                        MaterialStateProperty.all<Color>(Colors.white),
-                    backgroundColor:
-                        MaterialStateProperty.all<Color>(phoneFieldButtonColor),
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(7),
+                      // await DatabaseService(uid: 'sv6Zi6NT2ocCSG78ZbSJc9id8VJ3')
+                      //     .appointUser(context);
+                      await DatabaseService(uid: 'GRuBovrHQqVdhikUkYNxKnthVti2')
+                          .additionalAppointment(
+                              context, '02-19-2023', '11:00 AM');
+                    },
+                    style: ButtonStyle(
+                      fixedSize:
+                          MaterialStateProperty.all<Size>(const Size(190, 48)),
+                      foregroundColor:
+                          MaterialStateProperty.all<Color>(Colors.white),
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                          phoneFieldButtonColor),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(7),
+                        ),
                       ),
                     ),
+                    child: const Text('Create Appointment',
+                        style:
+                            TextStyle(fontSize: 16, fontFamily: 'Sofia Pro')),
                   ),
-                  child: const Text('Create Appointment',
-                      style: TextStyle(fontSize: 16, fontFamily: 'Sofia Pro')),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           GestureDetector(
