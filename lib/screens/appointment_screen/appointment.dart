@@ -85,10 +85,10 @@ class _AppointmentState extends State<Appointment> {
         leading: IconButton(
             onPressed: (() {
               //TODO change this to navigate pop
-              // FirebaseAuth.instance
-              //     .signOut()
-              //     .then((value) => nextScreenPop(context));
-              nextScreenPop(context);
+              FirebaseAuth.instance
+                  .signOut()
+                  .then((value) => nextScreenPop(context));
+              // nextScreenPop(context);
             }),
             icon: const Icon(
               Icons.arrow_back_ios,

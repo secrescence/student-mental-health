@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:student_mental_health/widgets/widgets/custom_snackbar.dart';
 
@@ -465,43 +466,6 @@ class DatabaseService {
     errorSnackbar(context, 'Oh Snap!', 'Time slot already taken');
   }
 
-  Future whatDateTheCurrentUserIsAppointed() async {
-    QuerySnapshot snapshot = await appointmentsCollection
-        .where(
-          'appointedHighPriority',
-          arrayContains: uid,
-        )
-        .get();
-
-    if (snapshot.docs.isNotEmpty) {
-      return snapshot.docs.first.id;
-    }
-
-    snapshot = await appointmentsCollection
-        .where(
-          'appointedMidPriority',
-          arrayContains: uid,
-        )
-        .get();
-
-    if (snapshot.docs.isNotEmpty) {
-      return snapshot.docs.first.id;
-    }
-
-    snapshot = await appointmentsCollection
-        .where(
-          'appointedLowPriority',
-          arrayContains: uid,
-        )
-        .get();
-
-    if (snapshot.docs.isNotEmpty) {
-      return snapshot.docs.first.id;
-    }
-
-    return null;
-  }
-
   //TODO : add a function that will check if the user is already appointed
   Future appointUserWithHighPriority(String schedUid) async {
     return await appointmentsCollection.doc(schedUid).update({
@@ -584,6 +548,12 @@ class DatabaseService {
   //get all schedules
   Future<Stream<QuerySnapshot>> getUserAppointment() async {
     return appointmentsCollection.snapshots();
+  }
+
+  Future whatDateTheCurrentUserIsAppointed() async {
+    return appointmentsCollection
+        .where('appointedUser', isEqualTo: uid)
+        .snapshots();
   }
 
   //TODO this is okay

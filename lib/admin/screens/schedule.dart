@@ -79,9 +79,8 @@ class _ScheduleState extends State<Schedule> {
         margin: const EdgeInsets.symmetric(horizontal: 50, vertical: 100),
         child: Card(
           elevation: 3,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

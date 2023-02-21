@@ -15,7 +15,7 @@ class YourAppointment extends StatefulWidget {
 }
 
 class _YourAppointmentState extends State<YourAppointment> {
-  Stream<DocumentSnapshot>? scheduleStream;
+  Stream<QuerySnapshot>? dateOfAppointmentStream;
   String dateThatCurrentUserIsAppointed = '';
   String? priority;
   bool ifLowAndMidPriority = false;
@@ -43,19 +43,17 @@ class _YourAppointmentState extends State<YourAppointment> {
     await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
         .whatDateTheCurrentUserIsAppointed()
         .then((value) async {
-      if (value != null) {
-        setState(() {
-          dateThatCurrentUserIsAppointed = value;
-        });
-        await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
-            .getOnlySpecificScheduleDate(dateThatCurrentUserIsAppointed)
-            .then((value) {
-          setState(() {
-            scheduleStream = value;
-          });
-          print(value);
-        });
-      }
+      setState(() {
+        dateOfAppointmentStream = value;
+      });
+      // await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
+      //     .getOnlySpecificScheduleDate(dateThatCurrentUserIsAppointed)
+      //     .then((value) {
+      //   setState(() {
+      //     scheduleStream = value;
+      //   });
+      //   print(value);
+      // });
     });
   }
 
@@ -135,8 +133,8 @@ class _YourAppointmentState extends State<YourAppointment> {
                     ),
                     SizedBox(
                       height: 300,
-                      child: StreamBuilder<DocumentSnapshot>(
-                        stream: scheduleStream,
+                      child: StreamBuilder<QuerySnapshot>(
+                        stream: dateOfAppointmentStream,
                         builder: (context, snapshot) {
                           if (!snapshot.hasData ||
                               snapshot.connectionState ==
@@ -148,11 +146,10 @@ class _YourAppointmentState extends State<YourAppointment> {
                               ),
                             );
                           }
-                          DocumentSnapshot document =
-                              snapshot.data as DocumentSnapshot;
-                          String date = document['date'];
-                          String time = document['time'];
-                          if (date.isEmpty || time.isEmpty) {
+                          final List<DocumentSnapshot> document =
+                              snapshot.data!.docs;
+
+                          if (document.isEmpty) {
                             return const Center(
                               child: Text(
                                 'No schedule available',
@@ -164,40 +161,40 @@ class _YourAppointmentState extends State<YourAppointment> {
                               ),
                             );
                           }
-                          return Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 30, vertical: 10),
-                                child: Row(
-                                  children: [
-                                    const SizedBox(width: 10),
-                                    Text(date,
-                                        style: const TextStyle(
-                                          fontSize: 15,
-                                          fontFamily: 'Sofia Pro',
-                                          fontWeight: FontWeight.w400,
-                                        )),
-                                    const Spacer(),
-                                    Text(time,
-                                        style: const TextStyle(
-                                          fontSize: 15,
-                                          fontFamily: 'Sofia Pro',
-                                          fontWeight: FontWeight.w400,
-                                        )),
-                                    const Spacer(),
-                                    //TODO: Change the status here
-                                    Text('Pending',
-                                        style: const TextStyle(
-                                          fontSize: 15,
-                                          fontFamily: 'Sofia Pro',
-                                          fontWeight: FontWeight.w400,
-                                        )),
-                                    const SizedBox(width: 25),
-                                  ],
-                                ),
-                              ),
-                            ],
+
+                          return ListView.builder(
+                            itemCount: document.length,
+                            itemBuilder: (context, index) {
+                              Map<String, dynamic> data = document[index].data()
+                                  as Map<String, dynamic>;
+                              return Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 30, vertical: 10),
+                                    child: Row(
+                                      children: [
+                                        const SizedBox(width: 35),
+                                        Text(data['date'],
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              fontFamily: 'Sofia Pro',
+                                              fontWeight: FontWeight.w400,
+                                            )),
+                                        const Spacer(),
+                                        Text(data['time'],
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              fontFamily: 'Sofia Pro',
+                                              fontWeight: FontWeight.w400,
+                                            )),
+                                        const SizedBox(width: 40),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
                           );
                         },
                       ),

@@ -44,30 +44,69 @@ class _NotesState extends State<Notes> {
             )),
       ),
       body: Container(
-        child: StreamBuilder<QuerySnapshot>(
-          stream: usersStream,
-          builder:
-              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-            if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            }
+          width: double.infinity,
+          // height: 200,
+          margin: const EdgeInsets.symmetric(horizontal: 50, vertical: 100),
+          child: Card(
+            elevation: 3,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            child: Column(
+              // crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  alignment: Alignment.centerLeft,
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                  child: const Text(
+                    'Notes',
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.2,
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream: usersStream,
+                    builder: (BuildContext context,
+                        AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      }
 
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Text('Loading...');
-            }
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Text('Loading...');
+                      }
 
-            return ListView(
-              children: snapshot.data!.docs.map((DocumentSnapshot document) {
-                Map<String, dynamic> data =
-                    document.data() as Map<String, dynamic>;
-                return ListTile(
-                  title: Text('${data['firstName']} ${data['lastName']}'),
-                );
-              }).toList(),
-            );
-          },
-        ),
-      ),
+                      return ListView(
+                        children: snapshot.data!.docs
+                            .map((DocumentSnapshot document) {
+                          Map<String, dynamic> data =
+                              document.data() as Map<String, dynamic>;
+                          return Container(
+                            // padding: const EdgeInsets.symmetric(
+                            //     vertical: 2, horizontal: 0),
+                            child: Card(
+                              child: ListTile(
+                                title: Text(
+                                    '${data['firstName']} ${data['lastName']}'),
+                                subtitle: Text('${data['email']}'),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          )),
     );
   }
 }
