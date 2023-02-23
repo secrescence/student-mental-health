@@ -541,8 +541,8 @@ class DatabaseService {
   }
 
   //get all users data
-  Future<Stream<QuerySnapshot>> usersList() async {
-    return userCollection.snapshots();
+  Future usersList() async {
+    return userCollection.doc(uid).snapshots();
   }
 
   //get all schedules

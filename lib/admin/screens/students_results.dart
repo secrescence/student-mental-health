@@ -14,7 +14,7 @@ class _DashboardState extends State<Dashboard> {
     return Scaffold(
       backgroundColor: adminContentBGColor,
       body: Center(
-        child: Text('Dashboard'),
+        child: Text('Students Results'),
       ),
     );
   }

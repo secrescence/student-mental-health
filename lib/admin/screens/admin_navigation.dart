@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:student_mental_health/admin/screens/dashboard.dart';
-import 'package:student_mental_health/admin/screens/notes.dart';
+import 'package:student_mental_health/admin/screens/students_results.dart';
+import 'package:student_mental_health/admin/screens/admin_appointments.dart';
 import 'package:student_mental_health/admin/screens/schedule.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 
@@ -49,8 +49,8 @@ class _AdminNavigationState extends State<AdminNavigation> {
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: ListTile(
-                      leading: const Icon(Icons.dashboard),
-                      title: Text('Dashboard',
+                      leading: const Icon(Icons.schedule),
+                      title: Text('Schedule',
                           style: TextStyle(
                             fontFamily: 'Sofia Pro',
                             fontWeight: _currentIndex == 0
@@ -72,8 +72,8 @@ class _AdminNavigationState extends State<AdminNavigation> {
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: ListTile(
-                      leading: const Icon(Icons.schedule),
-                      title: Text('Schedule',
+                      leading: const Icon(Icons.calendar_month),
+                      title: Text('Appointments',
                           style: TextStyle(
                             fontFamily: 'Sofia Pro',
                             fontWeight: _currentIndex == 1
@@ -95,8 +95,8 @@ class _AdminNavigationState extends State<AdminNavigation> {
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: ListTile(
-                      leading: const Icon(Icons.note),
-                      title: Text('Notes',
+                      leading: const Icon(Icons.quiz),
+                      title: Text('Student\'s Results',
                           style: TextStyle(
                             fontFamily: 'Sofia Pro',
                             fontWeight: _currentIndex == 2
@@ -114,9 +114,9 @@ class _AdminNavigationState extends State<AdminNavigation> {
             child: IndexedStack(
               index: _currentIndex,
               children: const [
-                Dashboard(),
                 Schedule(),
                 Notes(),
+                Dashboard(),
               ],
             ),
           ),
