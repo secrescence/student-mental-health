@@ -3,16 +3,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
+import 'package:student_mental_health/widgets/widgets/widgets.dart';
 
-class Notes extends StatefulWidget {
-  const Notes({super.key});
+class AdminAppointments extends StatefulWidget {
+  const AdminAppointments({super.key});
 
   @override
-  State<Notes> createState() => _NotesState();
+  State<AdminAppointments> createState() => _AdminAppointmentsState();
 }
 
-class _NotesState extends State<Notes> {
+class _AdminAppointmentsState extends State<AdminAppointments> {
   Stream<QuerySnapshot>? userAppointmentStream;
+  String statusView = '';
+  String userIdView = '';
+  String fullNameView = '';
+
+  bool viewAppointment = true;
 
   @override
   void initState() {
@@ -35,22 +41,26 @@ class _NotesState extends State<Notes> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
-        title: Text(
-          'Appointments',
-          style: TextStyle(
-              color: Colors.black,
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              fontFamily: 'Sofia Pro'),
+        title: const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 40),
+          child: Text(
+            'Appointments',
+            style: TextStyle(
+                color: Colors.black,
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                fontFamily: 'Sofia Pro'),
+          ),
         ),
-        leading: IconButton(
-            onPressed: (() {
-              //TODO: Add back button functionality
-            }),
-            icon: const Icon(
-              Icons.arrow_back_ios,
-              color: Color(0xFF000000),
-            )),
+        automaticallyImplyLeading: false,
+        // leading: IconButton(
+        //     onPressed: (() {
+        //       //TODO: Add back button functionality
+        //     }),
+        //     icon: const Icon(
+        //       Icons.arrow_back_ios,
+        //       color: Color(0xFF000000),
+        //     )),
       ),
       body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 50),
@@ -61,8 +71,7 @@ class _NotesState extends State<Notes> {
           child: Container(
             width: double.infinity,
             height: double.infinity,
-            // padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-            margin: const EdgeInsets.symmetric(vertical: 10),
+            // margin: const EdgeInsets.symmetric(vertical: 10),
             child: StreamBuilder<QuerySnapshot>(
               stream: userAppointmentStream,
               builder: (BuildContext context,
@@ -81,33 +90,34 @@ class _NotesState extends State<Notes> {
                   );
                 }
 
-                return ListView(
-                  shrinkWrap: true,
-                  children:
-                      snapshot.data!.docs.map((DocumentSnapshot document) {
-                    Map<String, dynamic> data =
-                        document.data() as Map<String, dynamic>;
-                    // final String fullName =
-                    //     '${data['firstName']} ${data['lastName']}';
-                    if (data['status'] == null) {
-                      return const SizedBox.shrink();
-                    }
+                return Visibility(
+                  visible: viewAppointment,
+                  replacement: viewAppointmentWidget(
+                      fullNameView, statusView, userIdView),
+                  child: ListView(
+                    shrinkWrap: true,
+                    children:
+                        snapshot.data!.docs.map((DocumentSnapshot document) {
+                      Map<String, dynamic> data =
+                          document.data() as Map<String, dynamic>;
+                      // final String fullName =
+                      //     '${data['firstName']} ${data['lastName']}';
+                      if (data['status'] == null) {
+                        return const SizedBox.shrink();
+                      }
 
-                    final String userId = data['appointedUser'];
-                    final String status = data['status'];
-                    print(userId);
-                    print(status);
-                    return Container(
-                      // padding: const EdgeInsets.symmetric(
-                      //     vertical: 2, horizontal: 0),
-                      color: Colors.grey[50],
-                      child: StreamBuilder<DocumentSnapshot>(
+                      userIdView = data['appointedUser'];
+                      statusView = data['status'];
+
+                      final String userId = data['appointedUser'];
+                      final String status = data['status'];
+
+                      return StreamBuilder<DocumentSnapshot>(
                         stream: FirebaseFirestore.instance
                             .collection('users')
                             .doc(userId)
                             .snapshots(),
                         builder: (context, snapshot) {
-                          print(snapshot);
                           if (!snapshot.hasData ||
                               snapshot.connectionState ==
                                   ConnectionState.waiting) {
@@ -126,26 +136,32 @@ class _NotesState extends State<Notes> {
                           Map<String, dynamic> userData =
                               snapshot.data!.data() as Map<String, dynamic>;
 
+                          fullNameView =
+                              '${userData['firstName']} ${userData['lastName']}';
+                          String fullName =
+                              '${userData['firstName']} ${userData['lastName']}';
+
                           return Column(
                             children: [
                               ListTile(
+                                onTap: () {
+                                  setState(() {
+                                    viewAppointment = false;
+                                  });
+                                },
+                                contentPadding:
+                                    const EdgeInsets.symmetric(vertical: 5),
                                 title: Row(
                                   children: [
-                                    Text(
-                                        '${userData['firstName']} ${userData['lastName']}'),
+                                    const SizedBox(width: 50),
+                                    Text(fullName),
                                     const Spacer(),
-                                    const Text(
-                                      'view',
-                                      style: TextStyle(
-                                        fontFamily: 'Sofia Pro',
-                                        fontSize: 13,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
+                                    const SizedBox(width: 50),
                                   ],
                                 ),
                                 subtitle: Row(
                                   children: [
+                                    const SizedBox(width: 50),
                                     Icon(
                                       Icons.circle,
                                       size: 12,
@@ -153,7 +169,7 @@ class _NotesState extends State<Notes> {
                                           ? Colors.red
                                           : status == 'completed'
                                               ? Colors.green
-                                              : Colors.yellow,
+                                              : Colors.amber,
                                     ),
                                     const SizedBox(
                                       width: 5,
@@ -163,14 +179,26 @@ class _NotesState extends State<Notes> {
                                       style: TextStyle(
                                         fontFamily: 'Sofia Pro',
                                         fontSize: 13,
+                                        fontWeight: FontWeight.w600,
                                         color: status == 'pending'
                                             ? Colors.red
                                             : status == 'completed'
                                                 ? Colors.green
-                                                : Colors.yellow,
+                                                : Colors.amber,
                                       ),
                                     ),
+                                    const SizedBox(width: 50),
                                   ],
+                                ),
+                                trailing: const Padding(
+                                  padding: EdgeInsets.only(right: 50),
+                                  child: Text(
+                                    'view',
+                                    style: TextStyle(
+                                      fontFamily: 'Sofia Pro',
+                                      fontSize: 13,
+                                    ),
+                                  ),
                                 ),
                               ),
                               const Divider(
@@ -180,15 +208,32 @@ class _NotesState extends State<Notes> {
                             ],
                           );
                         },
-                      ),
-                    );
-                  }).toList(),
+                      );
+                    }).toList(),
+                  ),
                 );
               },
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget viewAppointmentWidget(String fullName, String status, userId) {
+    return Column(
+      children: [
+        Container(
+          alignment: Alignment.centerLeft,
+          padding: const EdgeInsets.only(left: 20, top: 20),
+          child: IconButton(
+              onPressed: () => setState(() {
+                    viewAppointment = true;
+                  }),
+              icon: const Icon(Icons.arrow_back_ios)),
+        ),
+        Text(fullName),
+      ],
     );
   }
 }

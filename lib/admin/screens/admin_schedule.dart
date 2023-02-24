@@ -7,14 +7,14 @@ import 'package:student_mental_health/widgets/widgets/widgets.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 
-class Schedule extends StatefulWidget {
-  const Schedule({super.key});
+class AdminSchedule extends StatefulWidget {
+  const AdminSchedule({super.key});
 
   @override
-  State<Schedule> createState() => _ScheduleState();
+  State<AdminSchedule> createState() => _AdminScheduleState();
 }
 
-class _ScheduleState extends State<Schedule> {
+class _AdminScheduleState extends State<AdminSchedule> {
   final _formKey = GlobalKey<FormState>();
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
@@ -62,14 +62,15 @@ class _ScheduleState extends State<Schedule> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
-        leading: IconButton(
-            onPressed: (() {
-              //TODO: Add back button functionality
-            }),
-            icon: const Icon(
-              Icons.arrow_back_ios,
-              color: Color(0xFF000000),
-            )),
+        automaticallyImplyLeading: false,
+        // leading: IconButton(
+        //     onPressed: (() {
+        //       //TODO: Add back button functionality
+        //     }),
+        //     icon: const Icon(
+        //       Icons.arrow_back_ios,
+        //       color: Color(0xFF000000),
+        //     )),
       ),
       body:
           //TODO: Add the title
