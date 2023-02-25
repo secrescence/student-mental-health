@@ -614,6 +614,12 @@ class DatabaseService {
     return schedules;
   }
 
+  Future updateAppointmentStatus(String schedUid, String status) async {
+    return await appointmentsCollection.doc(schedUid).update({
+      'status': status,
+    });
+  }
+
 // used to display chats of both chatbot and user
   getChats(String chatId) async {
     return userCollection

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:flutter_toggle_tab/flutter_toggle_tab.dart';
 import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 import 'package:student_mental_health/widgets/widgets/widgets.dart';
@@ -17,8 +18,12 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
   String statusView = '';
   String userIdView = '';
   String fullNameView = '';
+  String dateOfAppointmentDocId = '';
 
   bool viewAppointment = true;
+
+  int currentIndex = 0;
+  final List<String> labels = ['Pending', 'Ongoing', 'Completed'];
 
   @override
   void initState() {
@@ -92,8 +97,7 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
 
                 return Visibility(
                   visible: viewAppointment,
-                  replacement: viewAppointmentWidget(
-                      fullNameView, statusView, userIdView),
+                  replacement: viewAppointmentWidget(),
                   child: ListView(
                     shrinkWrap: true,
                     children:
@@ -106,8 +110,8 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
                         return const SizedBox.shrink();
                       }
 
-                      userIdView = data['appointedUser'];
-                      statusView = data['status'];
+                      // userIdView = data['appointedUser'];
+                      // statusView = data['status'];
 
                       final String userId = data['appointedUser'];
                       final String status = data['status'];
@@ -136,8 +140,8 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
                           Map<String, dynamic> userData =
                               snapshot.data!.data() as Map<String, dynamic>;
 
-                          fullNameView =
-                              '${userData['firstName']} ${userData['lastName']}';
+                          // fullNameView =
+                          //     '${userData['firstName']} ${userData['lastName']}';
                           String fullName =
                               '${userData['firstName']} ${userData['lastName']}';
 
@@ -145,8 +149,13 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
                             children: [
                               ListTile(
                                 onTap: () {
+                                  //TODO todo
                                   setState(() {
                                     viewAppointment = false;
+                                    fullNameView = fullName;
+                                    userIdView = userId;
+                                    statusView = status;
+                                    dateOfAppointmentDocId = document.id;
                                   });
                                 },
                                 contentPadding:
@@ -220,7 +229,7 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
     );
   }
 
-  Widget viewAppointmentWidget(String fullName, String status, userId) {
+  Widget viewAppointmentWidget() {
     return Column(
       children: [
         Container(
@@ -232,7 +241,115 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
                   }),
               icon: const Icon(Icons.arrow_back_ios)),
         ),
-        Text(fullName),
+        Column(
+          children: [
+            Container(
+              alignment: Alignment.topLeft,
+              padding: const EdgeInsets.only(left: 30, top: 10),
+              child: Text(
+                fullNameView,
+                style: const TextStyle(
+                  fontFamily: 'Sofia Pro',
+                  fontSize: 19,
+                ),
+              ),
+            ),
+            const SizedBox(height: 5),
+            Row(
+              children: [
+                const SizedBox(width: 30),
+                Icon(
+                  Icons.circle,
+                  size: 12,
+                  color: statusView == 'pending'
+                      ? Colors.red
+                      : statusView == 'completed'
+                          ? Colors.green
+                          : Colors.amber,
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                Text(
+                  statusView,
+                  style: TextStyle(
+                    fontFamily: 'Sofia Pro',
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: statusView == 'pending'
+                        ? Colors.red
+                        : statusView == 'completed'
+                            ? Colors.green
+                            : Colors.amber,
+                  ),
+                ),
+                const SizedBox(width: 50),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                const SizedBox(width: 30),
+                const Text(
+                  'Status: ',
+                  style: TextStyle(
+                    fontFamily: 'Sofia Pro',
+                    fontSize: 15,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                FlutterToggleTab(
+                  isShadowEnable: true,
+                  width: 15,
+                  borderRadius: 10,
+                  marginSelected: const EdgeInsets.all(3),
+                  selectedTextStyle: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'Sofia Pro'),
+                  unSelectedTextStyle: const TextStyle(
+                      fontFamily: 'Sofia Pro', color: Colors.black54),
+                  labels: labels,
+                  selectedIndex: statusView == 'pending'
+                      ? currentIndex = 0
+                      : statusView == 'ongoing'
+                          ? currentIndex = 1
+                          : currentIndex = 2,
+                  selectedBackgroundColors: [
+                    currentIndex == 0
+                        ? Colors.red
+                        : currentIndex == 1
+                            ? Colors.amber
+                            : Colors.green,
+                  ],
+                  selectedLabelIndex: (int index) async {
+                    if (currentIndex != index && index == 0) {
+                      await DatabaseService().updateAppointmentStatus(
+                          dateOfAppointmentDocId, 'pending');
+                    } else if (currentIndex != index && index == 1) {
+                      await DatabaseService().updateAppointmentStatus(
+                          dateOfAppointmentDocId, 'ongoing');
+                    } else if (currentIndex != index && index == 2) {
+                      await DatabaseService().updateAppointmentStatus(
+                          dateOfAppointmentDocId, 'completed');
+                    }
+
+                    setState(() {
+                      currentIndex = index;
+                      if (index == 0) {
+                        statusView = 'pending';
+                      } else if (index == 1) {
+                        statusView = 'ongoing';
+                      } else {
+                        statusView = 'completed';
+                      }
+                    });
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
       ],
     );
   }
