@@ -542,7 +542,14 @@ class DatabaseService {
 
   //get all users data
   Future usersList() async {
-    return userCollection.doc(uid).snapshots();
+    return userCollection.snapshots();
+  }
+
+  Future questionnaireResultStream() async {
+    return userCollection
+        .doc(uid)
+        .collection('questionnaireResult')
+        .snapshots();
   }
 
   //get all schedules
@@ -617,6 +624,13 @@ class DatabaseService {
   Future updateAppointmentStatus(String schedUid, String status) async {
     return await appointmentsCollection.doc(schedUid).update({
       'status': status,
+    });
+  }
+
+  Future updateAppointmentNotes(String schedUid, String notes) async {
+    return await appointmentsCollection.doc(schedUid).update({
+      // 'notes': FieldValue.arrayUnion([notes]),
+      'notes': notes,
     });
   }
 

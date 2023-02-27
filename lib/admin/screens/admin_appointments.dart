@@ -19,6 +19,7 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
   String userIdView = '';
   String fullNameView = '';
   String dateOfAppointmentDocId = '';
+  String notesView = '';
 
   bool viewAppointment = true;
 
@@ -115,6 +116,7 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
 
                       final String userId = data['appointedUser'];
                       final String status = data['status'];
+                      final String notes = data['notes'];
 
                       return StreamBuilder<DocumentSnapshot>(
                         stream: FirebaseFirestore.instance
@@ -156,7 +158,9 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
                                     userIdView = userId;
                                     statusView = status;
                                     dateOfAppointmentDocId = document.id;
+                                    notesView = notes;
                                   });
+                                  print(dateOfAppointmentDocId);
                                 },
                                 contentPadding:
                                     const EdgeInsets.symmetric(vertical: 5),
@@ -241,115 +245,201 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
                   }),
               icon: const Icon(Icons.arrow_back_ios)),
         ),
-        Column(
+        Container(
+          alignment: Alignment.topLeft,
+          padding: const EdgeInsets.only(left: 30, top: 10),
+          child: Text(
+            fullNameView,
+            style: const TextStyle(
+              fontFamily: 'Sofia Pro',
+              fontSize: 19,
+            ),
+          ),
+        ),
+        const SizedBox(height: 5),
+        Row(
           children: [
-            Container(
-              alignment: Alignment.topLeft,
-              padding: const EdgeInsets.only(left: 30, top: 10),
-              child: Text(
-                fullNameView,
-                style: const TextStyle(
-                  fontFamily: 'Sofia Pro',
-                  fontSize: 19,
-                ),
+            const SizedBox(width: 30),
+            Icon(
+              Icons.circle,
+              size: 12,
+              color: statusView == 'pending'
+                  ? Colors.red
+                  : statusView == 'completed'
+                      ? Colors.green
+                      : Colors.amber,
+            ),
+            const SizedBox(
+              width: 5,
+            ),
+            Text(
+              statusView,
+              style: TextStyle(
+                fontFamily: 'Sofia Pro',
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: statusView == 'pending'
+                    ? Colors.red
+                    : statusView == 'completed'
+                        ? Colors.green
+                        : Colors.amber,
               ),
             ),
-            const SizedBox(height: 5),
-            Row(
-              children: [
-                const SizedBox(width: 30),
-                Icon(
-                  Icons.circle,
-                  size: 12,
-                  color: statusView == 'pending'
-                      ? Colors.red
-                      : statusView == 'completed'
-                          ? Colors.green
-                          : Colors.amber,
-                ),
-                const SizedBox(
-                  width: 5,
-                ),
-                Text(
-                  statusView,
-                  style: TextStyle(
-                    fontFamily: 'Sofia Pro',
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: statusView == 'pending'
-                        ? Colors.red
-                        : statusView == 'completed'
-                            ? Colors.green
-                            : Colors.amber,
-                  ),
-                ),
-                const SizedBox(width: 50),
-              ],
+            const SizedBox(width: 50),
+          ],
+        ),
+        const SizedBox(height: 20),
+        Row(
+          children: [
+            const SizedBox(width: 30),
+            const Text(
+              'Status: ',
+              style: TextStyle(
+                fontFamily: 'Sofia Pro',
+                fontSize: 15,
+              ),
             ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                const SizedBox(width: 30),
-                const Text(
-                  'Status: ',
-                  style: TextStyle(
-                    fontFamily: 'Sofia Pro',
-                    fontSize: 15,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                FlutterToggleTab(
-                  isShadowEnable: true,
-                  width: 15,
-                  borderRadius: 10,
-                  marginSelected: const EdgeInsets.all(3),
-                  selectedTextStyle: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: 'Sofia Pro'),
-                  unSelectedTextStyle: const TextStyle(
-                      fontFamily: 'Sofia Pro', color: Colors.black54),
-                  labels: labels,
-                  selectedIndex: statusView == 'pending'
-                      ? currentIndex = 0
-                      : statusView == 'ongoing'
-                          ? currentIndex = 1
-                          : currentIndex = 2,
-                  selectedBackgroundColors: [
-                    currentIndex == 0
-                        ? Colors.red
-                        : currentIndex == 1
-                            ? Colors.amber
-                            : Colors.green,
-                  ],
-                  selectedLabelIndex: (int index) async {
-                    if (currentIndex != index && index == 0) {
-                      await DatabaseService().updateAppointmentStatus(
-                          dateOfAppointmentDocId, 'pending');
-                    } else if (currentIndex != index && index == 1) {
-                      await DatabaseService().updateAppointmentStatus(
-                          dateOfAppointmentDocId, 'ongoing');
-                    } else if (currentIndex != index && index == 2) {
-                      await DatabaseService().updateAppointmentStatus(
-                          dateOfAppointmentDocId, 'completed');
-                    }
+            const SizedBox(width: 10),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.2,
+              child: FlutterToggleTab(
+                isShadowEnable: true,
+                width: 20,
+                height: 50,
+                borderRadius: 10,
+                marginSelected: const EdgeInsets.all(3),
+                selectedTextStyle: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Sofia Pro'),
+                unSelectedTextStyle: const TextStyle(
+                    fontFamily: 'Sofia Pro', color: Colors.black54),
+                labels: labels,
+                selectedIndex: statusView == 'pending'
+                    ? currentIndex = 0
+                    : statusView == 'ongoing'
+                        ? currentIndex = 1
+                        : currentIndex = 2,
+                selectedBackgroundColors: [
+                  currentIndex == 0
+                      ? Colors.red
+                      : currentIndex == 1
+                          ? Colors.amber
+                          : Colors.green,
+                ],
+                selectedLabelIndex: (int index) async {
+                  if (currentIndex != index && index == 0) {
+                    await DatabaseService().updateAppointmentStatus(
+                        dateOfAppointmentDocId, 'pending');
+                  } else if (currentIndex != index && index == 1) {
+                    await DatabaseService().updateAppointmentStatus(
+                        dateOfAppointmentDocId, 'ongoing');
+                  } else if (currentIndex != index && index == 2) {
+                    await DatabaseService().updateAppointmentStatus(
+                        dateOfAppointmentDocId, 'completed');
+                  }
 
-                    setState(() {
-                      currentIndex = index;
-                      if (index == 0) {
-                        statusView = 'pending';
-                      } else if (index == 1) {
-                        statusView = 'ongoing';
-                      } else {
-                        statusView = 'completed';
-                      }
-                    });
-                  },
-                ),
-              ],
+                  setState(() {
+                    currentIndex = index;
+                    if (index == 0) {
+                      statusView = 'pending';
+                    } else if (index == 1) {
+                      statusView = 'ongoing';
+                    } else {
+                      statusView = 'completed';
+                    }
+                  });
+                },
+              ),
             ),
           ],
         ),
+        const SizedBox(height: 20),
+        Card(
+          elevation: 3,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.5,
+            width: MediaQuery.of(context).size.width * 0.7,
+            child: Column(
+              children: [
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: 40,
+                  decoration: const BoxDecoration(
+                    color: primaryColor,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(10),
+                      topRight: Radius.circular(10),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      const Spacer(),
+                      const Text(
+                        'Notes',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontFamily: 'Sofia Pro',
+                          fontSize: 18,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const Spacer(),
+                      InkWell(
+                        onTap: () {
+                          // await DatabaseService().updateAppointmentNotes(
+                          //     dateOfAppointmentDocId, notesController.text);
+                          // setState(() {
+                          //   notes = notesController.text;
+                          // });
+                          print('');
+                        },
+                        child: const Text(
+                          '',
+                          style: TextStyle(
+                            fontFamily: 'Sofia Pro',
+                            fontSize: 13,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 15),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  child: TextFormField(
+                    onChanged: (value) async {
+                      await DatabaseService().updateAppointmentNotes(
+                          dateOfAppointmentDocId, value);
+                    },
+                    initialValue: notesView,
+                    maxLines: 20,
+                    style: const TextStyle(
+                      fontFamily: 'Sofia Pro',
+                      fontSize: 15,
+                    ),
+                    cursorColor: primaryColor,
+                    cursorHeight: 15,
+                    mouseCursor: MouseCursor.defer,
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      hintText: 'Add notes...',
+                      alignLabelWithHint: true,
+                      hintStyle: TextStyle(
+                        fontFamily: 'Sofia Pro',
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        )
       ],
     );
   }
