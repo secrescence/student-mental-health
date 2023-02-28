@@ -23,8 +23,6 @@ class _AppointmentState extends State<Appointment> {
     "time": "1:00",
     "availability": false,
   };
-  List<Map<String, dynamic>> listOfSchedule = [];
-  bool scheduleIsNotEmpty = true;
 
   Stream<QuerySnapshot>? scheduleStream;
 
@@ -38,25 +36,11 @@ class _AppointmentState extends State<Appointment> {
   }
 
   getListOfSchedule() async {
-    await DatabaseService().getSchedulesOfDateNow().then((value) {
-      if (value == null) {
-        setState(() {
-          listOfSchedule = value;
-        });
-      } else {
-        setState(() {
-          scheduleIsNotEmpty = false;
-        });
-      }
-    });
-
     await DatabaseService().getSchedules().then((snapshot) {
       setState(() {
         scheduleStream = snapshot;
       });
     });
-    //TODO remove this
-    await DatabaseService().getAllSchedulesDocId().then((value) {});
   }
 
   checkPriority() async {

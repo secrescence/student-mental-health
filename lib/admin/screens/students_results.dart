@@ -5,6 +5,7 @@ import 'package:flutter_toggle_tab/flutter_toggle_tab.dart';
 import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 import 'package:student_mental_health/widgets/widgets/widgets.dart';
+import 'package:intl/intl.dart';
 
 class StudentsResults extends StatefulWidget {
   const StudentsResults({super.key});
@@ -15,13 +16,13 @@ class StudentsResults extends StatefulWidget {
 
 class _StudentsResultsState extends State<StudentsResults> {
   Stream<QuerySnapshot>? userAppointmentStream;
-  String statusView = '';
+  String priorityView = '';
   String userIdView = '';
   String fullNameView = '';
   String dateOfAppointmentDocId = '';
-  String notesView = '';
+  String studentIdView = '';
 
-  bool viewAppointment = true;
+  bool viewStudentResult = true;
 
   int currentIndex = 0;
   final List<String> labels = ['Pending', 'Ongoing', 'Completed'];
@@ -97,8 +98,8 @@ class _StudentsResultsState extends State<StudentsResults> {
                 }
 
                 return Visibility(
-                  visible: viewAppointment,
-                  replacement: viewAppointmentWidget(),
+                  visible: viewStudentResult,
+                  replacement: viewStudentResultWidget(),
                   child: ListView(
                     shrinkWrap: true,
                     children:
@@ -115,8 +116,7 @@ class _StudentsResultsState extends State<StudentsResults> {
                       // statusView = data['status'];
 
                       final String userId = data['appointedUser'];
-                      final String status = data['status'];
-                      final String notes = data['notes'];
+                      final String priority = data['userAppointedPriority'];
 
                       return StreamBuilder<DocumentSnapshot>(
                         stream: FirebaseFirestore.instance
@@ -146,6 +146,7 @@ class _StudentsResultsState extends State<StudentsResults> {
                           //     '${userData['firstName']} ${userData['lastName']}';
                           String fullName =
                               '${userData['firstName']} ${userData['lastName']}';
+                          String studentId = userData['studentId'];
 
                           return Column(
                             children: [
@@ -153,12 +154,12 @@ class _StudentsResultsState extends State<StudentsResults> {
                                 onTap: () {
                                   //TODO todo
                                   setState(() {
-                                    viewAppointment = false;
+                                    viewStudentResult = false;
                                     fullNameView = fullName;
                                     userIdView = userId;
-                                    statusView = status;
+                                    priorityView = priority;
                                     dateOfAppointmentDocId = document.id;
-                                    notesView = notes;
+                                    studentIdView = studentId;
                                   });
                                   print(dateOfAppointmentDocId);
                                 },
@@ -175,27 +176,15 @@ class _StudentsResultsState extends State<StudentsResults> {
                                 subtitle: Row(
                                   children: [
                                     const SizedBox(width: 50),
-                                    Icon(
-                                      Icons.circle,
-                                      size: 12,
-                                      color: status == 'pending'
-                                          ? Colors.red
-                                          : status == 'completed'
-                                              ? Colors.green
-                                              : Colors.amber,
-                                    ),
-                                    const SizedBox(
-                                      width: 5,
-                                    ),
                                     Text(
-                                      status,
+                                      priority,
                                       style: TextStyle(
                                         fontFamily: 'Sofia Pro',
                                         fontSize: 13,
                                         fontWeight: FontWeight.w600,
-                                        color: status == 'pending'
+                                        color: priority == 'high priority'
                                             ? Colors.red
-                                            : status == 'completed'
+                                            : priority == 'low priority'
                                                 ? Colors.green
                                                 : Colors.amber,
                                       ),
@@ -233,212 +222,94 @@ class _StudentsResultsState extends State<StudentsResults> {
     );
   }
 
-  Widget viewAppointmentWidget() {
+  Widget viewStudentResultWidget() {
     return Column(
       children: [
-        Container(
-          alignment: Alignment.centerLeft,
-          padding: const EdgeInsets.only(left: 20, top: 20),
-          child: IconButton(
-              onPressed: () => setState(() {
-                    viewAppointment = true;
-                  }),
-              icon: const Icon(Icons.arrow_back_ios)),
+        Row(
+          children: [
+            Container(
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.only(left: 20, top: 20),
+              child: IconButton(
+                  onPressed: () => setState(() {
+                        viewStudentResult = true;
+                      }),
+                  icon: const Icon(Icons.arrow_back_ios)),
+            ),
+            const Spacer(),
+            Container(
+                alignment: Alignment.centerRight,
+                padding: const EdgeInsets.only(left: 20, top: 20),
+                child: ElevatedButton(
+                    style: ButtonStyle(
+                      fixedSize:
+                          MaterialStateProperty.all<Size>(const Size(85, 35)),
+                      foregroundColor:
+                          MaterialStateProperty.all<Color>(Colors.white),
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                          phoneFieldButtonColor),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(7),
+                        ),
+                      ),
+                    ),
+                    onPressed: () {
+                      DateTime currentDate = DateTime.now();
+                      String formattedDate =
+                          DateFormat('MM-dd-yyyy').format(currentDate);
+                      print(formattedDate); // output: 02-18-2023
+                    },
+                    child: Row(
+                      children: const [
+                        Icon(Icons.print, size: 16),
+                        SizedBox(width: 5),
+                        Text(
+                          'Print',
+                          style:
+                              TextStyle(fontSize: 14, fontFamily: 'Sofia Pro'),
+                        ),
+                      ],
+                    ))),
+            const SizedBox(width: 20),
+          ],
         ),
         Container(
           alignment: Alignment.topLeft,
           padding: const EdgeInsets.only(left: 30, top: 10),
           child: Text(
-            fullNameView,
+            'Name: $fullNameView',
             style: const TextStyle(
               fontFamily: 'Sofia Pro',
               fontSize: 19,
             ),
           ),
         ),
-        const SizedBox(height: 5),
-        Row(
-          children: [
-            const SizedBox(width: 30),
-            Icon(
-              Icons.circle,
-              size: 12,
-              color: statusView == 'pending'
-                  ? Colors.red
-                  : statusView == 'completed'
-                      ? Colors.green
-                      : Colors.amber,
-            ),
-            const SizedBox(
-              width: 5,
-            ),
-            Text(
-              statusView,
-              style: TextStyle(
-                fontFamily: 'Sofia Pro',
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: statusView == 'pending'
-                    ? Colors.red
-                    : statusView == 'completed'
-                        ? Colors.green
-                        : Colors.amber,
-              ),
-            ),
-            const SizedBox(width: 50),
-          ],
-        ),
-        const SizedBox(height: 20),
-        Row(
-          children: [
-            const SizedBox(width: 30),
-            const Text(
-              'Status: ',
-              style: TextStyle(
-                fontFamily: 'Sofia Pro',
-                fontSize: 15,
-              ),
-            ),
-            const SizedBox(width: 10),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.2,
-              child: FlutterToggleTab(
-                isShadowEnable: true,
-                width: 20,
-                height: 50,
-                borderRadius: 10,
-                marginSelected: const EdgeInsets.all(3),
-                selectedTextStyle: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: 'Sofia Pro'),
-                unSelectedTextStyle: const TextStyle(
-                    fontFamily: 'Sofia Pro', color: Colors.black54),
-                labels: labels,
-                selectedIndex: statusView == 'pending'
-                    ? currentIndex = 0
-                    : statusView == 'ongoing'
-                        ? currentIndex = 1
-                        : currentIndex = 2,
-                selectedBackgroundColors: [
-                  currentIndex == 0
-                      ? Colors.red
-                      : currentIndex == 1
-                          ? Colors.amber
-                          : Colors.green,
-                ],
-                selectedLabelIndex: (int index) async {
-                  if (currentIndex != index && index == 0) {
-                    await DatabaseService().updateAppointmentStatus(
-                        dateOfAppointmentDocId, 'pending');
-                  } else if (currentIndex != index && index == 1) {
-                    await DatabaseService().updateAppointmentStatus(
-                        dateOfAppointmentDocId, 'ongoing');
-                  } else if (currentIndex != index && index == 2) {
-                    await DatabaseService().updateAppointmentStatus(
-                        dateOfAppointmentDocId, 'completed');
-                  }
-
-                  setState(() {
-                    currentIndex = index;
-                    if (index == 0) {
-                      statusView = 'pending';
-                    } else if (index == 1) {
-                      statusView = 'ongoing';
-                    } else {
-                      statusView = 'completed';
-                    }
-                  });
-                },
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 20),
-        Card(
-          elevation: 3,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          child: SizedBox(
-            height: MediaQuery.of(context).size.height * 0.5,
-            width: MediaQuery.of(context).size.width * 0.7,
-            child: Column(
-              children: [
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 40,
-                  decoration: const BoxDecoration(
-                    color: primaryColor,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(10),
-                      topRight: Radius.circular(10),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      const Spacer(),
-                      const Text(
-                        'Notes',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontFamily: 'Sofia Pro',
-                          fontSize: 18,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const Spacer(),
-                      InkWell(
-                        onTap: () {
-                          // await DatabaseService().updateAppointmentNotes(
-                          //     dateOfAppointmentDocId, notesController.text);
-                          // setState(() {
-                          //   notes = notesController.text;
-                          // });
-                          print('');
-                        },
-                        child: const Text(
-                          '',
-                          style: TextStyle(
-                            fontFamily: 'Sofia Pro',
-                            fontSize: 13,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 15),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  child: TextFormField(
-                    onChanged: (value) async {
-                      await DatabaseService().updateAppointmentNotes(
-                          dateOfAppointmentDocId, value);
-                    },
-                    initialValue: notesView,
-                    maxLines: 20,
-                    style: const TextStyle(
-                      fontFamily: 'Sofia Pro',
-                      fontSize: 15,
-                    ),
-                    cursorColor: primaryColor,
-                    cursorHeight: 15,
-                    mouseCursor: MouseCursor.defer,
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      hintText: 'Add notes...',
-                      alignLabelWithHint: true,
-                      hintStyle: TextStyle(
-                        fontFamily: 'Sofia Pro',
-                        fontSize: 13,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+        Container(
+          alignment: Alignment.topLeft,
+          padding: const EdgeInsets.only(left: 30, top: 10),
+          child: Text(
+            'Student ID: $studentIdView',
+            style: const TextStyle(
+              fontFamily: 'Sofia Pro',
+              fontSize: 19,
             ),
           ),
+        ),
+        const SizedBox(height: 20),
+        Container(
+          alignment: Alignment.topLeft,
+          padding: const EdgeInsets.only(left: 30, top: 10),
+          child: const Text(
+            'Visual Summary',
+            style: TextStyle(
+              fontFamily: 'Sofia Pro',
+              fontSize: 21,
+            ),
+          ),
+        ),
+        Row(
+          children: [],
         )
       ],
     );

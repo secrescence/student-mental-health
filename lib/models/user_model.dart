@@ -1,4 +1,4 @@
-class UserModel {
+class queryUserModel {
   final String uid;
   final String phoneNumber;
   final String firstName;
@@ -8,7 +8,7 @@ class UserModel {
   final String year;
   final String section;
   final String studentId;
-  UserModel({
+  queryUserModel({
     required this.uid,
     required this.phoneNumber,
     required this.firstName,
@@ -33,8 +33,8 @@ class UserModel {
     };
   }
 
-  factory UserModel.fromMap(Map<String, dynamic> map) {
-    return UserModel(
+  factory queryUserModel.fromMap(Map<String, dynamic> map) {
+    return queryUserModel(
       uid: map['uid'] as String,
       phoneNumber: map['phoneNumber'] as String,
       firstName: map['firstName'] as String,

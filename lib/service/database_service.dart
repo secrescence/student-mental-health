@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:student_mental_health/widgets/widgets/custom_snackbar.dart';
 
 class DatabaseService {
@@ -14,6 +15,8 @@ class DatabaseService {
       FirebaseFirestore.instance.collection('appointments');
   final CollectionReference additionalAppointmentsCollection =
       FirebaseFirestore.instance.collection('additionalAppointments');
+
+  String currentDate = DateFormat('dd-MM-yyyy').format(DateTime.now());
 
   //delete user
   Future deleteUser() async {
@@ -136,7 +139,12 @@ class DatabaseService {
     double categoryStrategiesMEAN,
     double categoryClarityMEAN,
   ) async {
-    userCollection.doc(uid).collection('questionnaireResult').doc(uid).set({
+    userCollection
+        .doc(uid)
+        .collection('questionnaireResult')
+        .doc(currentDate)
+        .set({
+      'dateAnswered': currentDate,
       'grandMean': grandMean,
       'categoryNonacceptanceMEAN': categoryNonacceptanceMEAN,
       'categoryGoalsMEAN': categoryGoalsMEAN,
@@ -255,6 +263,8 @@ class DatabaseService {
   }
 
   // [ADMIN FUNCTIONS]
+
+  //add counseling schedule
   Future addSchedule(BuildContext context, String date, String time,
       {bool mounted = true}) async {
     // List of available times in ascending order
@@ -314,49 +324,10 @@ class DatabaseService {
         'date': date,
         'time': time,
         'appointedUser': '',
+        'status': 'pending',
       });
     }
   }
-
-  //add appointment schedule
-  // Future addSchedule(BuildContext context, String date, String time,
-  //     {bool mounted = true}) async {
-  //   int randomInt = Random().nextInt(10000000);
-  //   String documentId = "$date-$randomInt";
-
-  //   while (true) {
-  //     DocumentSnapshot documentSnapshot =
-  //         await appointmentsCollection.doc(documentId).get();
-
-  //     if (!documentSnapshot.exists) {
-  //       break;
-  //     }
-
-  //     randomInt = Random().nextInt(10000000);
-  //     documentId = "$date-$randomInt";
-  //   }
-
-  //   // Check if there are any schedules already for the given date and time
-  //   final QuerySnapshot querySnapshot = await appointmentsCollection
-  //       .where('date', isEqualTo: date)
-  //       .where('time', isEqualTo: time)
-  //       .get();
-
-  //   if (querySnapshot.docs.isNotEmpty) {
-  //     if (!mounted) return;
-  //     errorSnackbar(context, 'Oh Snap!', 'Time slot already taken');
-  //   } else {
-  //     await appointmentsCollection.doc(documentId).set({
-  //       'date': date,
-  //       'time': time,
-  //       'appointedUser': '',
-  //     });
-  //   }
-  // }
-
-  // Future addTimeSlots(String date, String time) async {
-  //   String docId = await addSchedule(date);
-  // }
 
   //the system will automatically add the appointment to the first available slot
   Future appointUser(BuildContext context, {bool mounted = true}) async {
@@ -409,7 +380,6 @@ class DatabaseService {
         break;
       }
 
-      print(timeIndex);
       if (timeIndex == 2) {
         timeIndex += 3;
       } else {
@@ -439,6 +409,7 @@ class DatabaseService {
         'date': date,
         'time': time,
         'appointedUser': '',
+        'status': 'pending',
       });
     }
 
@@ -466,71 +437,7 @@ class DatabaseService {
     errorSnackbar(context, 'Oh Snap!', 'Time slot already taken');
   }
 
-  //TODO : add a function that will check if the user is already appointed
-  Future appointUserWithHighPriority(String schedUid) async {
-    return await appointmentsCollection.doc(schedUid).update({
-      'appointedHighPriority': [uid],
-    });
-  }
-
-  // Future<List<String>> getAppointedHighPriority(String schedUid) async {
-  //   DocumentSnapshot snapshot =
-  //       await appointmentsCollection.doc(schedUid).get();
-  //   if (snapshot.exists) {
-  //     Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
-  //     if (data.containsKey('appointedHighPriority')) {
-  //       return List<String>.from(data['appointedHighPriority']);
-  //     } else {
-  //       return [];
-  //     }
-  //   } else {
-  //     return [];
-  //   }
-  // }
-
-  // Future appointUserWithMidPriority(String schedUid) async {
-  //   return await appointmentsCollection.doc(schedUid).set({
-  //     'appointedMidPriority': [uid],
-  //   });
-  // }
-
-  // Future<List<String>> getAppointedMidPriority(String schedUid) async {
-  //   DocumentSnapshot snapshot =
-  //       await appointmentsCollection.doc(schedUid).get();
-  //   if (snapshot.exists) {
-  //     Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
-  //     if (data.containsKey('appointedMidPriority')) {
-  //       return List<String>.from(data['appointedMidPriority']);
-  //     } else {
-  //       return [];
-  //     }
-  //   } else {
-  //     return [];
-  //   }
-  // }
-
-  // Future appointUserWithLowPriority(String schedUid) async {
-  //   return await appointmentsCollection.doc(schedUid).set({
-  //     'appointedLowPriority': [uid],
-  //   });
-  // }
-
-  // Future<List<String>> getAppointedLowPriority(String schedUid) async {
-  //   DocumentSnapshot snapshot =
-  //       await appointmentsCollection.doc(schedUid).get();
-  //   if (snapshot.exists) {
-  //     Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
-  //     if (data.containsKey('appointedLowPriority')) {
-  //       return List<String>.from(data['appointedLowPriority']);
-  //     } else {
-  //       return [];
-  //     }
-  //   } else {
-  //     return [];
-  //   }
-  // }
-
-  //SteamBuilder
+  //Streams
   Future<Stream<QuerySnapshot>> getSchedules() async {
     return appointmentsCollection.orderBy('date').snapshots();
   }
@@ -580,46 +487,46 @@ class DatabaseService {
     return documentIds[0];
   }
 
-  //get appointment schedule
-  Future checkIfUidOfScheduleExist(String date, int increment) async {
-    List<String> documentIds = [];
-    await FirebaseFirestore.instance
-        .collection("counseling")
-        .get()
-        .then((QuerySnapshot snapshot) {
-      documentIds = snapshot.docs.map((doc) => doc.id).toList();
-    });
-    List<String> filteredIds = documentIds
-        .where((element) => element.startsWith('$date-$increment'))
-        .toList();
-    return filteredIds;
-  }
+  // //get appointment schedule
+  // Future checkIfUidOfScheduleExist(String date, int increment) async {
+  //   List<String> documentIds = [];
+  //   await FirebaseFirestore.instance
+  //       .collection("counseling")
+  //       .get()
+  //       .then((QuerySnapshot snapshot) {
+  //     documentIds = snapshot.docs.map((doc) => doc.id).toList();
+  //   });
+  //   List<String> filteredIds = documentIds
+  //       .where((element) => element.startsWith('$date-$increment'))
+  //       .toList();
+  //   return filteredIds;
+  // }
 
-  Future getSchedulesOfDateNow() async {
-    List<String> documentIds = [];
-    await FirebaseFirestore.instance
-        .collection("counseling")
-        .get()
-        .then((QuerySnapshot snapshot) {
-      documentIds = snapshot.docs.map((doc) => doc.id).toList();
-    });
-    List<String> filteredIds = documentIds
-        .where((element) => element.startsWith(
-            "${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year}"))
-        .toList();
+  // Future getSchedulesOfDateNow() async {
+  //   List<String> documentIds = [];
+  //   await FirebaseFirestore.instance
+  //       .collection("counseling")
+  //       .get()
+  //       .then((QuerySnapshot snapshot) {
+  //     documentIds = snapshot.docs.map((doc) => doc.id).toList();
+  //   });
+  //   List<String> filteredIds = documentIds
+  //       .where((element) => element.startsWith(
+  //           "${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year}"))
+  //       .toList();
 
-    List<Map<String, dynamic>> schedules = [];
-    for (var i = 0; i < filteredIds.length; i++) {
-      await FirebaseFirestore.instance
-          .collection("counseling")
-          .doc(filteredIds[i])
-          .get()
-          .then((DocumentSnapshot snapshot) {
-        schedules.add(snapshot.data() as Map<String, dynamic>);
-      });
-    }
-    return schedules;
-  }
+  //   List<Map<String, dynamic>> schedules = [];
+  //   for (var i = 0; i < filteredIds.length; i++) {
+  //     await FirebaseFirestore.instance
+  //         .collection("counseling")
+  //         .doc(filteredIds[i])
+  //         .get()
+  //         .then((DocumentSnapshot snapshot) {
+  //       schedules.add(snapshot.data() as Map<String, dynamic>);
+  //     });
+  //   }
+  //   return schedules;
+  // }
 
   Future updateAppointmentStatus(String schedUid, String status) async {
     return await appointmentsCollection.doc(schedUid).update({
@@ -629,7 +536,6 @@ class DatabaseService {
 
   Future updateAppointmentNotes(String schedUid, String notes) async {
     return await appointmentsCollection.doc(schedUid).update({
-      // 'notes': FieldValue.arrayUnion([notes]),
       'notes': notes,
     });
   }
