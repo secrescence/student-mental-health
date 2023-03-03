@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_toggle_tab/flutter_toggle_tab.dart';
@@ -6,6 +7,7 @@ import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 import 'package:student_mental_health/widgets/widgets/widgets.dart';
 import 'package:intl/intl.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 
 class StudentsResults extends StatefulWidget {
   const StudentsResults({super.key});
@@ -27,8 +29,14 @@ class _StudentsResultsState extends State<StudentsResults> {
   int currentIndex = 0;
   final List<String> labels = ['Pending', 'Ongoing', 'Completed'];
 
+  List<StudentResultData>? _results;
+  TooltipBehavior? _tooltipBehavior;
+  String? highestCategory;
+
   @override
   void initState() {
+    _tooltipBehavior = TooltipBehavior(enable: true);
+
     getData();
     super.initState();
   }
@@ -151,8 +159,9 @@ class _StudentsResultsState extends State<StudentsResults> {
                           return Column(
                             children: [
                               ListTile(
-                                onTap: () {
-                                  //TODO todo
+                                onTap: () async {
+                                  //TODO to be implemented
+
                                   setState(() {
                                     viewStudentResult = false;
                                     fullNameView = fullName;
@@ -161,7 +170,18 @@ class _StudentsResultsState extends State<StudentsResults> {
                                     dateOfAppointmentDocId = document.id;
                                     studentIdView = studentId;
                                   });
-                                  print(dateOfAppointmentDocId);
+
+                                  List<StudentResultData>? results =
+                                      await _getResults(userId);
+                                  setState(() {
+                                    _results = results;
+                                  });
+
+                                  String category =
+                                      await _getHighestCategory(userId);
+                                  setState(() {
+                                    highestCategory = category;
+                                  });
                                 },
                                 contentPadding:
                                     const EdgeInsets.symmetric(vertical: 5),
@@ -304,14 +324,141 @@ class _StudentsResultsState extends State<StudentsResults> {
             'Visual Summary',
             style: TextStyle(
               fontFamily: 'Sofia Pro',
-              fontSize: 21,
             ),
           ),
         ),
-        Row(
-          children: [],
-        )
+        Container(
+          padding: const EdgeInsets.only(top: 20, left: 10, bottom: 0),
+          child: SfCircularChart(
+            margin: const EdgeInsets.symmetric(horizontal: 10),
+            tooltipBehavior: _tooltipBehavior,
+            onTooltipRender: (tooltipArgs) {
+              tooltipArgs.text = tooltipArgs.text!.split(' ')[0];
+            },
+            title: ChartTitle(
+                borderWidth: 8,
+                text: 'Visual Summary',
+                alignment: ChartAlignment.near,
+                textStyle: const TextStyle(
+                    fontFamily: 'Sofia Pro',
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black)),
+            legend: Legend(
+              textStyle: const TextStyle(
+                  fontFamily: 'Sofia Pro',
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500),
+              isVisible: true,
+              overflowMode: LegendItemOverflowMode.wrap,
+              iconHeight: 19,
+              iconWidth: 19,
+              position: LegendPosition.right,
+              padding: 7,
+              itemPadding: 12,
+              isResponsive: true,
+            ),
+            series: <CircularSeries>[
+              RadialBarSeries<StudentResultData, String>(
+                dataSource: _results,
+                xValueMapper: (StudentResultData result, _) => result.category,
+                yValueMapper: (StudentResultData result, _) => result.score,
+                dataLabelSettings: DataLabelSettings(
+                    isVisible: true,
+                    textStyle: TextStyle(
+                      fontFamily: 'Sofia Pro',
+                      fontSize: 16,
+                      color: Colors.black.withOpacity(0.8),
+                    )),
+                enableTooltip: true,
+                maximumValue: 5,
+                radius: '100%',
+                innerRadius: '10%',
+                cornerStyle: CornerStyle.bothCurve,
+                trackOpacity: 0.7,
+                gap: '3%',
+                selectionBehavior:
+                    SelectionBehavior(enable: true, unselectedOpacity: 0.4),
+                onPointTap: (pointInteractionDetails) {},
+              )
+            ],
+          ),
+        ),
       ],
     );
   }
+
+  Future<List<StudentResultData>?> _getResults(String userViewId) async {
+    final Map<String, dynamic>? data =
+        await DatabaseService(uid: userViewId).getQuestionnaireResult();
+    if (data != null) {
+      return [
+        StudentResultData('Nonacceptance',
+            twoDecimalPlace(data['categoryNonacceptanceMEAN'])),
+        StudentResultData('Goals', twoDecimalPlace(data['categoryGoalsMEAN'])),
+        StudentResultData(
+            'Impulse', twoDecimalPlace(data['categoryImpulseMEAN'])),
+        StudentResultData(
+            'Awareness', twoDecimalPlace(data['categoryAwarenessMEAN'])),
+        StudentResultData(
+            'Strategies', twoDecimalPlace(data['categoryStrategiesMEAN'])),
+        StudentResultData(
+            'Clarity', twoDecimalPlace(data['categoryClarityMEAN'])),
+      ];
+    } else {
+      return null;
+    }
+  }
+
+  Future _getHighestCategory(String userViewId) async {
+    final Map<String, dynamic>? data =
+        await DatabaseService(uid: userViewId).getQuestionnaireResult();
+    if (data != null) {
+      double nonacceptance = twoDecimalPlace(data['categoryNonacceptanceMEAN']);
+      double goals = twoDecimalPlace(data['categoryGoalsMEAN']);
+      double impulse = twoDecimalPlace(data['categoryImpulseMEAN']);
+      double awareness = twoDecimalPlace(data['categoryAwarenessMEAN']);
+      double strategies = twoDecimalPlace(data['categoryStrategiesMEAN']);
+      double clarity = twoDecimalPlace(data['categoryClarityMEAN']);
+
+      List<double> categories = [
+        nonacceptance,
+        goals,
+        impulse,
+        awareness,
+        strategies,
+        clarity
+      ];
+
+      Map<String, double> categoryValues = {
+        "Nonacceptance": nonacceptance,
+        "Goals": goals,
+        "Impulse": impulse,
+        "Awareness": awareness,
+        "Strategies": strategies,
+        "Clarity": clarity
+      };
+
+      double maxValue = categories.reduce((a, b) => a > b ? a : b);
+      String maxCategory = categoryValues.keys
+          .firstWhere((key) => categoryValues[key] == maxValue);
+      return maxCategory;
+    } else {
+      return null;
+    }
+  }
+
+  twoDecimalPlace(double value) {
+    String cut = value.toStringAsFixed(2);
+    double cutDouble = double.parse(cut);
+    return cutDouble;
+  }
+
+  //end of class
+}
+
+class StudentResultData {
+  StudentResultData(this.category, this.score);
+  final String category;
+  final double score;
 }
