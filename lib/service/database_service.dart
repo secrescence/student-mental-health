@@ -204,6 +204,19 @@ class DatabaseService {
     }
   }
 
+  Future getQuestionnaireResultForAdmin(String userUid) async {
+    final DocumentSnapshot snapshot = await userCollection
+        .doc(userUid)
+        .collection('questionnaireResult')
+        .doc(userUid)
+        .get();
+    if (snapshot.exists) {
+      return snapshot.data() as Map<String, dynamic>;
+    } else {
+      return null;
+    }
+  }
+
   //get highest result of categories
   Future<Map<String, dynamic>?> getHighestResult() async {
     final DocumentSnapshot snapshot = await userCollection
