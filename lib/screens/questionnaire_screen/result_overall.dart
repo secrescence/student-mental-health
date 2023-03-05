@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:student_mental_health/screens/appointment_screen/appointment.dart';
+import 'package:student_mental_health/screens/articles.dart';
+import 'package:student_mental_health/screens/questionnaire_screen/settings.dart';
+import 'package:student_mental_health/screens/videos.dart';
 import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 // ignore: depend_on_referenced_packages
@@ -62,6 +64,8 @@ class _ResultOverallState extends State<ResultOverall> {
   bool showHighPriority = false;
   bool isLowAndMidPriority = false;
   bool showLowAndMidPriority = false;
+
+  String highestCategory = '';
 
   @override
   void dispose() {
@@ -149,6 +153,12 @@ class _ResultOverallState extends State<ResultOverall> {
         }
       });
     });
+    _getHighestCategory().then((value) {
+      setState(() {
+        highestCategory = value;
+      });
+      print(highestCategory);
+    });
   }
 
   @override
@@ -162,8 +172,7 @@ class _ResultOverallState extends State<ResultOverall> {
           'assets/logo-violet.png',
           fit: BoxFit.cover,
         ),
-        //TODO - disable back button
-        //automaticallyImplyLeading: false,
+        automaticallyImplyLeading: false,
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -288,6 +297,7 @@ class _ResultOverallState extends State<ResultOverall> {
               GestureDetector(
                 onTap: () async {
                   print('Articles');
+                  nextScreen(context, const Articles());
                 },
                 child: const SizedBox(
                   width: double.infinity,
@@ -304,6 +314,7 @@ class _ResultOverallState extends State<ResultOverall> {
               GestureDetector(
                 onTap: () {
                   print('Videos');
+                  nextScreen(context, Videos(highestCategory: highestCategory));
                 },
                 child: const SizedBox(
                   width: double.infinity,
@@ -366,6 +377,21 @@ class _ResultOverallState extends State<ResultOverall> {
                 child: const SizedBox(
                   width: double.infinity,
                   child: Text('Questionnaire',
+                      style: TextStyle(
+                          color: Colors.black54,
+                          fontSize: 17,
+                          fontFamily: 'Sofia Pro')),
+                ),
+              ),
+              const SizedBox(height: 12),
+              GestureDetector(
+                onTap: () {
+                  print('Settings');
+                  nextScreen(context, const Settings());
+                },
+                child: const SizedBox(
+                  width: double.infinity,
+                  child: Text('Settings',
                       style: TextStyle(
                           color: Colors.black54,
                           fontSize: 17,
@@ -448,6 +474,51 @@ class _ResultOverallState extends State<ResultOverall> {
         ),
       ],
     );
+  }
+
+  Future _getHighestCategory() async {
+    final Map<String, dynamic>? data =
+        await DatabaseService(uid: FirebaseAuth.instance.currentUser?.uid)
+            .getQuestionnaireResult();
+    if (data != null) {
+      double nonacceptance = twoDecimalPlace(data['categoryNonacceptanceMEAN']);
+      double goals = twoDecimalPlace(data['categoryGoalsMEAN']);
+      double impulse = twoDecimalPlace(data['categoryImpulseMEAN']);
+      double awareness = twoDecimalPlace(data['categoryAwarenessMEAN']);
+      double strategies = twoDecimalPlace(data['categoryStrategiesMEAN']);
+      double clarity = twoDecimalPlace(data['categoryClarityMEAN']);
+
+      List<double> categories = [
+        nonacceptance,
+        goals,
+        impulse,
+        awareness,
+        strategies,
+        clarity
+      ];
+
+      Map<String, double> categoryValues = {
+        "Nonacceptance": nonacceptance,
+        "Goals": goals,
+        "Impulse": impulse,
+        "Awareness": awareness,
+        "Strategies": strategies,
+        "Clarity": clarity
+      };
+
+      double maxValue = categories.reduce((a, b) => a > b ? a : b);
+      String maxCategory = categoryValues.keys
+          .firstWhere((key) => categoryValues[key] == maxValue);
+      return maxCategory;
+    } else {
+      return null;
+    }
+  }
+
+  twoDecimalPlace(double value) {
+    String cut = value.toStringAsFixed(2);
+    double cutDouble = double.parse(cut);
+    return cutDouble;
   }
 
   //end of class

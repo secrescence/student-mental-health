@@ -38,7 +38,6 @@ class _SplashState extends State<Splash> {
           _isSingedUpUsingEmailOnly &&
           _isDoneWithQuestionnaire &&
           _isDoneWithResults) {
-        //TODO change this to result overall
         nextScreen(context, const ResultOverall());
       } else if (_isSignedIn &&
           _isDoneWithChatbot &&

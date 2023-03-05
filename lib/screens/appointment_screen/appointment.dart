@@ -69,9 +69,7 @@ class _AppointmentState extends State<Appointment> {
         leading: IconButton(
             onPressed: (() {
               //TODO change this to navigate pop
-              FirebaseAuth.instance
-                  .signOut()
-                  .then((value) => nextScreenPop(context));
+              nextScreenPop(context);
               // nextScreenPop(context);
             }),
             icon: const Icon(
@@ -158,7 +156,7 @@ class _AppointmentState extends State<Appointment> {
                               snapshot.connectionState ==
                                   ConnectionState.waiting) {
                             return const Center(
-                              child: SpinKitSpinningLines(
+                              child: SpinKitChasingDots(
                                 color: primaryColor,
                                 size: 50,
                               ),

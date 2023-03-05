@@ -4,6 +4,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_toggle_tab/flutter_toggle_tab.dart';
 import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
+import 'package:student_mental_health/widgets/widgets/loading_admin.dart';
 import 'package:student_mental_health/widgets/widgets/widgets.dart';
 
 class AdminAppointments extends StatefulWidget {
@@ -84,15 +85,17 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
                   AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (!snapshot.hasData ||
                     snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: SpinKitChasingDots(
-                      color: primaryColor,
-                      size: 50,
-                    ),
-                  );
+                  return const LoadingAdmin();
                 } else if (snapshot.hasError) {
                   return const Center(
-                    child: Text('Something went wrong'),
+                    child: Text(
+                      'Something went wrong',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'Sofia Pro'),
+                    ),
                   );
                 }
 
@@ -127,18 +130,19 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
                           if (!snapshot.hasData ||
                               snapshot.connectionState ==
                                   ConnectionState.waiting) {
-                            return const Center(
-                              child: SpinKitChasingDots(
-                                color: primaryColor,
-                                size: 50,
-                              ),
-                            );
+                            return const LoadingAdmin();
                           } else if (snapshot.hasError) {
                             return const Center(
-                              child: Text('Something went wrong'),
+                              child: Text(
+                                'Something went wrong',
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w600,
+                                    fontFamily: 'Sofia Pro'),
+                              ),
                             );
                           }
-
                           Map<String, dynamic> userData =
                               snapshot.data!.data() as Map<String, dynamic>;
 
@@ -160,14 +164,17 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
                                     dateOfAppointmentDocId = document.id;
                                     notesView = notes;
                                   });
-                                  print(dateOfAppointmentDocId);
                                 },
                                 contentPadding:
                                     const EdgeInsets.symmetric(vertical: 5),
                                 title: Row(
                                   children: [
                                     const SizedBox(width: 50),
-                                    Text(fullName),
+                                    Text(fullName,
+                                        style: const TextStyle(
+                                          fontFamily: 'Sofia Pro',
+                                          fontSize: 18,
+                                        )),
                                     const Spacer(),
                                     const SizedBox(width: 50),
                                   ],
