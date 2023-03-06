@@ -174,7 +174,7 @@ class _YourAppointmentState extends State<YourAppointment> {
                                         horizontal: 30, vertical: 10),
                                     child: Row(
                                       children: [
-                                        const SizedBox(width: 35),
+                                        // const SizedBox(width: 20),
                                         Text(data['date'],
                                             style: const TextStyle(
                                               fontSize: 15,
@@ -188,7 +188,14 @@ class _YourAppointmentState extends State<YourAppointment> {
                                               fontFamily: 'Sofia Pro',
                                               fontWeight: FontWeight.w400,
                                             )),
-                                        const SizedBox(width: 40),
+                                        const SizedBox(width: 35),
+                                        Text(data['status'],
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              fontFamily: 'Sofia Pro',
+                                              fontWeight: FontWeight.w400,
+                                            )),
+                                        const SizedBox(width: 20),
                                       ],
                                     ),
                                   ),

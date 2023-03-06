@@ -96,7 +96,7 @@ class _AuthLoadingState extends State<AuthLoading> {
         backgroundColor: Colors.transparent,
         automaticallyImplyLeading: false,
       ),
-      body: const Center(child: SpinKitSpinningLines(color: primaryColor)),
+      body: const Center(child: SpinKitChasingDots(color: primaryColor)),
     );
   }
 }

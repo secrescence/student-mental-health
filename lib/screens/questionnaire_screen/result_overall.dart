@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:student_mental_health/screens/appointment_screen/appointment.dart';
 import 'package:student_mental_health/screens/articles.dart';
+import 'package:student_mental_health/screens/journal.dart';
 import 'package:student_mental_health/screens/questionnaire_screen/settings.dart';
 import 'package:student_mental_health/screens/videos.dart';
 import 'package:student_mental_health/service/database_service.dart';
@@ -344,25 +345,12 @@ class _ResultOverallState extends State<ResultOverall> {
               const SizedBox(height: 12),
               GestureDetector(
                 onTap: () {
+                  nextScreen(context, const Journal());
                   print('Journal');
                 },
                 child: const SizedBox(
                   width: double.infinity,
                   child: Text('Journal',
-                      style: TextStyle(
-                          color: Colors.black54,
-                          fontSize: 17,
-                          fontFamily: 'Sofia Pro')),
-                ),
-              ),
-              const SizedBox(height: 12),
-              GestureDetector(
-                onTap: () {
-                  print('Mood Tracker');
-                },
-                child: const SizedBox(
-                  width: double.infinity,
-                  child: Text('Mood Tracker',
                       style: TextStyle(
                           color: Colors.black54,
                           fontSize: 17,

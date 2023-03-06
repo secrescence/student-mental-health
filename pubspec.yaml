@@ -50,6 +50,10 @@ dependencies:
   expandable: ^5.0.1
   flutter_toggle_tab: ^1.2.0
   intl: ^0.17.0
+  youtube_player_flutter: ^8.1.2
+  flutter_inappwebview: ^5.7.2+3
+  video_player: ^2.5.3
+  chewie: ^1.4.0
 
 
 dev_dependencies:
