@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -27,6 +26,14 @@ class _VideosState extends State<Videos> {
         elevation: 0,
         backgroundColor: Colors.transparent,
         foregroundColor: const Color(0xFF1D3557),
+        leading: IconButton(
+            onPressed: (() {
+              nextScreenPop(context);
+            }),
+            icon: const Icon(
+              Icons.arrow_back_ios,
+              color: Color(0xFF000000),
+            )),
       ),
       body: Column(
         children: [
@@ -83,7 +90,11 @@ class _VideosState extends State<Videos> {
                         child: ListTile(
                           onTap: () {
                             nextScreen(
-                                context, VideoPlayer(videoLink: data['link']));
+                                context,
+                                VideoPlayer(
+                                    videoLink: data['link'],
+                                    videoTitle: data['title'],
+                                    videoSubtitle: data['subtitle']));
                           },
                           title: Text(
                             data['title'],

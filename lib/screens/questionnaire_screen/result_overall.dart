@@ -298,7 +298,8 @@ class _ResultOverallState extends State<ResultOverall> {
               GestureDetector(
                 onTap: () async {
                   print('Articles');
-                  nextScreen(context, const Articles());
+                  nextScreen(
+                      context, Articles(highestCategory: highestCategory));
                 },
                 child: const SizedBox(
                   width: double.infinity,

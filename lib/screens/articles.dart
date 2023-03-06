@@ -1,10 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:student_mental_health/screens/articles_viewer.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
+import 'package:student_mental_health/widgets/widgets/widgets.dart';
 
 class Articles extends StatefulWidget {
-  const Articles({super.key});
+  final String highestCategory;
+  const Articles({super.key, required this.highestCategory});
 
   @override
   State<Articles> createState() => _ArticlesState();
@@ -18,6 +21,14 @@ class _ArticlesState extends State<Articles> {
         elevation: 0,
         backgroundColor: Colors.transparent,
         foregroundColor: const Color(0xFF1D3557),
+        leading: IconButton(
+            onPressed: (() {
+              nextScreenPop(context);
+            }),
+            icon: const Icon(
+              Icons.arrow_back_ios,
+              color: Color(0xFF000000),
+            )),
       ),
       body: Column(
         children: [
@@ -36,7 +47,19 @@ class _ArticlesState extends State<Articles> {
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
-                    .collection('articles')
+                    .collection(widget.highestCategory == 'Awareness'
+                        ? 'awarenessArticles'
+                        : widget.highestCategory == 'Goals'
+                            ? 'goalsArticles'
+                            : widget.highestCategory == 'Impulse'
+                                ? 'impulseArticles'
+                                : widget.highestCategory == 'Nonacceptance'
+                                    ? 'nonAcceptanceArticles'
+                                    : widget.highestCategory == 'Strategies'
+                                        ? 'strategiesArticles'
+                                        : widget.highestCategory == 'Clarity'
+                                            ? 'clarityArticles'
+                                            : '')
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData ||
@@ -60,6 +83,10 @@ class _ArticlesState extends State<Articles> {
 
                       return Card(
                         child: ListTile(
+                          onTap: () {
+                            nextScreen(context,
+                                ArticlesViewer(articleLink: data['link']));
+                          },
                           title: Text(
                             data['title'],
                             style: const TextStyle(fontFamily: 'Sofia Pro'),
