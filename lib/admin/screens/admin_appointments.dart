@@ -223,7 +223,7 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
                               ),
                               const Divider(
                                 height: 0,
-                                thickness: 1,
+                                thickness: 5,
                               ),
                             ],
                           );
