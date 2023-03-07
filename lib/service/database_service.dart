@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +17,8 @@ class DatabaseService {
       FirebaseFirestore.instance.collection('appointments');
   final CollectionReference additionalAppointmentsCollection =
       FirebaseFirestore.instance.collection('additionalAppointments');
+  final CollectionReference journalCollection =
+      FirebaseFirestore.instance.collection('journal');
 
   String currentDate = DateFormat('dd-MM-yyyy').format(DateTime.now());
 
@@ -553,67 +557,37 @@ class DatabaseService {
     });
   }
 
-// used to display chats of both chatbot and user
-  getChats(String chatId) async {
-    return userCollection
-        .doc(chatId)
-        .collection('messages')
-        .orderBy('time')
-        .snapshots();
-  }
-
-//when user send a message
-  Future sendMessage(
-      String chatId, Map<String, dynamic> chatMessageData) async {
-    userCollection
-        .doc(chatId)
-        .collection('messages')
-        .doc(uid)
-        .set(chatMessageData);
-  }
-
-  Future sendOption(String chatId, Map<String, dynamic> chatMessageData) async {
-    userCollection
-        .doc(chatId)
-        .collection('messages')
-        .doc(chatId)
-        .set(chatMessageData);
-  }
-
-//chatbot message
-  Future chatbotResponse(
-      String chatId, String message, String index, String sender) async {
-    await userCollection.doc(chatId).collection('messages').doc(index).set({
-      'message': message,
-      'sender': sender,
-      'time': DateTime.now().millisecondsSinceEpoch,
+  Future addJournalNotes() async {
+    String randInt = Random().nextInt(90000).toString();
+    String docId = '$uid-$randInt';
+    return await journalCollection.doc(docId).set({
+      'id': uid,
+      'title': '',
+      'content': '',
+      'mood': '',
+      'date': '',
     });
   }
 
-//check if user already replied to chatbot
-  Future<bool> ifUserReplied(String chatId, String userName) async {
-    final QuerySnapshot result = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(chatId)
-        .collection('messages')
-        .limit(1)
-        .where('sender', isEqualTo: userName)
-        .get();
-    final List<DocumentSnapshot> documents = result.docs;
-    return documents.length == 1;
-  }
-
-//if user chooses yes or no
-  Future<bool> ifUserChoosesYesOrNo(String chatId, String answer) async {
-    final QuerySnapshot result = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(chatId)
-        .collection('messages')
-        .limit(1)
-        .where('message', isEqualTo: answer)
-        .get();
-    final List<DocumentSnapshot> documents = result.docs;
-    return documents.length == 1;
+  Future updateJournalNotes(
+      String title, String content, String mood, String date) async {
+    return await journalCollection
+        .where('date', isEqualTo: date)
+        .get()
+        .then((value) => value.docs.forEach((element) {
+              element.reference.update({
+                'title': title,
+                'content': content,
+                'mood': mood,
+                'date': date,
+              });
+            }));
+    // return await journalCollection.doc('').update({
+    //   'title': title,
+    //   'content': content,
+    //   'mood': mood,
+    //   'date': date,
+    // });
   }
 
   //end of db service class

@@ -394,6 +394,7 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
                         ),
                       ),
                       const Spacer(),
+                      //TODO remove this
                       InkWell(
                         onTap: () {
                           // await DatabaseService().updateAppointmentNotes(

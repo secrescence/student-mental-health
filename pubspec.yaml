@@ -52,6 +52,7 @@ dependencies:
   intl: ^0.17.0
   youtube_player_flutter: ^8.1.2
   flutter_inappwebview: ^5.7.2+3
+  toggle_switch: ^2.0.1
 
 
 dev_dependencies:
