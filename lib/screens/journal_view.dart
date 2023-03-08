@@ -1,7 +1,9 @@
 import 'dart:math';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_toggle_tab/flutter_toggle_tab.dart';
+import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 import 'package:student_mental_health/widgets/widgets/widgets.dart';
 import 'package:toggle_switch/toggle_switch.dart';
@@ -24,6 +26,9 @@ class JournalView extends StatefulWidget {
 }
 
 class _JournalViewState extends State<JournalView> {
+  String noteTitle = '';
+  String noteContent = '';
+
   List<bool> _isSelected = [false, false, false, false, false, false];
   List<String> _buttonTexts = [
     "Undecided",
@@ -107,10 +112,10 @@ class _JournalViewState extends State<JournalView> {
                           ),
                         ),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(
                         _buttonTexts[index],
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 12,
                           fontFamily: 'Sofia Pro',
                         ),
@@ -122,10 +127,12 @@ class _JournalViewState extends State<JournalView> {
               const SizedBox(height: 30),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: TextField(
-                  onChanged: (value) {
-                    print(value);
+                child: TextFormField(
+                  onChanged: (value) async {
+                    await DatabaseService()
+                        .updateJournalTitle(widget.journalId, value);
                   },
+                  initialValue: widget.journalTitle,
                   decoration: const InputDecoration(
                     hintText: 'Title',
                     hintStyle: TextStyle(
@@ -144,11 +151,12 @@ class _JournalViewState extends State<JournalView> {
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                // color: Colors.amber,
-                child: TextField(
-                  onChanged: (value) {
-                    print(value);
+                child: TextFormField(
+                  onChanged: (value) async {
+                    await DatabaseService()
+                        .updateJournalContent(widget.journalId, value);
                   },
+                  initialValue: widget.journalContent,
                   decoration: const InputDecoration(
                     hintText: 'Write your thoughts here...',
                     hintStyle: TextStyle(
@@ -160,7 +168,7 @@ class _JournalViewState extends State<JournalView> {
                   style: const TextStyle(
                     fontSize: 16,
                   ),
-                  maxLines: 15,
+                  maxLines: 25,
                   cursorColor: primaryColor,
                 ),
               ),

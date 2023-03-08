@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:student_mental_health/screens/appointment_screen/appointment.dart';
+import 'package:student_mental_health/screens/appointment_screen/your_appointment.dart';
 import 'package:student_mental_health/screens/articles.dart';
 import 'package:student_mental_health/screens/journal.dart';
 import 'package:student_mental_health/screens/questionnaire_screen/settings.dart';
@@ -222,7 +223,7 @@ class _ResultOverallState extends State<ResultOverall> {
                   });
                   Future.delayed(const Duration(milliseconds: 50))
                       .then((value) {
-                    nextScreen(context, const Appointment());
+                    nextScreen(context, const YourAppointment());
                   });
                 },
                 style: ButtonStyle(

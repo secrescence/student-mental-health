@@ -38,7 +38,8 @@ class AuthService {
                 .linkWithCredential(phoneAuthCredential);
           },
           verificationFailed: (error) {
-            throw Exception(error.message);
+            if (!mounted) {}
+            errorSnackbar(context, 'Oh Snap!', error.message);
           },
           codeSent: (verificationId, forceResendingToken) {
             nextScreen(

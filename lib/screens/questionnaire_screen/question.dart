@@ -16,7 +16,7 @@ class Answer {
 List<Question> getQuestions() {
   List<Question> list = [];
   //ADD questions and answer here
-//1
+  //1 / 1 c
   list.add(Question(
     "I am clear about my feelings.",
     [
@@ -27,7 +27,7 @@ List<Question> getQuestions() {
       Answer("Strongly Agree", 5, 'CLARITY'),
     ],
   ));
-  //3
+  //3 / 2 c
   list.add(Question(
     "I pay attention to how I feel.",
     [
@@ -38,18 +38,18 @@ List<Question> getQuestions() {
       Answer("Strongly Agree", 5, 'AWARENESS'),
     ],
   ));
-  //4
+  //4 / 3 cx
   list.add(Question(
     "I experience my emotions as overwhelming and out of control.",
     [
-      Answer("Strongly Disagree", 5, 'AWARENESS'),
-      Answer("Disagree", 4, 'AWARENESS'),
-      Answer("Undecided", 3, 'AWARENESS'),
-      Answer("Agree", 2, 'AWARENESS'),
-      Answer("Strongly Agree", 1, 'AWARENESS'),
+      Answer("Strongly Disagree", 5, 'IMPULSE'),
+      Answer("Disagree", 4, 'IMPULSE'),
+      Answer("Undecided", 3, 'IMPULSE'),
+      Answer("Agree", 2, 'IMPULSE'),
+      Answer("Strongly Agree", 1, 'IMPULSE'),
     ],
   ));
-  //5
+  //5 / 4 c
   list.add(Question(
     "I have no idea how I am feeling.",
     [
@@ -60,7 +60,7 @@ List<Question> getQuestions() {
       Answer("Strongly Agree", 1, 'CLARITY'),
     ],
   ));
-  //6
+  //6 / 5 c
   list.add(Question(
     "I have difficulty making sense out of my feelings.",
     [
@@ -71,7 +71,7 @@ List<Question> getQuestions() {
       Answer("Strongly Agree", 1, 'CLARITY'),
     ],
   ));
-  //7
+  //7 / 6 c
   list.add(Question(
     "I am attentive to my feelings.",
     [
@@ -82,7 +82,7 @@ List<Question> getQuestions() {
       Answer("Strongly Agree", 5, 'AWARENESS'),
     ],
   ));
-  //8
+  //8 / 7 c
   list.add(Question(
     "I know exactly how I am feeling.",
     [
@@ -93,7 +93,7 @@ List<Question> getQuestions() {
       Answer("Strongly Agree", 5, 'CLARITY'),
     ],
   ));
-  //9
+  //9 / 8 c
   list.add(Question(
     "I care about what I am feeling.",
     [
@@ -104,18 +104,18 @@ List<Question> getQuestions() {
       Answer("Strongly Agree", 5, 'AWARENESS'),
     ],
   ));
-  //10
+  //10 / 9 cx
   list.add(Question(
     "I am confused about how I feel.",
     [
-      Answer("Strongly Disagree", 5, 'AWARENESS'),
-      Answer("Disagree", 4, 'AWARENESS'),
-      Answer("Undecided", 3, 'AWARENESS'),
-      Answer("Agree", 2, 'AWARENESS'),
-      Answer("Strongly Agree", 1, 'AWARENESS'),
+      Answer("Strongly Disagree", 5, 'CLARITY'),
+      Answer("Disagree", 4, 'CLARITY'),
+      Answer("Undecided", 3, 'CLARITY'),
+      Answer("Agree", 2, 'CLARITY'),
+      Answer("Strongly Agree", 1, 'CLARITY'),
     ],
   ));
-  //12
+  //12 / 10 c
   list.add(Question(
     "When I'm upset, I acknowledge my emotions.",
     [
@@ -126,7 +126,7 @@ List<Question> getQuestions() {
       Answer("Strongly Agree", 5, 'AWARENESS'),
     ],
   ));
-  //14
+  //14 / 11 c
   list.add(Question(
     "When I'm upset, I become angry with myself for feeling that way.",
     [
@@ -137,7 +137,7 @@ List<Question> getQuestions() {
       Answer("Strongly Agree", 1, 'NONACCEPTANCE'),
     ],
   ));
-  //15
+  //15 / 12 c
   list.add(Question(
     "When I'm upset, I become embarrassed for feeling that way.",
     [
@@ -148,7 +148,7 @@ List<Question> getQuestions() {
       Answer("Strongly Agree", 1, 'NONACCEPTANCE'),
     ],
   ));
-  //16
+  //16 / 13 c
   list.add(Question(
     "When I'm upset, I have difficulty getting work done.",
     [
@@ -159,7 +159,7 @@ List<Question> getQuestions() {
       Answer("Strongly Agree", 1, 'GOALS'),
     ],
   ));
-  //17
+  //17 / 14 c
   list.add(Question(
     "When I'm upset, I become out of control.",
     [
@@ -170,7 +170,7 @@ List<Question> getQuestions() {
       Answer("Strongly Agree", 1, 'IMPULSE'),
     ],
   ));
-  //19
+  //19 / 15 c
   list.add(Question(
     "When I'm upset, I believe that I will remain that way for a long time",
     [
@@ -181,7 +181,7 @@ List<Question> getQuestions() {
       Answer("Strongly Agree", 1, 'STRATEGIES'),
     ],
   ));
-  //20
+  //20 / 16 c
   list.add(Question(
     "When I'm upset, I believe that I'll end up feeling very depressed.",
     [
@@ -192,7 +192,7 @@ List<Question> getQuestions() {
       Answer("Strongly Agree", 1, 'STRATEGIES'),
     ],
   ));
-  //21
+  //21 / 17 c
   list.add(Question(
     "When I'm upset, I believe that my feelings are valid and important.",
     [
@@ -203,7 +203,7 @@ List<Question> getQuestions() {
       Answer("Strongly Agree", 5, 'AWARENESS'),
     ],
   ));
-  //22
+  //22 / 18 c
   list.add(Question(
     "When I'm upset, I have difficulty focusing on other things.",
     [
@@ -214,7 +214,7 @@ List<Question> getQuestions() {
       Answer("Strongly Agree", 1, 'GOALS'),
     ],
   ));
-  //23
+  //23 / 19 c
   list.add(Question(
     "When I'm upset, I feel out of control.",
     [
@@ -225,7 +225,7 @@ List<Question> getQuestions() {
       Answer("Strongly Agree", 1, 'IMPULSE'),
     ],
   ));
-  //24
+  //24 / 20 c
   list.add(Question(
     "When I'm upset, I can still get things done.",
     [
@@ -236,7 +236,7 @@ List<Question> getQuestions() {
       Answer("Strongly Agree", 5, 'GOALS'),
     ],
   ));
-  //25
+  //25 / 21 c
   list.add(Question(
     "When I'm upset, I feel ashamed with myself for feeling that way.",
     [
@@ -247,7 +247,7 @@ List<Question> getQuestions() {
       Answer("Strongly Agree", 1, 'NONACCEPTANCE'),
     ],
   ));
-  //26
+  //26 / 22 c
   list.add(Question(
     "When I'm upset, I know that I can find a way to eventually feel better.",
     [
@@ -258,7 +258,7 @@ List<Question> getQuestions() {
       Answer("Strongly Agree", 5, 'STRATEGIES'),
     ],
   ));
-  //27
+  //27 / 23 c
   list.add(Question(
     "When I'm upset, I feel like I am weak.",
     [
@@ -269,7 +269,7 @@ List<Question> getQuestions() {
       Answer("Strongly Agree", 1, 'NONACCEPTANCE'),
     ],
   ));
-  //28
+  //28 / 24 c
   list.add(Question(
     "When I'm upset, I feel like I can remain in control of my behaviors.",
     [
@@ -280,7 +280,7 @@ List<Question> getQuestions() {
       Answer("Strongly Agree", 1, 'IMPULSE'),
     ],
   ));
-  //29
+  //29 / 25 c
   list.add(Question(
     "When I'm upset, I feel guilty for feeling that way.",
     [
@@ -291,7 +291,7 @@ List<Question> getQuestions() {
       Answer("Strongly Agree", 1, 'NONACCEPTANCE'),
     ],
   ));
-  //30
+  //30 / 26 c
   list.add(Question(
     "When I'm upset, I have difficulty concentrating.",
     [
@@ -302,7 +302,7 @@ List<Question> getQuestions() {
       Answer("Strongly Agree", 1, 'GOALS'),
     ],
   ));
-  //31
+  //31 / 27 c
   list.add(Question(
     "When I'm upset, I have difficulty controlling my behaviors.",
     [
@@ -313,7 +313,7 @@ List<Question> getQuestions() {
       Answer("Strongly Agree", 1, 'IMPULSE'),
     ],
   ));
-  //32
+  //32 / 28 c
   list.add(Question(
     "When I'm upset, I believe that there is nothing I can do to make myself feel better.",
     [
@@ -324,7 +324,7 @@ List<Question> getQuestions() {
       Answer("Strongly Agree", 1, 'STRATEGIES'),
     ],
   ));
-  //33
+  //33 / 29 c
   list.add(Question(
     "When I'm upset, I become irritated with myself for feeling that way.",
     [
@@ -335,7 +335,7 @@ List<Question> getQuestions() {
       Answer("Strongly Agree", 1, 'NONACCEPTANCE'),
     ],
   ));
-  //34
+  //34 / 30 c
   list.add(Question(
     "When I'm upset, I start to feel very bad about myself.",
     [
@@ -346,7 +346,7 @@ List<Question> getQuestions() {
       Answer("Strongly Agree", 1, 'STRATEGIES'),
     ],
   ));
-  //35
+  //35 / 31 c
   list.add(Question(
     "When I'm upset, I believe that wallowing in it is all I can do.",
     [
@@ -357,7 +357,7 @@ List<Question> getQuestions() {
       Answer("Strongly Agree", 1, 'STRATEGIES'),
     ],
   ));
-  //37
+  //37 / 32 c
   list.add(Question(
     "When I'm upset, I lose control over my behaviors.",
     [
@@ -368,7 +368,7 @@ List<Question> getQuestions() {
       Answer("Strongly Agree", 1, 'IMPULSE'),
     ],
   ));
-  //38
+  //38 / 33 c
   list.add(Question(
     "When I'm upset, I have difficulty thinking about anything else.",
     [
@@ -379,7 +379,7 @@ List<Question> getQuestions() {
       Answer("Strongly Agree", 1, 'GOALS'),
     ],
   ));
-  //39
+  //39 / 34 c
   list.add(Question(
     "When I'm upset, I take time to figure out what I'm really feeling.",
     [
@@ -390,7 +390,7 @@ List<Question> getQuestions() {
       Answer("Strongly Agree", 5, 'AWARENESS'),
     ],
   ));
-  //40
+  //40 / 35 c
   list.add(Question(
     "When I'm upset, it takes me a long time to feel better.",
     [
@@ -401,7 +401,7 @@ List<Question> getQuestions() {
       Answer("Strongly Agree", 1, 'STRATEGIES'),
     ],
   ));
-  //41
+  //41 / 36 c
   list.add(Question(
     "When I'm upset, my emotions feel overwhelming.",
     [

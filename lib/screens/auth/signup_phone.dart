@@ -150,11 +150,11 @@ class _SignUpPhoneState extends State<SignUpPhone> {
                               decoration: InputDecoration(
                                 filled: true,
                                 fillColor: phoneFieldBGColor,
-                                hintText: "Enter phone number",
+                                hintText: "9123456789",
                                 hintStyle: TextStyle(
                                   fontFamily: 'Sofia Pro',
                                   fontWeight: FontWeight.w600,
-                                  fontSize: 15,
+                                  fontSize: 18,
                                   color: primaryColor.withOpacity(0.6),
                                 ),
                                 enabledBorder: OutlineInputBorder(

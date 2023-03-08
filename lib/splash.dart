@@ -25,6 +25,7 @@ class _SplashState extends State<Splash> {
   bool _isDoneWithQuestionnaire = false;
   bool _isDoneWithChatbot = false;
   bool _isSingedUpUsingEmailOnly = false;
+  bool _isDoneWithOTP = false;
   bool _isSignedIn = false;
   String? currentUser = FirebaseAuth.instance.currentUser?.uid;
 
@@ -48,9 +49,16 @@ class _SplashState extends State<Splash> {
           _isDoneWithChatbot &&
           _isSingedUpUsingEmailOnly) {
         nextScreen(context, const NeedToTakeQuestionnaireToProceed());
-      } else if (_isSignedIn && _isSingedUpUsingEmailOnly) {
+      } else if (_isSignedIn &&
+          _isSingedUpUsingEmailOnly &&
+          _isDoneWithOTP == true) {
         nextScreen(context, const Welcome());
-      } else if (_isSingedUpUsingEmailOnly) {
+      } else if (_isSingedUpUsingEmailOnly &&
+          _isSignedIn &&
+          _isDoneWithChatbot == false &&
+          _isDoneWithResults == false &&
+          _isDoneWithQuestionnaire == false &&
+          _isSingedUpUsingEmailOnly) {
         nextScreen(context, const SignUpPhone());
       } else {
         nextScreen(context, const Onboarding());
@@ -93,6 +101,15 @@ class _SplashState extends State<Splash> {
         if (value != null) {
           setState(() {
             _isSingedUpUsingEmailOnly = value;
+          });
+        }
+      });
+      await DatabaseService(uid: currentUser)
+          .getUsersDoneWithOTP()
+          .then((value) {
+        if (value != null) {
+          setState(() {
+            _isDoneWithOTP = value;
           });
         }
       });

@@ -20,7 +20,7 @@ class DatabaseService {
   final CollectionReference journalCollection =
       FirebaseFirestore.instance.collection('journal');
 
-  String currentDate = DateFormat('dd-MM-yyyy').format(DateTime.now());
+  String currentDate = DateFormat('MM-dd-yyyy').format(DateTime.now());
 
   //delete user
   Future deleteUser() async {
@@ -51,6 +51,7 @@ class DatabaseService {
       'phoneNumber': '',
       //user progress in the app by default
       'isUserSingedInUsingEmailOnly': true,
+      'isUserDoneWithOTP': false,
       'isUserDoneWithChatbot': false,
       'isUserDoneWithQuestionnaire': false,
       'isUserDoneWithResults': false,
@@ -91,6 +92,12 @@ class DatabaseService {
   }
 
   //to check user progress in the app
+  Future userDoneWithOTP() async {
+    return await userCollection.doc(uid).update({
+      'isUserDoneWithOTP': true,
+    });
+  }
+
   Future userDoneWithChatbot() async {
     return await userCollection.doc(uid).update({
       'isUserDoneWithChatbot': true,
@@ -107,6 +114,12 @@ class DatabaseService {
     return await userCollection.doc(uid).update({
       'isUserDoneWithResults': true,
     });
+  }
+
+  Future getUsersDoneWithOTP() async {
+    DocumentReference d = userCollection.doc(uid);
+    DocumentSnapshot documentSnapshot = await d.get();
+    return documentSnapshot['isUserDoneWithOTP'];
   }
 
   Future getUsersSignedInUsingEmailOnly() async {
@@ -143,11 +156,7 @@ class DatabaseService {
     double categoryStrategiesMEAN,
     double categoryClarityMEAN,
   ) async {
-    userCollection
-        .doc(uid)
-        .collection('questionnaireResult')
-        .doc(currentDate)
-        .set({
+    userCollection.doc(uid).collection('questionnaireResult').doc(uid).set({
       'dateAnswered': currentDate,
       'grandMean': grandMean,
       'categoryNonacceptanceMEAN': categoryNonacceptanceMEAN,
@@ -565,29 +574,26 @@ class DatabaseService {
       'title': '',
       'content': '',
       'mood': '',
-      'date': '',
+      'date': currentDate,
     });
   }
 
-  Future updateJournalNotes(
-      String title, String content, String mood, String date) async {
-    return await journalCollection
-        .where('date', isEqualTo: date)
-        .get()
-        .then((value) => value.docs.forEach((element) {
-              element.reference.update({
-                'title': title,
-                'content': content,
-                'mood': mood,
-                'date': date,
-              });
-            }));
-    // return await journalCollection.doc('').update({
-    //   'title': title,
-    //   'content': content,
-    //   'mood': mood,
-    //   'date': date,
-    // });
+  Future updateJournalTitle(String userUid, String title) async {
+    return await journalCollection.doc(userUid).update({
+      'title': title,
+    });
+  }
+
+  Future updateJournalContent(String userUid, String content) async {
+    return await journalCollection.doc(userUid).update({
+      'content': content,
+    });
+  }
+
+  Future updateJournalMood(String userUid, String mood) async {
+    return await journalCollection.doc(userUid).update({
+      'mood': mood,
+    });
   }
 
   //end of db service class

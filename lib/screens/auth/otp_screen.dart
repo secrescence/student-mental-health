@@ -239,6 +239,8 @@ class _OtpScreenState extends State<OtpScreen> {
       }
     });
     await HelperFunctions.saveUserLoggedInStatus(true);
+    await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
+        .userDoneWithOTP();
   }
 
   void resendOtpTimer() {
