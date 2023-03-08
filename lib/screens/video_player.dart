@@ -99,7 +99,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
                               fontFamily: 'Sofia Pro',
                               fontSize: 17,
                               color: Colors.grey[700]),
-                          maxLines: 2,
+                          maxLines: 23,
                         ),
                       ),
                     ],

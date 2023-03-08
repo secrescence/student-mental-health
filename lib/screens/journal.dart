@@ -19,11 +19,27 @@ class Journal extends StatefulWidget {
 }
 
 class _JournalState extends State<Journal> {
-  @override
-  void initState() {
-    print(FirebaseAuth.instance.currentUser!.uid);
-    super.initState();
-  }
+  String docId = '';
+  String noteTitle = '';
+  String noteContent = '';
+  String noteDate = '';
+
+  final List<String> _buttonImages = [
+    "https://i.ibb.co/kqhgWSZ/neutral.png",
+    "https://i.ibb.co/5jvNmMG/happy.png",
+    "https://i.ibb.co/YQkPfCP/sad.png",
+    "https://i.ibb.co/Sc01N34/angry.png",
+    "https://i.ibb.co/W0rbnfB/scared.png",
+    "https://i.ibb.co/dDh3M0K/stressed.png",
+  ];
+  final List _mood = [
+    "Neutral",
+    "Happy",
+    "Sad",
+    "Angry",
+    "Scared",
+    "Stressed",
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -87,6 +103,23 @@ class _JournalState extends State<Journal> {
                     itemCount: documents.length,
                     itemBuilder: (context, index) {
                       Map<String, dynamic> data = journalData[index];
+
+                      String mood = data['mood'];
+                      String moodImage = _buttonImages[0];
+                      if (mood == 'Neutral') {
+                        moodImage = _buttonImages[0];
+                      } else if (mood == 'Happy') {
+                        moodImage = _buttonImages[1];
+                      } else if (mood == 'Sad') {
+                        moodImage = _buttonImages[2];
+                      } else if (mood == 'Angry') {
+                        moodImage = _buttonImages[3];
+                      } else if (mood == 'Scared') {
+                        moodImage = _buttonImages[4];
+                      } else if (mood == 'Stressed') {
+                        moodImage = _buttonImages[5];
+                      }
+
                       return ListTile(
                         onTap: () {
                           nextScreen(
@@ -97,7 +130,22 @@ class _JournalState extends State<Journal> {
                                 journalContent: data['content'],
                                 journalDate: data['date'],
                               ));
+                          setState(() {
+                            docId = documents[index].id;
+                            noteTitle = data['title'];
+                            noteContent = data['content'];
+                            noteDate = data['date'];
+                          });
                         },
+                        leading: Container(
+                          width: 60,
+                          height: 70,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: NetworkImage(moodImage),
+                            ),
+                          ),
+                        ),
                         title: Text(
                           data['title'] == '' ? 'Untitled' : data['title'],
                           style: const TextStyle(
@@ -170,15 +218,18 @@ class _JournalState extends State<Journal> {
                         child: FloatingActionButton(
                           elevation: 5,
                           onPressed: () async {
-                            print(Random().nextInt(90000) + 10000);
-                            String documentId =
-                                "P4RadET3HpW7p8aduPMwJ9ty6f22-14121";
-                            String userId = documentId.split("-")[0];
-                            print(userId);
-                            // nextScreen(context, const JournalView());
                             await DatabaseService(
                                     uid: FirebaseAuth.instance.currentUser!.uid)
                                 .addJournalNotes();
+                            if (!mounted) return;
+                            nextScreen(
+                                context,
+                                JournalView(
+                                  journalId: docId,
+                                  journalTitle: noteTitle,
+                                  journalContent: noteContent,
+                                  journalDate: noteDate,
+                                ));
                           },
                           backgroundColor: primaryColor,
                           foregroundColor: Colors.white,

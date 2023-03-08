@@ -1,11 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:student_mental_health/screens/appointment_screen/your_appointment.dart';
-import 'package:student_mental_health/screens/questionnaire_screen/result_overall.dart';
 import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 import 'package:student_mental_health/widgets/widgets/widgets.dart';
@@ -252,9 +249,12 @@ class _AppointmentState extends State<Appointment> {
 
                       // await DatabaseService(uid: 'sv6Zi6NT2ocCSG78ZbSJc9id8VJ3')
                       //     .appointUser(context);
-                      await DatabaseService(uid: 'GRuBovrHQqVdhikUkYNxKnthVti2')
-                          .additionalAppointment(
-                              context, '02-19-2023', '11:00 AM');
+                      // await DatabaseService(uid: 'GRuBovrHQqVdhikUkYNxKnthVti2')
+                      //     .additionalAppointment(
+                      //         context, '02-19-2023', '11:00 AM');
+                      await DatabaseService(
+                              uid: FirebaseAuth.instance.currentUser!.uid)
+                          .appointUser(context);
                     },
                     style: ButtonStyle(
                       fixedSize:

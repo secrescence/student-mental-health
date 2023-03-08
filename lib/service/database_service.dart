@@ -578,13 +578,13 @@ class DatabaseService {
     });
   }
 
-  Future updateJournalTitle(String userUid, String title) async {
+  Future updateJournalTitle(String userUid, String? title) async {
     return await journalCollection.doc(userUid).update({
       'title': title,
     });
   }
 
-  Future updateJournalContent(String userUid, String content) async {
+  Future updateJournalContent(String userUid, String? content) async {
     return await journalCollection.doc(userUid).update({
       'content': content,
     });
@@ -594,6 +594,26 @@ class DatabaseService {
     return await journalCollection.doc(userUid).update({
       'mood': mood,
     });
+  }
+
+  Future getUserEmail() async {
+    DocumentReference d = userCollection.doc(uid);
+    DocumentSnapshot documentSnapshot = await d.get();
+    if (documentSnapshot.exists) {
+      return documentSnapshot['email'];
+    } else {
+      return null;
+    }
+  }
+
+  Future getUserName() async {
+    DocumentReference d = userCollection.doc(uid);
+    DocumentSnapshot documentSnapshot = await d.get();
+    if (documentSnapshot.exists) {
+      return documentSnapshot['firstName'] + ' ' + documentSnapshot['lastName'];
+    } else {
+      return null;
+    }
   }
 
   //end of db service class

@@ -30,24 +30,22 @@ class _JournalViewState extends State<JournalView> {
   String noteContent = '';
 
   List<bool> _isSelected = [false, false, false, false, false, false];
-  List<String> _buttonTexts = [
-    "Undecided",
+  final List<String> _buttonImages = [
+    "https://i.ibb.co/kqhgWSZ/neutral.png",
+    "https://i.ibb.co/5jvNmMG/happy.png",
+    "https://i.ibb.co/YQkPfCP/sad.png",
+    "https://i.ibb.co/Sc01N34/angry.png",
+    "https://i.ibb.co/W0rbnfB/scared.png",
+    "https://i.ibb.co/dDh3M0K/stressed.png",
+  ];
+  final List _mood = [
+    "Neutral",
     "Happy",
     "Sad",
     "Angry",
-    "Anxious",
+    "Scared",
     "Stressed",
   ];
-  List<String> _buttonImages = [
-    "https://via.placeholder.com/150/FF0000/FFFFFF",
-    "https://via.placeholder.com/150/00FF00/FFFFFF",
-    "https://via.placeholder.com/150/0000FF/FFFFFF",
-    "https://via.placeholder.com/150/FFFF00/FFFFFF",
-    "https://via.placeholder.com/150/00FFFF/FFFFFF",
-    "https://via.placeholder.com/150/FF00FF/FFFFFF",
-  ];
-
-  int _selectedIndex = -1;
 
   @override
   Widget build(BuildContext context) {
@@ -68,56 +66,65 @@ class _JournalViewState extends State<JournalView> {
           child: Column(
             children: [
               const SizedBox(height: 30),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    widget.journalDate,
+                    style: const TextStyle(
+                      fontFamily: 'Sofia Pro',
+                      fontSize: 15,
+                      color: Colors.black,
+                    ),
+                  ),
+                  const SizedBox(width: 20),
+                ],
+              ),
+              const SizedBox(height: 20),
+              const Center(
+                child: Text(
+                  'What\'s your mood today?',
+                  style: TextStyle(
+                    fontFamily: 'Sofia Pro',
+                    fontSize: 20,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
               ToggleButtons(
                 isSelected: _isSelected,
-                onPressed: (int index) {
+                onPressed: (int index) async {
                   setState(() {
-                    if (_selectedIndex == index) {
-                      // The button is already selected, so deselect it
-                      _isSelected[index] = false;
-                      _selectedIndex = -1;
-                    } else {
-                      // Deselect the currently selected button (if any)
-                      if (_selectedIndex != -1) {
-                        _isSelected[_selectedIndex] = false;
-                      }
-                      // Select the clicked button
-                      _isSelected[index] = true;
-                      _selectedIndex = index;
-                    }
+                    _isSelected =
+                        List.generate(_isSelected.length, (i) => i == index);
                   });
+                  int selectedIndex = _isSelected.indexOf(true);
+                  String selectedMood = _mood[selectedIndex];
+                  await DatabaseService()
+                      .updateJournalMood(widget.journalId, selectedMood);
                 },
                 renderBorder: false,
-                constraints: const BoxConstraints(minWidth: 68, minHeight: 36),
+                constraints: const BoxConstraints(minWidth: 65, minHeight: 60),
                 color: Colors.black,
-                selectedColor: Colors.black,
-                fillColor: Colors.red,
+                selectedColor: Colors.white,
+                fillColor: primaryColor.withOpacity(0.9),
                 highlightColor: Colors.white,
-                splashColor: Colors.green,
+                splashColor: Colors.white,
                 disabledColor: Colors.blue,
                 disabledBorderColor: Colors.amber,
-                borderWidth: 60,
                 children: List.generate(
-                  _buttonTexts.length,
+                  _buttonImages.length,
                   (index) => Column(
                     children: [
                       Container(
                         width: 60,
-                        height: 80,
+                        height: 70,
                         decoration: BoxDecoration(
-                          shape: BoxShape.circle,
+                          // shape: BoxShape.circle,
                           image: DecorationImage(
                             image: NetworkImage(_buttonImages[index]),
-                            fit: BoxFit.cover,
+                            // fit: BoxFit.fill,
                           ),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        _buttonTexts[index],
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontFamily: 'Sofia Pro',
                         ),
                       ),
                     ],

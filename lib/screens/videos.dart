@@ -103,6 +103,7 @@ class _VideosState extends State<Videos> {
                           subtitle: Text(
                             data['subtitle'],
                             style: const TextStyle(
+                              overflow: TextOverflow.ellipsis,
                               fontFamily: 'Sofia Pro',
                             ),
                           ),
