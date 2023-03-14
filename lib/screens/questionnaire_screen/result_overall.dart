@@ -33,6 +33,7 @@ class _ResultOverallState extends State<ResultOverall> {
   bool isRepeat = true;
 
   //priority dialog
+  //TODO put this to firestore
   String highPriority1 =
       'As a result, I strongly encourage you\nto talk with our school\'s guidance\ncounselor. Our expert will help and\ngive the necessary support that you\nneed.';
   String highPriority2 = 'Click next to continue';
