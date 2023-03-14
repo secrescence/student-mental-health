@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:student_mental_health/screens/questionnaire_screen/question.dart';
@@ -5,6 +7,7 @@ import 'package:student_mental_health/screens/questionnaire_screen/result_catego
 import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 import 'package:student_mental_health/widgets/widgets/widgets.dart';
+import 'package:http/http.dart' as http;
 
 class Questionnaire extends StatefulWidget {
   const Questionnaire({super.key});
@@ -222,6 +225,7 @@ class _QuestionnaireState extends State<Questionnaire> {
                   await DatabaseService(
                           uid: FirebaseAuth.instance.currentUser!.uid)
                       .appointUser(context);
+                  sendEmail();
                 } else if (grandMean >= 3.5 && grandMean <= 3.9) {
                   await DatabaseService(
                           uid: FirebaseAuth.instance.currentUser!.uid)
@@ -230,6 +234,7 @@ class _QuestionnaireState extends State<Questionnaire> {
                   await DatabaseService(
                           uid: FirebaseAuth.instance.currentUser!.uid)
                       .appointUser(context);
+                  sendEmail();
                 } else if (grandMean < 3.49) {
                   await DatabaseService(
                           uid: FirebaseAuth.instance.currentUser!.uid)
@@ -257,5 +262,39 @@ class _QuestionnaireState extends State<Questionnaire> {
         ),
       ),
     );
+  }
+
+  Future sendEmail() async {
+    String userName =
+        await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
+            .getUserName();
+    String userEmail =
+        await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
+            .getUserEmail();
+    String message =
+        'Good day! you have an appointment with the guidance counselor. Please check your appointment screen for more details.';
+
+    const serviceId = 'service_9jrgmse';
+    const templateId = 'template_3avfj5g';
+    const userId = 'V2rX-nEaZfwpSl1uI';
+    final url = Uri.parse('https://api.emailjs.com/api/v1.0/email/send');
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'service_id': serviceId,
+        'template_id': templateId,
+        'user_id': userId,
+        'template_params': {
+          'user_name': userName,
+          'to_email': userEmail,
+          'message': message,
+        },
+      }),
+    );
+
+    print(response.body);
   }
 }
