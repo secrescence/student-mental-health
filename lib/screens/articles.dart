@@ -95,6 +95,7 @@ class _ArticlesState extends State<Articles> {
                             data['subtitle'],
                             style: const TextStyle(
                               fontFamily: 'Sofia Pro',
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ),

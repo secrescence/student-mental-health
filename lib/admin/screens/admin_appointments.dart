@@ -15,7 +15,6 @@ class AdminAppointments extends StatefulWidget {
 }
 
 class _AdminAppointmentsState extends State<AdminAppointments> {
-  Stream<QuerySnapshot>? userAppointmentStream;
   String statusView = '';
   String userIdView = '';
   String fullNameView = '';
@@ -26,20 +25,6 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
 
   int currentIndex = 0;
   final List<String> labels = ['Pending', 'Ongoing', 'Completed'];
-
-  @override
-  void initState() {
-    getData();
-    super.initState();
-  }
-
-  getData() async {
-    await DatabaseService().getUserAppointment().then((snapshot) {
-      setState(() {
-        userAppointmentStream = snapshot;
-      });
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,14 +45,6 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
           ),
         ),
         automaticallyImplyLeading: false,
-        // leading: IconButton(
-        //     onPressed: (() {
-        //       //TODO: Add back button functionality
-        //     }),
-        //     icon: const Icon(
-        //       Icons.arrow_back_ios,
-        //       color: Color(0xFF000000),
-        //     )),
       ),
       body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 50),
@@ -80,7 +57,9 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
             height: double.infinity,
             // margin: const EdgeInsets.symmetric(vertical: 10),
             child: StreamBuilder<QuerySnapshot>(
-              stream: userAppointmentStream,
+              stream: FirebaseFirestore.instance
+                  .collection('appointments')
+                  .snapshots(),
               builder: (BuildContext context,
                   AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (!snapshot.hasData ||
@@ -110,7 +89,9 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
                           document.data() as Map<String, dynamic>;
                       // final String fullName =
                       //     '${data['firstName']} ${data['lastName']}';
-                      if (data['status'] == null) {
+                      if (data['appointedUser'] == null ||
+                          data['status'] == null ||
+                          data['notes'] == null) {
                         return const SizedBox.shrink();
                       }
 

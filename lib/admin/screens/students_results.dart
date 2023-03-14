@@ -139,12 +139,14 @@ class _StudentsResultsState extends State<StudentsResults> {
                           document.data() as Map<String, dynamic>;
                       // final String fullName =
                       //     '${data['firstName']} ${data['lastName']}';
-                      if (data['status'] == null) {
+                      if (data['appointedUser'] == null ||
+                          data['userAppointedPriority'] == null) {
                         return const SizedBox.shrink();
                       }
 
                       final String userId = data['appointedUser'];
-                      final String priority = data['userAppointedPriority'];
+                      final String priority =
+                          data['userAppointedPriority']; //TODO tommorow
 
                       return StreamBuilder<DocumentSnapshot>(
                         stream: FirebaseFirestore.instance
