@@ -1,11 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_toggle_tab/flutter_toggle_tab.dart';
 import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 import 'package:student_mental_health/widgets/widgets/loading_admin.dart';
-import 'package:student_mental_health/widgets/widgets/widgets.dart';
 
 class AdminAppointments extends StatefulWidget {
   const AdminAppointments({super.key});
@@ -30,22 +28,22 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: adminContentBGColor,
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        title: const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 40),
-          child: Text(
-            'Appointments',
-            style: TextStyle(
-                color: Colors.black,
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                fontFamily: 'Sofia Pro'),
-          ),
-        ),
-        automaticallyImplyLeading: false,
-      ),
+      // appBar: AppBar(
+      //   elevation: 0,
+      //   backgroundColor: Colors.transparent,
+      //   title: const Padding(
+      //     padding: EdgeInsets.symmetric(horizontal: 40),
+      //     child: Text(
+      //       'Appointments',
+      //       style: TextStyle(
+      //           color: Colors.black,
+      //           fontSize: 20,
+      //           fontWeight: FontWeight.w600,
+      //           fontFamily: 'Sofia Pro'),
+      //     ),
+      //   ),
+      //   automaticallyImplyLeading: false,
+      // ),
       body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 50),
         child: Card(
@@ -65,6 +63,16 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
                 if (!snapshot.hasData ||
                     snapshot.connectionState == ConnectionState.waiting) {
                   return const LoadingAdmin();
+                } else if (snapshot.data!.docs.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      'No appointments yet',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 20,
+                          fontFamily: 'Sofia Pro'),
+                    ),
+                  );
                 } else if (snapshot.hasError) {
                   return const Center(
                     child: Text(

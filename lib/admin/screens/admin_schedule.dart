@@ -59,29 +59,29 @@ class _AdminScheduleState extends State<AdminSchedule> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: adminContentBGColor,
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        title: const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 40),
-          child: Text(
-            'Schedule',
-            style: TextStyle(
-                color: Colors.black,
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                fontFamily: 'Sofia Pro'),
-          ),
-        ),
-        automaticallyImplyLeading: false,
-        // leading: IconButton(
-        //     onPressed: (() {
-        //       //TODO: Add back button functionality
-        //     }),
-        //     icon: const Icon(
-        //       Icons.arrow_back_ios,
-        //       color: Color(0xFF000000),
-      ),
+      // appBar: AppBar(
+      //   elevation: 0,
+      //   backgroundColor: Colors.transparent,
+      //   title: const Padding(
+      //     padding: EdgeInsets.symmetric(horizontal: 40),
+      //     child: Text(
+      //       'Schedule',
+      //       style: TextStyle(
+      //           color: Colors.black,
+      //           fontSize: 20,
+      //           fontWeight: FontWeight.w600,
+      //           fontFamily: 'Sofia Pro'),
+      //     ),
+      //   ),
+      //   automaticallyImplyLeading: false,
+      //   // leading: IconButton(
+      //   //     onPressed: (() {
+      //   //       //TODO: Add back button functionality
+      //   //     }),
+      //   //     icon: const Icon(
+      //   //       Icons.arrow_back_ios,
+      //   //       color: Color(0xFF000000),
+      // ),
       body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 50),
         child: Card(

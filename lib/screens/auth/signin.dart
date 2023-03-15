@@ -69,12 +69,12 @@ class _SignInState extends State<SignIn> {
                     alignment: Alignment.centerLeft,
                     padding: const EdgeInsets.symmetric(vertical: 25),
                     child: const Text(
-                      'Log In',
+                      'Sign In',
                       style: TextStyle(
-                          fontFamily: 'Sofia Pro',
-                          fontSize: 23,
-                          color: Colors.black,
-                          fontWeight: FontWeight.w600),
+                        fontFamily: 'Sofia Pro',
+                        fontSize: 23,
+                        color: Colors.black,
+                      ),
                     ),
                   ),
                   //email

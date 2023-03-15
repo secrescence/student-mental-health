@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 import 'package:student_mental_health/service/auth_service.dart';
 import 'package:student_mental_health/widgets/widgets/custom_snackbar.dart';
@@ -17,19 +18,40 @@ class _SignUpUserInfoState extends State<SignUpUserInfo> {
   _SignUpUserInfoState() {
     _schoolYearSelectedValue = _schoolYear[0];
     _classSectionSelectedValue = _classSection[0];
+    _departmentSelectedValue = _department[0];
   }
 
   //dropdown
   final _schoolYear = ['1', '2', '3', '4'];
-  final _classSection = ['A', 'B', 'C', 'D'];
+  final _classSection = [
+    'A',
+    'B',
+    'C',
+    'D',
+    'E',
+    'F',
+    'G',
+    'H',
+    'I',
+    'J',
+    'K',
+    'L',
+  ];
+  final _department = [
+    'Computer Science',
+    'Criminology',
+    'Education',
+    'Fisheries',
+    'Food Technology'
+  ];
   String? _schoolYearSelectedValue = '';
   String? _classSectionSelectedValue = '';
+  String? _departmentSelectedValue = '';
 
   // controllers
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
-  final TextEditingController departmentController = TextEditingController();
   final TextEditingController studentIdController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
@@ -46,7 +68,6 @@ class _SignUpUserInfoState extends State<SignUpUserInfo> {
     firstNameController.dispose();
     lastNameController.dispose();
     emailController.dispose();
-    departmentController.dispose();
     studentIdController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
@@ -292,31 +313,26 @@ class _SignUpUserInfoState extends State<SignUpUserInfo> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                //department
+
                 Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Row(
                     children: [
+                      //department
                       Expanded(
                         flex: 3,
-                        child: SizedBox(
-                          height: 45,
-                          child: TextFormField(
-                            controller: departmentController,
-                            style: const TextStyle(color: Colors.black),
-                            cursorColor: primaryColor,
+                        child: DropdownButtonFormField(
                             decoration: textInputDeco.copyWith(
-                              errorMaxLines: 1,
-                              errorStyle: const TextStyle(
-                                  height: 0,
-                                  color: Colors.transparent,
-                                  fontSize: 0),
                               contentPadding: const EdgeInsets.all(0),
                               prefixIconConstraints:
                                   const BoxConstraints(maxHeight: 20),
                               suffixIconConstraints:
                                   const BoxConstraints(maxHeight: 20),
+                              suffixIcon: const Padding(
+                                padding: EdgeInsets.only(
+                                    top: 0, right: 12, bottom: 0, left: 2),
+                              ),
                               floatingLabelStyle: const TextStyle(
                                   color: Colors.black,
                                   fontFamily: 'Sofia Pro',
@@ -325,35 +341,38 @@ class _SignUpUserInfoState extends State<SignUpUserInfo> {
                                   FloatingLabelAlignment.start,
                               floatingLabelBehavior:
                                   FloatingLabelBehavior.always,
-                              alignLabelWithHint: true,
+                              alignLabelWithHint: false,
+                              labelText: 'Department',
                               labelStyle: const TextStyle(
                                   color: Colors.black,
                                   fontFamily: 'Sofia Pro',
                                   fontSize: 17),
-                              labelText: 'Department',
-                              hintText: 'Computer Science',
                               hintStyle: const TextStyle(
                                   fontSize: 13, fontFamily: 'Sofia Pro'),
                               prefixIcon: const Padding(
                                 padding: EdgeInsets.only(
-                                    top: 0, right: 7, bottom: 0, left: 7),
-                                child: Icon(
-                                  Icons.school,
-                                  color: Color(0xFF1D3557),
-                                  size: 20,
-                                ),
+                                    top: 0, right: 10.5, bottom: 0, left: 2),
                               ),
                             ),
-                            autovalidateMode:
-                                AutovalidateMode.onUserInteraction,
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return '';
-                              }
-                              return null;
-                            },
-                          ),
-                        ),
+                            value: _departmentSelectedValue,
+                            items: _department
+                                .map((e) => DropdownMenuItem(
+                                      alignment: AlignmentDirectional.center,
+                                      value: e,
+                                      child: Container(
+                                        padding: const EdgeInsets.only(left: 4),
+                                        child: SizedBox(
+                                          child: Text(e),
+                                        ),
+                                      ),
+                                    ))
+                                .toList(),
+                            onChanged: ((value) {
+                              print(value);
+                              setState(() {
+                                _departmentSelectedValue = value;
+                              });
+                            })),
                       ),
                       // school year
                       Expanded(
@@ -457,7 +476,7 @@ class _SignUpUserInfoState extends State<SignUpUserInfo> {
                                         value: e,
                                         child: Container(
                                           padding:
-                                              const EdgeInsets.only(left: 4),
+                                              const EdgeInsets.only(left: 3),
                                           child: SizedBox(
                                             child: Text(e),
                                           ),
@@ -730,12 +749,17 @@ class _SignUpUserInfoState extends State<SignUpUserInfo> {
   }
 
   void signUp() async {
+    String? firstName = toBeginningOfSentenceCase(
+        firstNameController.text.trim().toLowerCase());
+    String? lastName =
+        toBeginningOfSentenceCase(lastNameController.text.trim().toLowerCase());
+
     if (formKey.currentState!.validate()) {
       AuthService().signUpUserInfo(
-        firstName: firstNameController.text.trim(),
-        lastName: lastNameController.text.trim(),
+        firstName: firstName!,
+        lastName: lastName!,
         email: emailController.text.trim(),
-        department: departmentController.text.trim(),
+        department: _departmentSelectedValue!,
         year: _schoolYearSelectedValue!,
         section: _classSectionSelectedValue!,
         studentId: studentIdController.text.trim(),

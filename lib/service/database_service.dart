@@ -356,7 +356,7 @@ class DatabaseService {
   }
 
   //the system will automatically add the appointment to the first available slot
-  Future appointUser(BuildContext context, {bool mounted = true}) async {
+  Future appointUser(BuildContext context, String priority, {bool mounted = true}) async {
     List<String> scheduleIds = await getAllSchedulesDocId();
 
     for (String scheduleId in scheduleIds) {
@@ -366,6 +366,7 @@ class DatabaseService {
         // If the slot is empty, update it with the uid and return
         await appointmentsCollection.doc(scheduleId).update({
           'appointedUser': uid,
+          'appointedUserPriority': priority,
         });
         return;
       }

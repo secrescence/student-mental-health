@@ -74,30 +74,30 @@ class _StudentsResultsState extends State<StudentsResults> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: adminContentBGColor,
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        title: const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 40),
-          child: Text(
-            'Student\'s Results',
-            style: TextStyle(
-                color: Colors.black,
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                fontFamily: 'Sofia Pro'),
-          ),
-        ),
-        automaticallyImplyLeading: false,
-        // leading: IconButton(
-        //     onPressed: (() {
-        //       //TODO: Add back button functionality
-        //     }),
-        //     icon: const Icon(
-        //       Icons.arrow_back_ios,
-        //       color: Color(0xFF000000),
-        //     )),
-      ),
+      // appBar: AppBar(
+      //   elevation: 0,
+      //   backgroundColor: Colors.transparent,
+      //   title: const Padding(
+      //     padding: EdgeInsets.symmetric(horizontal: 40),
+      //     child: Text(
+      //       'Student\'s Results',
+      //       style: TextStyle(
+      //           color: Colors.black,
+      //           fontSize: 20,
+      //           fontWeight: FontWeight.w600,
+      //           fontFamily: 'Sofia Pro'),
+      //     ),
+      //   ),
+      //   automaticallyImplyLeading: false,
+      //   // leading: IconButton(
+      //   //     onPressed: (() {
+      //   //       //TODO: Add back button functionality
+      //   //     }),
+      //   //     icon: const Icon(
+      //   //       Icons.arrow_back_ios,
+      //   //       color: Color(0xFF000000),
+      //   //     )),
+      // ),
       body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 50),
         child: Card(
@@ -115,6 +115,16 @@ class _StudentsResultsState extends State<StudentsResults> {
                 if (!snapshot.hasData ||
                     snapshot.connectionState == ConnectionState.waiting) {
                   return const LoadingAdmin();
+                } else if (snapshot.data!.docs.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      'No results yet',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 20,
+                          fontFamily: 'Sofia Pro'),
+                    ),
+                  );
                 } else if (snapshot.hasError) {
                   return const Center(
                     child: Text(
@@ -122,7 +132,6 @@ class _StudentsResultsState extends State<StudentsResults> {
                       style: TextStyle(
                           color: Colors.black,
                           fontSize: 20,
-                          fontWeight: FontWeight.w600,
                           fontFamily: 'Sofia Pro'),
                     ),
                   );
@@ -140,13 +149,12 @@ class _StudentsResultsState extends State<StudentsResults> {
                       // final String fullName =
                       //     '${data['firstName']} ${data['lastName']}';
                       if (data['appointedUser'] == null ||
-                          data['userAppointedPriority'] == null) {
+                          data['appointedUserPriority'] == null) {
                         return const SizedBox.shrink();
                       }
 
                       final String userId = data['appointedUser'];
-                      final String priority =
-                          data['userAppointedPriority']; //TODO tommorow
+                      final String priority = data['appointedUserPriority'];
 
                       return StreamBuilder<DocumentSnapshot>(
                         stream: FirebaseFirestore.instance

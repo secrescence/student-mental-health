@@ -224,7 +224,8 @@ class _QuestionnaireState extends State<Questionnaire> {
                   if (!mounted) return;
                   await DatabaseService(
                           uid: FirebaseAuth.instance.currentUser!.uid)
-                      .appointUser(context);
+                      .appointUser(context, 'high priority');
+                  //send email to the user
                   sendEmail();
                 } else if (grandMean >= 3.5 && grandMean <= 3.9) {
                   await DatabaseService(
@@ -233,7 +234,8 @@ class _QuestionnaireState extends State<Questionnaire> {
                   if (!mounted) return;
                   await DatabaseService(
                           uid: FirebaseAuth.instance.currentUser!.uid)
-                      .appointUser(context);
+                      .appointUser(context, 'mid priority');
+                  //send email to the user
                   sendEmail();
                 } else if (grandMean < 3.49) {
                   await DatabaseService(

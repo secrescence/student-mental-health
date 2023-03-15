@@ -222,39 +222,7 @@ class _AppointmentState extends State<Appointment> {
                 children: [
                   ElevatedButton(
                     onPressed: () async {
-                      // await DatabaseService()
-                      //     .getUidScheduleOfDateNow()
-                      //     .then((value) async {
-                      //   if (!value.toString().contains(
-                      //       "${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year}")) {
-                      //     setState(() {
-                      //       incrementForDateOfAppointment = 1;
-                      //     });
-                      //     await DatabaseService().addSchedule(
-                      //         schedule, incrementForDateOfAppointment);
-                      //   } else {
-                      //     setState(() {
-                      //       incrementForDateOfAppointment++;
-                      //     });
-                      //     await DatabaseService().addSchedule(
-                      //         schedule, incrementForDateOfAppointment);
-                      //     print('w');
-                      //   }
-                      // });
-                      // await DatabaseService()
-                      //     .getAllSchedules()
-                      //     .then((value) => print(value));
-                      // await DatabaseService()
-                      //     .addSchedule(context, '02-17-2023', '10:00 AM');
-
-                      // await DatabaseService(uid: 'sv6Zi6NT2ocCSG78ZbSJc9id8VJ3')
-                      //     .appointUser(context);
-                      // await DatabaseService(uid: 'GRuBovrHQqVdhikUkYNxKnthVti2')
-                      //     .additionalAppointment(
-                      //         context, '02-19-2023', '11:00 AM');
-                      await DatabaseService(
-                              uid: FirebaseAuth.instance.currentUser!.uid)
-                          .appointUser(context);
+                      //TODO to be implemented create appointment
                     },
                     style: ButtonStyle(
                       fixedSize:
