@@ -134,7 +134,7 @@ class _AdminScheduleState extends State<AdminSchedule> {
                     thickness: 1,
                   ),
                   SizedBox(
-                    height: 500,
+                    height: 400,
                     child: StreamBuilder<QuerySnapshot>(
                       stream: scheduleStream,
                       builder: (context, snapshot) {

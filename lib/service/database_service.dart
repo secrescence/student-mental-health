@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -15,6 +16,8 @@ class DatabaseService {
       FirebaseFirestore.instance.collection('users');
   final CollectionReference appointmentsCollection =
       FirebaseFirestore.instance.collection('appointments');
+  final CollectionReference appointmentsQueueCollection =
+      FirebaseFirestore.instance.collection('appointmentsQueue');
   final CollectionReference additionalAppointmentsCollection =
       FirebaseFirestore.instance.collection('additionalAppointments');
   final CollectionReference journalCollection =
@@ -356,7 +359,30 @@ class DatabaseService {
   }
 
   //the system will automatically add the appointment to the first available slot
-  Future appointUser(BuildContext context, String priority, {bool mounted = true}) async {
+  // Future appointUser(BuildContext context, String priority, {bool mounted = true}) async {
+  //   List<String> scheduleIds = await getAllSchedulesDocId();
+
+  //   for (String scheduleId in scheduleIds) {
+  //     final DocumentSnapshot appointmentsDoc =
+  //         await appointmentsCollection.doc(scheduleId).get();
+  //     if (appointmentsDoc.get('appointedUser') == '') {
+  //       // If the slot is empty, update it with the uid and return
+  //       await appointmentsCollection.doc(scheduleId).update({
+  //         'appointedUser': uid,
+  //         'appointedUserPriority': priority,
+  //       });
+  //       return;
+  //     }
+  //   }
+
+  //   // If no empty slot is found, throw an error
+  //   //TODO Create a no available slots dialog
+  //   print('No available slots');
+  //   errorSnackbar(context, 'Oh Snap!', 'Time slot already taken');
+  // }
+
+  Future appointUser(BuildContext context, String priority,
+      {bool mounted = true}) async {
     List<String> scheduleIds = await getAllSchedulesDocId();
 
     for (String scheduleId in scheduleIds) {
@@ -372,10 +398,41 @@ class DatabaseService {
       }
     }
 
-    // If no empty slot is found, throw an error
-    //TODO Create a no available slots dialog
-    print('No available slots');
-    errorSnackbar(context, 'Oh Snap!', 'Time slot already taken');
+    // If no empty slot is found, add the user to the queue
+    await appointmentsQueueCollection.add({
+      'uid': uid,
+      'priority': priority,
+    });
+
+    //TODO Display a message to the user that they have been added to the queue
+    errorSnackbar(context, 'No available slots yet',
+        'Wala pa slots please wait and we will notify you');
+
+    // Listen for new schedule updates
+    StreamSubscription<QuerySnapshot>? subscription;
+    subscription = appointmentsCollection.snapshots().listen((snapshots) async {
+      // Check if there is a new schedule available
+      for (QueryDocumentSnapshot scheduleDoc in snapshots.docs) {
+        if (!scheduleIds.contains(scheduleDoc.id)) {
+          // There is a new schedule available, try to appoint a user
+          final queueSnapshot = await appointmentsCollection
+              .orderBy('priority', descending: true)
+              .limit(1)
+              .get();
+
+          if (queueSnapshot.docs.isNotEmpty) {
+            final user = queueSnapshot.docs.first;
+            await appointmentsCollection.doc(scheduleDoc.id).update({
+              'appointedUser': user.get('uid'),
+              'appointedUserPriority': user.get('priority'),
+            });
+            await user.reference.delete();
+            subscription?.cancel();
+            return;
+          }
+        }
+      }
+    });
   }
 
   //add additional appointment for emergency cases

@@ -82,7 +82,7 @@ class _AdminSignInState extends State<AdminSignIn> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      'Log In',
+                      'Sign In',
                       style: TextStyle(
                         color: Colors.black,
                         fontFamily: 'Sofia Pro',
@@ -127,7 +127,7 @@ class _AdminSignInState extends State<AdminSignIn> {
                             padding: EdgeInsets.only(
                                 top: 0, right: 7, bottom: 0, left: 7),
                             child: Icon(
-                              Icons.credit_card,
+                              Icons.mail,
                               color: Color(0xFF1D3557),
                               size: 20,
                             ),
