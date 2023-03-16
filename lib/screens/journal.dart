@@ -23,6 +23,7 @@ class _JournalState extends State<Journal> {
   String noteTitle = '';
   String noteContent = '';
   String noteDate = '';
+  int moodIndex = 0;
 
   final List<String> _buttonImages = [
     "https://i.ibb.co/kqhgWSZ/neutral.png",
@@ -33,12 +34,12 @@ class _JournalState extends State<Journal> {
     "https://i.ibb.co/dDh3M0K/stressed.png",
   ];
   final List _mood = [
-    "Neutral",
-    "Happy",
-    "Sad",
-    "Angry",
-    "Scared",
-    "Stressed",
+    "neutral",
+    "happy",
+    "sad",
+    "angry",
+    "scared",
+    "stressed",
   ];
 
   @override
@@ -106,18 +107,25 @@ class _JournalState extends State<Journal> {
 
                       String mood = data['mood'];
                       String moodImage = _buttonImages[0];
-                      if (mood == 'Neutral') {
+                      int moodIndex = 0;
+                      if (mood == 'neutral') {
                         moodImage = _buttonImages[0];
-                      } else if (mood == 'Happy') {
+                        moodIndex = 0;
+                      } else if (mood == 'happy') {
                         moodImage = _buttonImages[1];
-                      } else if (mood == 'Sad') {
+                        moodIndex = 1;
+                      } else if (mood == 'sad') {
                         moodImage = _buttonImages[2];
-                      } else if (mood == 'Angry') {
+                        moodIndex = 2;
+                      } else if (mood == 'angry') {
                         moodImage = _buttonImages[3];
-                      } else if (mood == 'Scared') {
+                        moodIndex = 3;
+                      } else if (mood == 'scared') {
                         moodImage = _buttonImages[4];
-                      } else if (mood == 'Stressed') {
+                        moodIndex = 4;
+                      } else if (mood == 'stressed') {
                         moodImage = _buttonImages[5];
+                        moodIndex = 5;
                       }
 
                       return ListTile(
@@ -125,12 +133,14 @@ class _JournalState extends State<Journal> {
                           nextScreen(
                               context,
                               JournalView(
+                                selectedMoodIndex: moodIndex,
                                 journalId: documents[index].id,
                                 journalTitle: data['title'],
                                 journalContent: data['content'],
                                 journalDate: data['date'],
                               ));
                           setState(() {
+                            moodIndex = moodIndex;
                             docId = documents[index].id;
                             noteTitle = data['title'];
                             noteContent = data['content'];
@@ -152,11 +162,11 @@ class _JournalState extends State<Journal> {
                             fontFamily: 'Sofia Pro',
                           ),
                         ),
-                        subtitle: Text(
-                            data['content'] == '' ? 'empty' : data['content'],
-                            style: const TextStyle(
-                              fontFamily: 'Sofia Pro',
-                            )),
+                        subtitle:
+                            Text(data['date'] == '' ? 'empty' : data['date'],
+                                style: const TextStyle(
+                                  fontFamily: 'Sofia Pro',
+                                )),
                         trailing: IconButton(
                           icon: const Icon(Icons.delete),
                           onPressed: () {
@@ -220,16 +230,18 @@ class _JournalState extends State<Journal> {
                           onPressed: () async {
                             await DatabaseService(
                                     uid: FirebaseAuth.instance.currentUser!.uid)
-                                .addJournalNotes();
-                            if (!mounted) return;
-                            nextScreen(
-                                context,
-                                JournalView(
-                                  journalId: docId,
-                                  journalTitle: noteTitle,
-                                  journalContent: noteContent,
-                                  journalDate: noteDate,
-                                ));
+                                .addJournalNotes()
+                                .then((journalId) {
+                              nextScreen(
+                                  context,
+                                  JournalView(
+                                    selectedMoodIndex: moodIndex,
+                                    journalId: journalId,
+                                    journalTitle: noteTitle,
+                                    journalContent: noteContent,
+                                    journalDate: noteDate,
+                                  ));
+                            });
                           },
                           backgroundColor: primaryColor,
                           foregroundColor: Colors.white,

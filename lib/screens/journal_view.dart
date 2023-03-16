@@ -1,20 +1,17 @@
-import 'dart:math';
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_toggle_tab/flutter_toggle_tab.dart';
 import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 import 'package:student_mental_health/widgets/widgets/widgets.dart';
-import 'package:toggle_switch/toggle_switch.dart';
 
 class JournalView extends StatefulWidget {
+  final int selectedMoodIndex;
   final String journalId;
   final String journalTitle;
   final String journalContent;
   final String journalDate;
   const JournalView({
     super.key,
+    required this.selectedMoodIndex,
     required this.journalId,
     required this.journalTitle,
     required this.journalContent,
@@ -39,13 +36,19 @@ class _JournalViewState extends State<JournalView> {
     "https://i.ibb.co/dDh3M0K/stressed.png",
   ];
   final List _mood = [
-    "Neutral",
-    "Happy",
-    "Sad",
-    "Angry",
-    "Scared",
-    "Stressed",
+    "neutral",
+    "happy",
+    "sad",
+    "angry",
+    "scared",
+    "stressed",
   ];
+
+  @override
+  void initState() {
+    _isSelected[widget.selectedMoodIndex] = true;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,9 +102,8 @@ class _JournalViewState extends State<JournalView> {
                         List.generate(_isSelected.length, (i) => i == index);
                   });
                   int selectedIndex = _isSelected.indexOf(true);
-                  String selectedMood = _mood[selectedIndex];
-                  await DatabaseService()
-                      .updateJournalMood(widget.journalId, selectedMood);
+                  await DatabaseService().updateJournalMood(
+                      widget.journalId, _mood[selectedIndex]);
                 },
                 renderBorder: false,
                 constraints: const BoxConstraints(minWidth: 65, minHeight: 60),

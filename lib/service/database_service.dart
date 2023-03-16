@@ -413,12 +413,14 @@ class DatabaseService {
     subscription = appointmentsCollection.snapshots().listen((snapshots) async {
       // Check if there is a new schedule available
       for (QueryDocumentSnapshot scheduleDoc in snapshots.docs) {
+        print(scheduleDoc);
         if (!scheduleIds.contains(scheduleDoc.id)) {
           // There is a new schedule available, try to appoint a user
           final queueSnapshot = await appointmentsCollection
               .orderBy('priority', descending: true)
               .limit(1)
               .get();
+          print(queueSnapshot);
 
           if (queueSnapshot.docs.isNotEmpty) {
             final user = queueSnapshot.docs.first;
@@ -627,13 +629,15 @@ class DatabaseService {
   Future addJournalNotes() async {
     String randInt = Random().nextInt(90000).toString();
     String docId = '$uid-$randInt';
-    return await journalCollection.doc(docId).set({
+    await journalCollection.doc(docId).set({
       'id': uid,
       'title': '',
       'content': '',
-      'mood': '',
+      'mood': 'neutral',
       'date': currentDate,
     });
+
+    return docId;
   }
 
   Future updateJournalTitle(String userUid, String? title) async {
