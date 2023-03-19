@@ -25,6 +25,8 @@ class DatabaseService {
 
   String currentDate = DateFormat('MM-dd-yyyy').format(DateTime.now());
 
+  StreamSubscription<QuerySnapshot>? queueSubscription;
+
   //delete user
   Future deleteUser() async {
     return await userCollection.doc(uid).delete();
@@ -358,7 +360,7 @@ class DatabaseService {
     }
   }
 
-  //the system will automatically add the appointment to the first available slot
+  // the system will automatically add the appointment to the first available slot
   // Future appointUser(BuildContext context, String priority, {bool mounted = true}) async {
   //   List<String> scheduleIds = await getAllSchedulesDocId();
 
@@ -381,7 +383,7 @@ class DatabaseService {
   //   errorSnackbar(context, 'Oh Snap!', 'Time slot already taken');
   // }
 
-  Future appointUser(BuildContext context, String priority,
+  Future appointUser(BuildContext context, int priority,
       {bool mounted = true}) async {
     List<String> scheduleIds = await getAllSchedulesDocId();
 
@@ -398,40 +400,62 @@ class DatabaseService {
       }
     }
 
-    // If no empty slot is found, add the user to the queue
+    // If no empty slot is found, add user to queue
     await appointmentsQueueCollection.add({
-      'uid': uid,
+      'userId': uid,
       'priority': priority,
+      'timestamp': DateTime.now(),
     });
 
-    //TODO Display a message to the user that they have been added to the queue
-    errorSnackbar(context, 'No available slots yet',
-        'Wala pa slots please wait and we will notify you');
+    // Show message to user that they have been added to queue
 
-    // Listen for new schedule updates
-    StreamSubscription<QuerySnapshot>? subscription;
-    subscription = appointmentsCollection.snapshots().listen((snapshots) async {
-      // Check if there is a new schedule available
-      for (QueryDocumentSnapshot scheduleDoc in snapshots.docs) {
-        print(scheduleDoc);
-        if (!scheduleIds.contains(scheduleDoc.id)) {
-          // There is a new schedule available, try to appoint a user
-          final queueSnapshot = await appointmentsCollection
-              .orderBy('priority', descending: true)
-              .limit(1)
-              .get();
-          print(queueSnapshot);
+    final int queueNumber = await getQueueNumber();
+    final String message =
+        'No available slots. You are number $queueNumber in the queue.';
+    print(message);
+    if (!mounted) return;
+    errorSnackbar(context, 'no available slots', message);
+  }
 
-          if (queueSnapshot.docs.isNotEmpty) {
-            final user = queueSnapshot.docs.first;
-            await appointmentsCollection.doc(scheduleDoc.id).update({
-              'appointedUser': user.get('uid'),
-              'appointedUserPriority': user.get('priority'),
-            });
-            await user.reference.delete();
-            subscription?.cancel();
-            return;
-          }
+  Future<int> getQueueNumber() async {
+    final QuerySnapshot querySnapshot = await appointmentsQueueCollection
+        .orderBy('priority')
+        .orderBy('timestamp')
+        .get();
+    final List<QueryDocumentSnapshot> docs = querySnapshot.docs;
+    final int userIndex = docs.indexWhere((doc) => doc.get('userId') == uid);
+    return userIndex + 1;
+  }
+
+  Future<void> handleAppointments() async {
+    queueSubscription = FirebaseFirestore.instance
+        .collection('appointmentsQueue')
+        .orderBy('priority')
+        .orderBy('timestamp')
+        .snapshots()
+        .listen((snapshot) async {
+      // Find an available slot
+      for (QueryDocumentSnapshot doc in snapshot.docs) {
+        final int priority = doc.get('priority');
+        final String userId = doc.get('userId');
+        final QuerySnapshot appointmentsSnapshot = await FirebaseFirestore
+            .instance
+            .collection('appointments')
+            .where('appointedUser', isEqualTo: null)
+            .where('appointedUserPriority', isEqualTo: priority)
+            .orderBy('date')
+            .orderBy('time')
+            .limit(1)
+            .get();
+        if (appointmentsSnapshot.docs.isNotEmpty) {
+          final String appointmentId = appointmentsSnapshot.docs[0].id;
+          await FirebaseFirestore.instance
+              .collection('appointments')
+              .doc(appointmentId)
+              .update({
+            'appointedUser': userId,
+          });
+          await doc.reference.delete();
         }
       }
     });

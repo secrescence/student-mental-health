@@ -362,8 +362,9 @@ class _ResultOverallState extends State<ResultOverall> {
               ),
               const SizedBox(height: 12),
               GestureDetector(
-                onTap: () {
+                onTap: () async {
                   print('Questionnaire');
+                  await DatabaseService(uid: '213').appointUser(context, 1);
                 },
                 child: const SizedBox(
                   width: double.infinity,
@@ -383,6 +384,27 @@ class _ResultOverallState extends State<ResultOverall> {
                 child: const SizedBox(
                   width: double.infinity,
                   child: Text('Settings',
+                      style: TextStyle(
+                          color: Colors.black54,
+                          fontSize: 17,
+                          fontFamily: 'Sofia Pro')),
+                ),
+              ),
+              const SizedBox(height: 12),
+              GestureDetector(
+                onTap: () async {
+                  print('Add appointment');
+                  await DatabaseService().addSchedule(
+                    context,
+                    '03-20-2023',
+                    '10:00 AM',
+                  );
+
+                  await DatabaseService().handleAppointments();
+                },
+                child: const SizedBox(
+                  width: double.infinity,
+                  child: Text('Add appointment',
                       style: TextStyle(
                           color: Colors.black54,
                           fontSize: 17,

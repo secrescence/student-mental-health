@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:student_mental_health/admin/auth/admin_signin.dart';
@@ -16,8 +19,11 @@ class AdminSplash extends StatefulWidget {
 class _AdminSplashState extends State<AdminSplash> {
   bool _isAdminSignedIn = false;
 
+  StreamSubscription<QuerySnapshot>? queueSubscription;
+
   @override
   void initState() {
+    handleAppointments();
     getAdminLoggedInStatus();
     Future.delayed(const Duration(milliseconds: 500)).then((value) =>
         _isAdminSignedIn
@@ -32,6 +38,40 @@ class _AdminSplashState extends State<AdminSplash> {
         setState(() {
           _isAdminSignedIn = value;
         });
+      }
+    });
+  }
+
+  Future<void> handleAppointments() async {
+    queueSubscription = FirebaseFirestore.instance
+        .collection('appointmentsQueue')
+        .orderBy('priority')
+        .orderBy('timestamp')
+        .snapshots()
+        .listen((snapshot) async {
+      // Find an available slot
+      for (QueryDocumentSnapshot doc in snapshot.docs) {
+        final int priority = doc.get('priority');
+        final String userId = doc.get('userId');
+        final QuerySnapshot appointmentsSnapshot = await FirebaseFirestore
+            .instance
+            .collection('appointments')
+            .where('appointedUser', isEqualTo: '')
+            .where('appointedUserPriority', isEqualTo: priority)
+            .orderBy('date')
+            .orderBy('time')
+            .limit(1)
+            .get();
+        if (appointmentsSnapshot.docs.isNotEmpty) {
+          final String appointmentId = appointmentsSnapshot.docs[0].id;
+          await FirebaseFirestore.instance
+              .collection('appointments')
+              .doc(appointmentId)
+              .update({
+            'appointedUser': userId,
+          });
+          await doc.reference.delete();
+        }
       }
     });
   }

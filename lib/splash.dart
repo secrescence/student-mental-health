@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -29,9 +32,12 @@ class _SplashState extends State<Splash> {
   bool _isSignedIn = false;
   String? currentUser = FirebaseAuth.instance.currentUser?.uid;
 
+  StreamSubscription<QuerySnapshot>? queueSubscription;
+
   @override
   void initState() {
     super.initState();
+    handleAppointments();
     getUserLoggedInStatus();
     Future.delayed(const Duration(milliseconds: 2300)).then((value) {
       if (_isSignedIn &&
@@ -119,6 +125,46 @@ class _SplashState extends State<Splash> {
         setState(() {
           _isSignedIn = value;
         });
+      }
+    });
+  }
+
+  Future<void> handleAppointments() async {
+    if (queueSubscription != null) queueSubscription?.cancel();
+    queueSubscription = FirebaseFirestore.instance
+        .collection('appointmentsQueue')
+        .orderBy('priority')
+        .orderBy('timestamp')
+        .snapshots()
+        .listen((snapshot) async {
+      // Find an available slot
+      for (QueryDocumentSnapshot doc in snapshot.docs) {
+        // print('doc: ${doc.data()}');
+        final int priority = doc.get('priority');
+        final String userId = doc.get('userId');
+        // print('priority: $priority');
+        // print('userId: $userId');
+        final QuerySnapshot appointmentsSnapshot = await FirebaseFirestore
+            .instance
+            .collection('appointments')
+            .where('appointedUser', isEqualTo: null)
+            .where('appointedUserPriority', isEqualTo: priority)
+            .orderBy('date')
+            .orderBy('time')
+            .limit(1)
+            .get();
+        print('appointmentsSnapshot: ${appointmentsSnapshot.docs}');
+        if (appointmentsSnapshot.docs.isNotEmpty) {
+          final String appointmentId = appointmentsSnapshot.docs[0].id;
+          print('appointmentId: $appointmentId');
+          await FirebaseFirestore.instance
+              .collection('appointments')
+              .doc(appointmentId)
+              .update({
+            'appointedUser': userId,
+          });
+          await doc.reference.delete();
+        }
       }
     });
   }
