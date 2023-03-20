@@ -144,15 +144,15 @@ class _SplashState extends State<Splash> {
         final String userId = doc.get('userId');
         // print('priority: $priority');
         // print('userId: $userId');
-        final QuerySnapshot appointmentsSnapshot = await FirebaseFirestore
-            .instance
-            .collection('appointments')
-            .where('appointedUser', isEqualTo: null)
-            .where('appointedUserPriority', isEqualTo: priority)
-            .orderBy('date')
-            .orderBy('time')
-            .limit(1)
-            .get();
+        final QuerySnapshot appointmentsSnapshot =
+            await FirebaseFirestore.instance
+                .collection('appointments')
+                .where('appointedUser', isEqualTo: null)
+                // .where('appointedUserPriority', isEqualTo: priority)
+                .orderBy('date')
+                .orderBy('time')
+                .limit(1)
+                .get();
         print('appointmentsSnapshot: ${appointmentsSnapshot.docs}');
         if (appointmentsSnapshot.docs.isNotEmpty) {
           final String appointmentId = appointmentsSnapshot.docs[0].id;
@@ -162,6 +162,7 @@ class _SplashState extends State<Splash> {
               .doc(appointmentId)
               .update({
             'appointedUser': userId,
+            'appointedUserPriority': priority,
           });
           await doc.reference.delete();
         }
