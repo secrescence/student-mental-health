@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:pinput/pinput.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 import 'package:student_mental_health/service/auth_service.dart';
 import 'package:student_mental_health/widgets/widgets/custom_snackbar.dart';
@@ -766,6 +767,9 @@ class _SignUpUserInfoState extends State<SignUpUserInfo> {
         password: passwordController.text.trim(),
         context: context,
       );
+    } else if (formKey.currentState!.validate() == false &&
+        passwordController.length < 8) {
+      errorSnackbar(context, 'Oops!', 'Password must be at least 8 characters');
     } else {
       errorSnackbar(context, 'Uh-oh!', 'Please fill all the fields correctly');
     }
