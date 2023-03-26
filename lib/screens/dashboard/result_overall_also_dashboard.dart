@@ -3,24 +3,26 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:student_mental_health/screens/appointment_screen/appointment.dart';
 import 'package:student_mental_health/screens/appointment_screen/your_appointment.dart';
-import 'package:student_mental_health/screens/articles.dart';
-import 'package:student_mental_health/screens/journal.dart';
-import 'package:student_mental_health/screens/questionnaire_screen/settings.dart';
-import 'package:student_mental_health/screens/videos.dart';
+import 'package:student_mental_health/screens/dashboard/articles.dart';
+import 'package:student_mental_health/screens/dashboard/journal.dart';
+import 'package:student_mental_health/screens/dashboard/account_settings.dart';
+import 'package:student_mental_health/screens/dashboard/videos.dart';
 import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart' show toBeginningOfSentenceCase;
 import 'package:student_mental_health/widgets/widgets/widgets.dart';
 
-class ResultOverall extends StatefulWidget {
-  const ResultOverall({super.key});
+class ResultOverallAlsoDashboard extends StatefulWidget {
+  const ResultOverallAlsoDashboard({super.key});
 
   @override
-  State<ResultOverall> createState() => _ResultOverallState();
+  State<ResultOverallAlsoDashboard> createState() =>
+      _ResultOverallAlsoDashboardState();
 }
 
-class _ResultOverallState extends State<ResultOverall> {
+class _ResultOverallAlsoDashboardState
+    extends State<ResultOverallAlsoDashboard> {
   final TextEditingController _chatController = TextEditingController();
   //overall score
   double? overallScore;
@@ -176,6 +178,14 @@ class _ResultOverallState extends State<ResultOverall> {
           fit: BoxFit.cover,
         ),
         automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings, color: Colors.black87),
+            onPressed: () {
+              nextScreen(context, const AccountSettings());
+            },
+          ),
+        ],
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -248,173 +258,228 @@ class _ResultOverallState extends State<ResultOverall> {
           Visibility(
               visible: showLowAndMidPriority,
               child: const SizedBox(
-                height: 145,
+                height: 50,
               )),
+          Visibility(
+            visible: showLowAndMidPriority,
+            child: GestureDetector(
+              // onTap: () {
+              //   _showBottomSheet(context);
+              //   setState(() {
+              //     showLowAndMidPriority = true;
+              //   });
+              // },
+              onVerticalDragStart: (details) {
+                _showBottomSheet(context);
+                setState(() {
+                  showLowAndMidPriority = true;
+                });
+              },
+              child: SizedBox(
+                  height: 40,
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.keyboard_arrow_up,
+                          color: Colors.grey[600],
+                        ),
+                        const Text(
+                          'Swipe up to open',
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontFamily: 'Sofia Pro',
+                          ),
+                        ),
+                      ])),
+            ),
+          ),
         ],
       ),
     );
   }
 
+  // _showBottomSheet(BuildContext context) {
+  //   showModalBottomSheet(
+  //     context: context,
+  //     barrierColor: Colors.transparent,
+  //     isDismissible: false,
+  //     isScrollControlled: true,
+  //     backgroundColor: Colors.grey[200],
+  //     shape: const RoundedRectangleBorder(
+  //       borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+  //     ),
+  //     builder: (context) => DraggableScrollableSheet(
+  //       expand: false,
+  //       initialChildSize: 0.2,
+  //       maxChildSize: 0.2,
+  //       minChildSize: 0.1,
+  //       builder: (context, scrollController) => SingleChildScrollView(
+  //         child: _bottomSheetUI(),
+  //       ),
+  //     ),
+  //   );
+  // }
+
   _showBottomSheet(BuildContext context) {
     showModalBottomSheet(
-      context: context,
-      barrierColor: Colors.transparent,
-      isDismissible: false,
-      isScrollControlled: true,
-      backgroundColor: Colors.grey[200],
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-      ),
-      builder: (context) => DraggableScrollableSheet(
-        expand: false,
-        initialChildSize: 0.2,
-        maxChildSize: 0.2,
-        minChildSize: 0.1,
-        builder: (context, scrollController) => SingleChildScrollView(
-          child: _bottomSheetUI(),
+        context: context,
+        barrierColor: Colors.white70,
+        isDismissible: true,
+        isScrollControlled: true,
+        enableDrag: true,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
         ),
-      ),
-    );
+        builder: (context) => DraggableScrollableSheet(
+              expand: false,
+              initialChildSize: 0.28,
+              maxChildSize: 0.28,
+              minChildSize: 0.28,
+              builder: (context, scrollController) => SingleChildScrollView(
+                controller: scrollController,
+                child: _bottomSheetUI(),
+              ),
+            ));
   }
 
   Widget _bottomSheetUI() {
-    return Stack(
-      alignment: AlignmentDirectional.topCenter,
-      clipBehavior: Clip.none,
-      children: [
-        Positioned(
-            top: 15,
-            child: Container(
-              height: 7,
-              width: 70,
-              decoration: BoxDecoration(
-                color: Colors.grey[400],
-                borderRadius: BorderRadius.circular(20),
-              ),
-            )),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 35),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              GestureDetector(
-                onTap: () async {
-                  print('Articles');
-                  nextScreen(
-                      context, Articles(highestCategory: highestCategory));
-                },
-                child: const SizedBox(
-                  width: double.infinity,
-                  child: Text(
-                    'Articles',
-                    style: TextStyle(
-                        color: Colors.black54,
-                        fontSize: 17,
-                        fontFamily: 'Sofia Pro'),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              GestureDetector(
-                onTap: () {
-                  print('Videos');
-                  nextScreen(context, Videos(highestCategory: highestCategory));
-                },
-                child: const SizedBox(
-                  width: double.infinity,
-                  child: Text(
-                    'Videos',
-                    style: TextStyle(
-                        color: Colors.black54,
-                        fontSize: 17,
-                        fontFamily: 'Sofia Pro'),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              GestureDetector(
-                onTap: () {
-                  nextScreen(context, const Appointment());
-                },
-                child: const SizedBox(
-                  width: double.infinity,
-                  child: Text('Appointment',
-                      style: TextStyle(
-                          color: Colors.black54,
-                          fontSize: 17,
-                          fontFamily: 'Sofia Pro')),
-                ),
-              ),
-              const SizedBox(height: 12),
-              GestureDetector(
-                onTap: () {
-                  nextScreen(context, const Journal());
-                  print('Journal');
-                },
-                child: const SizedBox(
-                  width: double.infinity,
-                  child: Text('Journal',
-                      style: TextStyle(
-                          color: Colors.black54,
-                          fontSize: 17,
-                          fontFamily: 'Sofia Pro')),
-                ),
-              ),
-              const SizedBox(height: 12),
-              GestureDetector(
-                onTap: () async {
-                  print('Questionnaire');
-                  await DatabaseService(uid: '123').appointUser(context, 1);
-                },
-                child: const SizedBox(
-                  width: double.infinity,
-                  child: Text('Questionnaire',
-                      style: TextStyle(
-                          color: Colors.black54,
-                          fontSize: 17,
-                          fontFamily: 'Sofia Pro')),
-                ),
-              ),
-              const SizedBox(height: 12),
-              GestureDetector(
-                onTap: () {
-                  print('Settings');
-                  nextScreen(context, const Settings());
-                },
-                child: const SizedBox(
-                  width: double.infinity,
-                  child: Text('Settings',
-                      style: TextStyle(
-                          color: Colors.black54,
-                          fontSize: 17,
-                          fontFamily: 'Sofia Pro')),
-                ),
-              ),
-              const SizedBox(height: 12),
-              GestureDetector(
-                onTap: () async {
-                  print('Add appointment');
-                  await DatabaseService().addSchedule(
-                    context,
-                    '03-20-2023',
-                    '9:00 AM',
-                  );
-
-                  await DatabaseService().handleAppointments();
-                },
-                child: const SizedBox(
-                  width: double.infinity,
-                  child: Text('Add appointment',
-                      style: TextStyle(
-                          color: Colors.black54,
-                          fontSize: 17,
-                          fontFamily: 'Sofia Pro')),
-                ),
-              ),
-            ],
-          ),
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
         ),
-      ],
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.7),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          const SizedBox(height: 10),
+          Container(
+            height: 7,
+            width: 70,
+            decoration: BoxDecoration(
+              color: Colors.grey[400],
+              borderRadius: BorderRadius.circular(20),
+            ),
+          ),
+          const SizedBox(height: 25),
+          Container(
+            height: 200,
+            padding: const EdgeInsets.symmetric(horizontal: 30),
+            child: Column(
+              children: [
+                GestureDetector(
+                  onTap: () async {
+                    print('Articles');
+                    nextScreen(
+                        context, Articles(highestCategory: highestCategory));
+                  },
+                  child: const SizedBox(
+                    width: double.infinity,
+                    child: Text(
+                      'Articles',
+                      style: TextStyle(
+                          color: Colors.black54,
+                          fontSize: 17,
+                          fontFamily: 'Sofia Pro'),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 13),
+                GestureDetector(
+                  onTap: () {
+                    print('Videos');
+                    nextScreen(
+                        context, Videos(highestCategory: highestCategory));
+                  },
+                  child: const SizedBox(
+                    width: double.infinity,
+                    child: Text(
+                      'Videos',
+                      style: TextStyle(
+                          color: Colors.black54,
+                          fontSize: 17,
+                          fontFamily: 'Sofia Pro'),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 13),
+                GestureDetector(
+                  onTap: () {
+                    nextScreen(context, const Appointment());
+                  },
+                  child: const SizedBox(
+                    width: double.infinity,
+                    child: Text('Appointment',
+                        style: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 17,
+                            fontFamily: 'Sofia Pro')),
+                  ),
+                ),
+                const SizedBox(height: 13),
+                GestureDetector(
+                  onTap: () {
+                    nextScreen(context, const Journal());
+                    print('Journal');
+                  },
+                  child: const SizedBox(
+                    width: double.infinity,
+                    child: Text('Journal',
+                        style: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 17,
+                            fontFamily: 'Sofia Pro')),
+                  ),
+                ),
+                const SizedBox(height: 13),
+                GestureDetector(
+                  onTap: () async {
+                    print('Questionnaire');
+                    await DatabaseService(uid: '123').appointUser(context, '1');
+                  },
+                  child: const SizedBox(
+                    width: double.infinity,
+                    child: Text('Questionnaire',
+                        style: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 17,
+                            fontFamily: 'Sofia Pro')),
+                  ),
+                ),
+                const SizedBox(height: 13),
+                GestureDetector(
+                  onTap: () async {
+                    print('Add appointment');
+                    await DatabaseService().addSchedule(
+                      context,
+                      '03-20-2023',
+                      '10:00 AM',
+                    );
+                  },
+                  child: const SizedBox(
+                    width: double.infinity,
+                    child: Text('Add appointment',
+                        style: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 17,
+                            fontFamily: 'Sofia Pro')),
+                  ),
+                ),
+                const SizedBox(height: 25),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 

@@ -4,11 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:student_mental_health/screens/appointment_screen/appointment.dart';
 import 'package:student_mental_health/screens/auth/signup_phone.dart';
+import 'package:student_mental_health/screens/dashboard/result_overall_also_dashboard.dart';
 import 'package:student_mental_health/screens/questionnaire_screen/need_to_take_quest_to_proceed.dart';
 import 'package:student_mental_health/screens/questionnaire_screen/result_categories.dart';
-import 'package:student_mental_health/screens/questionnaire_screen/result_overall.dart';
 import 'package:student_mental_health/screens/welcome_screen/welcome.dart';
 import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
@@ -37,15 +36,15 @@ class _SplashState extends State<Splash> {
   @override
   void initState() {
     super.initState();
-    handleAppointments();
+    DatabaseService().listenToAppointmentsCollection();
     getUserLoggedInStatus();
-    Future.delayed(const Duration(milliseconds: 2300)).then((value) {
+    Future.delayed(const Duration(milliseconds: 1500)).then((value) {
       if (_isSignedIn &&
           _isDoneWithChatbot &&
           _isSingedUpUsingEmailOnly &&
           _isDoneWithQuestionnaire &&
           _isDoneWithResults) {
-        nextScreen(context, const ResultOverall());
+        nextScreen(context, const ResultOverallAlsoDashboard());
       } else if (_isSignedIn &&
           _isDoneWithChatbot &&
           _isSingedUpUsingEmailOnly &&
@@ -125,47 +124,6 @@ class _SplashState extends State<Splash> {
         setState(() {
           _isSignedIn = value;
         });
-      }
-    });
-  }
-
-  Future<void> handleAppointments() async {
-    if (queueSubscription != null) queueSubscription?.cancel();
-    queueSubscription = FirebaseFirestore.instance
-        .collection('appointmentsQueue')
-        .orderBy('priority')
-        .orderBy('timestamp')
-        .snapshots()
-        .listen((snapshot) async {
-      // Find an available slot
-      for (QueryDocumentSnapshot doc in snapshot.docs) {
-        // print('doc: ${doc.data()}');
-        final int priority = doc.get('priority');
-        final String userId = doc.get('userId');
-        // print('priority: $priority');
-        // print('userId: $userId');
-        final QuerySnapshot appointmentsSnapshot =
-            await FirebaseFirestore.instance
-                .collection('appointments')
-                .where('appointedUser', isEqualTo: null)
-                // .where('appointedUserPriority', isEqualTo: priority)
-                .orderBy('date')
-                .orderBy('time')
-                .limit(1)
-                .get();
-        print('appointmentsSnapshot: ${appointmentsSnapshot.docs}');
-        if (appointmentsSnapshot.docs.isNotEmpty) {
-          final String appointmentId = appointmentsSnapshot.docs[0].id;
-          print('appointmentId: $appointmentId');
-          await FirebaseFirestore.instance
-              .collection('appointments')
-              .doc(appointmentId)
-              .update({
-            'appointedUser': userId,
-            'appointedUserPriority': priority,
-          });
-          await doc.reference.delete();
-        }
       }
     });
   }

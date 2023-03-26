@@ -730,12 +730,19 @@ class _SignUpUserInfoState extends State<SignUpUserInfo> {
                   child: CustomButton(
                     color: phoneFieldButtonColor,
                     onPressed: () {
-                      if (passwordController.text.trim() ==
+                      if (passwordController.text.trim().length < 8) {
+                        errorSnackbar(context, 'Oops!',
+                            'Password must be at least 8 characters');
+                      } else if (studentIdController.text.trim().length != 11) {
+                        errorSnackbar(context, 'Oops!',
+                            'Please enter a valid student ID');
+                      } else if (passwordController.text.trim() !=
                           confirmPasswordController.text.trim()) {
-                        signUp();
-                      } else {
                         errorSnackbar(
                             context, 'Oops!', 'Passwords do not match');
+                      } else if (passwordController.text.trim() ==
+                          confirmPasswordController.text.trim()) {
+                        signUp();
                       }
                     },
                     text: 'Sign Up',
@@ -767,9 +774,6 @@ class _SignUpUserInfoState extends State<SignUpUserInfo> {
         password: passwordController.text.trim(),
         context: context,
       );
-    } else if (formKey.currentState!.validate() == false &&
-        passwordController.length < 8) {
-      errorSnackbar(context, 'Oops!', 'Password must be at least 8 characters');
     } else {
       errorSnackbar(context, 'Uh-oh!', 'Please fill all the fields correctly');
     }

@@ -1,7 +1,7 @@
 import 'package:expandable/expandable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:student_mental_health/screens/questionnaire_screen/result_overall.dart';
+import 'package:student_mental_health/screens/dashboard/result_overall_also_dashboard.dart';
 import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 import 'package:student_mental_health/widgets/widgets/custom_button.dart';
@@ -290,7 +290,7 @@ class _ResultCategoriesState extends State<ResultCategories> {
                           uid: FirebaseAuth.instance.currentUser?.uid)
                       .userDoneWithResults();
                   if (!mounted) return;
-                  nextScreen(context, const ResultOverall());
+                  nextScreen(context, const ResultOverallAlsoDashboard());
                 },
                 color: phoneFieldButtonColor,
               )

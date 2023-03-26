@@ -16,8 +16,8 @@ class DatabaseService {
       FirebaseFirestore.instance.collection('users');
   final CollectionReference appointmentsCollection =
       FirebaseFirestore.instance.collection('appointments');
-  final CollectionReference appointmentsQueueCollection =
-      FirebaseFirestore.instance.collection('appointmentsQueue');
+  final CollectionReference appointmentsWaitingListCollection =
+      FirebaseFirestore.instance.collection('appointmentsWaitingList');
   final CollectionReference additionalAppointmentsCollection =
       FirebaseFirestore.instance.collection('additionalAppointments');
   final CollectionReference journalCollection =
@@ -383,7 +383,7 @@ class DatabaseService {
   //   errorSnackbar(context, 'Oh Snap!', 'Time slot already taken');
   // }
 
-  Future appointUser(BuildContext context, int priority,
+  Future appointUser(BuildContext context, String priority,
       {bool mounted = true}) async {
     List<String> scheduleIds = await getAllSchedulesDocId();
 
@@ -400,62 +400,35 @@ class DatabaseService {
       }
     }
 
-    // If no empty slot is found, add user to queue
-    await appointmentsQueueCollection.add({
-      'userId': uid,
+    // If no empty slot is found, add the user to the waiting list based on priority
+    await appointmentsWaitingListCollection.add({
+      'uid': uid,
       'priority': priority,
-      'timestamp': DateTime.now(),
     });
 
-    // Show message to user that they have been added to queue
-
-    final int queueNumber = await getQueueNumber();
-    final String message =
-        'No available slots. You are number $queueNumber in the queue.';
-    print(message);
-    if (!mounted) return;
-    errorSnackbar(context, 'no available slots', message);
+    // Listen to the waiting list collection and automatically appoint a user when a new schedule becomes available
+    listenToAppointmentsCollection();
   }
 
-  Future<int> getQueueNumber() async {
-    final QuerySnapshot querySnapshot = await appointmentsQueueCollection
-        .orderBy('priority')
-        .orderBy('timestamp')
-        .get();
-    final List<QueryDocumentSnapshot> docs = querySnapshot.docs;
-    final int userIndex = docs.indexWhere((doc) => doc.get('userId') == uid);
-    return userIndex + 1;
-  }
+  void listenToAppointmentsCollection() {
+    appointmentsCollection.snapshots().listen((querySnapshot) async {
+      for (DocumentSnapshot documentSnapshot in querySnapshot.docs) {
+        if (documentSnapshot.get('appointedUser') == '') {
+          // If a schedule becomes available, check the waiting list and appoint the user with the highest priority
+          QuerySnapshot waitingListSnapshot =
+              await appointmentsWaitingListCollection
+                  .orderBy('priority')
+                  .limit(1)
+                  .get();
+          if (waitingListSnapshot.docs.isNotEmpty) {
+            DocumentSnapshot waitingListDoc = waitingListSnapshot.docs.first;
+            await waitingListDoc.reference.delete();
 
-  Future<void> handleAppointments() async {
-    queueSubscription = FirebaseFirestore.instance
-        .collection('appointmentsQueue')
-        .orderBy('priority')
-        .orderBy('timestamp')
-        .snapshots()
-        .listen((snapshot) async {
-      // Find an available slot
-      for (QueryDocumentSnapshot doc in snapshot.docs) {
-        final int priority = doc.get('priority');
-        final String userId = doc.get('userId');
-        final QuerySnapshot appointmentsSnapshot = await FirebaseFirestore
-            .instance
-            .collection('appointments')
-            .where('appointedUser', isEqualTo: null)
-            .where('appointedUserPriority', isEqualTo: priority)
-            .orderBy('date')
-            .orderBy('time')
-            .limit(1)
-            .get();
-        if (appointmentsSnapshot.docs.isNotEmpty) {
-          final String appointmentId = appointmentsSnapshot.docs[0].id;
-          await FirebaseFirestore.instance
-              .collection('appointments')
-              .doc(appointmentId)
-              .update({
-            'appointedUser': userId,
-          });
-          await doc.reference.delete();
+            await appointmentsCollection.doc(documentSnapshot.id).update({
+              'appointedUser': waitingListDoc.get('uid'),
+              'appointedUserPriority': waitingListDoc.get('priority'),
+            });
+          }
         }
       }
     });
@@ -700,6 +673,60 @@ class DatabaseService {
     } else {
       return null;
     }
+  }
+
+  Future getFirstName() async {
+    DocumentReference d = userCollection.doc(uid);
+    DocumentSnapshot documentSnapshot = await d.get();
+    if (documentSnapshot.exists) {
+      return documentSnapshot['firstName'];
+    } else {
+      return null;
+    }
+  }
+
+  Future getLastName() async {
+    DocumentReference d = userCollection.doc(uid);
+    DocumentSnapshot documentSnapshot = await d.get();
+    if (documentSnapshot.exists) {
+      return documentSnapshot['lastName'];
+    } else {
+      return null;
+    }
+  }
+
+  Future getEmail() async {
+    DocumentReference d = userCollection.doc(uid);
+    DocumentSnapshot documentSnapshot = await d.get();
+    if (documentSnapshot.exists) {
+      return documentSnapshot['email'];
+    } else {
+      return null;
+    }
+  }
+
+  Future updateFirstName(String firstName) async {
+    return await userCollection.doc(uid).update({
+      'firstName': firstName,
+    });
+  }
+
+  Future updateLastName(String lastName) async {
+    return await userCollection.doc(uid).update({
+      'lastName': lastName,
+    });
+  }
+
+  Future updateEmail(String email) async {
+    return await userCollection.doc(uid).update({
+      'email': email,
+    });
+  }
+
+  Future updatePhone(String phone) async {
+    return await userCollection.doc(uid).update({
+      'phone': phone,
+    });
   }
 
   //end of db service class

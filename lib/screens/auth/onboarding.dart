@@ -272,7 +272,7 @@ class _OnboardingState extends State<Onboarding> {
                   ),
 
                   child: const Text(
-                    'Log In',
+                    'Sign In',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,

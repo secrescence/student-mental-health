@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:student_mental_health/screens/auth/signup_phone.dart';
+import 'package:student_mental_health/screens/dashboard/result_overall_also_dashboard.dart';
 import 'package:student_mental_health/screens/questionnaire_screen/need_to_take_quest_to_proceed.dart';
 import 'package:student_mental_health/screens/questionnaire_screen/result_categories.dart';
 import 'package:student_mental_health/screens/welcome_screen/welcome.dart';
@@ -19,9 +20,11 @@ class AuthLoading extends StatefulWidget {
 }
 
 class _AuthLoadingState extends State<AuthLoading> {
+  bool _isDoneWithResults = false;
   bool _isDoneWithQuestionnaire = false;
   bool _isDoneWithChatbot = false;
   bool _isSingedUpUsingEmailOnly = false;
+  bool _isDoneWithOTP = false;
   bool _isSignedIn = false;
   String? currentUser = FirebaseAuth.instance.currentUser?.uid;
 
@@ -33,15 +36,28 @@ class _AuthLoadingState extends State<AuthLoading> {
       if (_isSignedIn &&
           _isDoneWithChatbot &&
           _isSingedUpUsingEmailOnly &&
+          _isDoneWithQuestionnaire &&
+          _isDoneWithResults) {
+        nextScreen(context, const ResultOverallAlsoDashboard());
+      } else if (_isSignedIn &&
+          _isDoneWithChatbot &&
+          _isSingedUpUsingEmailOnly &&
           _isDoneWithQuestionnaire) {
         nextScreen(context, const ResultCategories());
       } else if (_isSignedIn &&
           _isDoneWithChatbot &&
           _isSingedUpUsingEmailOnly) {
         nextScreen(context, const NeedToTakeQuestionnaireToProceed());
-      } else if (_isSignedIn && _isSingedUpUsingEmailOnly) {
+      } else if (_isSignedIn &&
+          _isSingedUpUsingEmailOnly &&
+          _isDoneWithOTP == true) {
         nextScreen(context, const Welcome());
-      } else if (_isSingedUpUsingEmailOnly) {
+      } else if (_isSingedUpUsingEmailOnly &&
+          _isSignedIn &&
+          _isDoneWithChatbot == false &&
+          _isDoneWithResults == false &&
+          _isDoneWithQuestionnaire == false &&
+          _isSingedUpUsingEmailOnly) {
         nextScreen(context, const SignUpPhone());
       } else {
         nextScreen(context, const Onboarding());
@@ -51,6 +67,15 @@ class _AuthLoadingState extends State<AuthLoading> {
 
   getUserLoggedInStatus() async {
     if (currentUser != null) {
+      await DatabaseService(uid: currentUser)
+          .getUserDoneWithResults()
+          .then((value) {
+        if (value != null) {
+          setState(() {
+            _isDoneWithResults = value;
+          });
+        }
+      });
       await DatabaseService(uid: currentUser)
           .getDoneWithQuestionnaire()
           .then((value) {
@@ -75,6 +100,15 @@ class _AuthLoadingState extends State<AuthLoading> {
         if (value != null) {
           setState(() {
             _isSingedUpUsingEmailOnly = value;
+          });
+        }
+      });
+      await DatabaseService(uid: currentUser)
+          .getUsersDoneWithOTP()
+          .then((value) {
+        if (value != null) {
+          setState(() {
+            _isDoneWithOTP = value;
           });
         }
       });

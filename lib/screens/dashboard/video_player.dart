@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:student_mental_health/screens/videos.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 import 'package:student_mental_health/widgets/widgets/widgets.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
