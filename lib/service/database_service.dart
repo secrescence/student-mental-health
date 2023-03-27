@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:student_mental_health/widgets/widgets/custom_snackbar.dart';
@@ -24,6 +23,8 @@ class DatabaseService {
       FirebaseFirestore.instance.collection('journal');
 
   String currentDate = DateFormat('MM-dd-yyyy').format(DateTime.now());
+  String dateCanAnswerAgain = DateFormat('MM-dd-yyyy').format(
+      DateTime.now().add(const Duration(days: 7))); //TODO change to 60 days
 
   StreamSubscription<QuerySnapshot>? queueSubscription;
 
@@ -162,7 +163,8 @@ class DatabaseService {
     double categoryClarityMEAN,
   ) async {
     userCollection.doc(uid).collection('questionnaireResult').doc(uid).set({
-      'dateAnswered': currentDate,
+      'dateAnswered': currentDate, //TODO make this a regular date time now
+      'dateCanAnswerAgain': dateCanAnswerAgain,
       'grandMean': grandMean,
       'categoryNonacceptanceMEAN': categoryNonacceptanceMEAN,
       'categoryGoalsMEAN': categoryGoalsMEAN,
@@ -404,6 +406,7 @@ class DatabaseService {
     await appointmentsWaitingListCollection.add({
       'uid': uid,
       'priority': priority,
+      'timestamp': Timestamp.now(),
     });
 
     // Listen to the waiting list collection and automatically appoint a user when a new schedule becomes available
@@ -418,6 +421,7 @@ class DatabaseService {
           QuerySnapshot waitingListSnapshot =
               await appointmentsWaitingListCollection
                   .orderBy('priority')
+                  .orderBy('timestamp', descending: false)
                   .limit(1)
                   .get();
           if (waitingListSnapshot.docs.isNotEmpty) {
@@ -727,6 +731,32 @@ class DatabaseService {
     return await userCollection.doc(uid).update({
       'phone': phone,
     });
+  }
+
+  Future getDateAnswered() async {
+    final DocumentSnapshot snapshot = await userCollection
+        .doc(uid)
+        .collection('questionnaireResult')
+        .doc(uid)
+        .get();
+    if (snapshot.exists) {
+      return snapshot['dateAnswered'];
+    } else {
+      return null;
+    }
+  }
+
+  Future getDateCanAnswerAgain() async {
+    final DocumentSnapshot snapshot = await userCollection
+        .doc(uid)
+        .collection('questionnaireResult')
+        .doc(uid)
+        .get();
+    if (snapshot.exists) {
+      return snapshot['dateCanAnswerAgain'];
+    } else {
+      return null;
+    }
   }
 
   //end of db service class

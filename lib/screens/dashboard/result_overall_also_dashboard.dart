@@ -7,6 +7,7 @@ import 'package:student_mental_health/screens/dashboard/articles.dart';
 import 'package:student_mental_health/screens/dashboard/journal.dart';
 import 'package:student_mental_health/screens/dashboard/account_settings.dart';
 import 'package:student_mental_health/screens/dashboard/videos.dart';
+import 'package:student_mental_health/screens/questionnaire_screen/take_questionnaire_again.dart';
 import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 // ignore: depend_on_referenced_packages
@@ -444,7 +445,7 @@ class _ResultOverallAlsoDashboardState
                 GestureDetector(
                   onTap: () async {
                     print('Questionnaire');
-                    await DatabaseService(uid: '123').appointUser(context, '1');
+                    nextScreen(context, const TakeQuestionnaireAgain());
                   },
                   child: const SizedBox(
                     width: double.infinity,
@@ -458,12 +459,13 @@ class _ResultOverallAlsoDashboardState
                 const SizedBox(height: 13),
                 GestureDetector(
                   onTap: () async {
-                    print('Add appointment');
-                    await DatabaseService().addSchedule(
-                      context,
-                      '03-20-2023',
-                      '10:00 AM',
-                    );
+                    print('Add schedule');
+
+                    // await DatabaseService().addSchedule(
+                    //   context,
+                    //   '03-20-2023',
+                    //   '10:00 AM',
+                    // );
                   },
                   child: const SizedBox(
                     width: double.infinity,
@@ -474,6 +476,20 @@ class _ResultOverallAlsoDashboardState
                             fontFamily: 'Sofia Pro')),
                   ),
                 ),
+                // const SizedBox(height: 13),
+                // GestureDetector(
+                //   onTap: () async {
+                //     print('appoint user');
+                //   },
+                //   child: const SizedBox(
+                //     width: double.infinity,
+                //     child: Text('Appoint user',
+                //         style: TextStyle(
+                //             color: Colors.black54,
+                //             fontSize: 17,
+                //             fontFamily: 'Sofia Pro')),
+                //   ),
+                // ),
                 const SizedBox(height: 25),
               ],
             ),
