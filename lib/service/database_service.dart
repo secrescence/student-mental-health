@@ -293,8 +293,12 @@ class DatabaseService {
   // [ADMIN FUNCTIONS]
 
   //add counseling schedule
-  Future addSchedule(BuildContext context, String date, String time,
-      {bool mounted = true}) async {
+  Future addSchedule(
+      {required BuildContext context,
+      required String date,
+      required String forDocId,
+      required String time,
+      bool mounted = true}) async {
     // List of available times in ascending order
     final List<String> availableTimes = [
       '9:00 AM',
@@ -314,7 +318,7 @@ class DatabaseService {
       return;
     }
 
-    String documentId = "$date-$timeIndex";
+    String documentId = "$forDocId-$timeIndex";
 
     while (true) {
       DocumentSnapshot documentSnapshot =

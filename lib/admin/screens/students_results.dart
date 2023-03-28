@@ -24,6 +24,8 @@ class _StudentsResultsState extends State<StudentsResults> {
   String fullNameView = '';
   String dateOfAppointmentDocId = '';
   String studentIdView = '';
+  String userPriorityView = '';
+  String grandMeanView = '';
 
   bool viewStudentResult = true;
 
@@ -104,169 +106,256 @@ class _StudentsResultsState extends State<StudentsResults> {
           elevation: 3,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          child: Container(
-            width: double.infinity,
-            height: double.infinity,
-            // margin: const EdgeInsets.symmetric(vertical: 10),
-            child: StreamBuilder<QuerySnapshot>(
-              stream: userAppointmentStream,
-              builder: (BuildContext context,
-                  AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (!snapshot.hasData ||
-                    snapshot.connectionState == ConnectionState.waiting) {
-                  return const LoadingAdmin();
-                } else if (snapshot.data!.docs.isEmpty) {
-                  return const Center(
-                    child: Text(
-                      'No results yet',
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 20,
-                          fontFamily: 'Sofia Pro'),
-                    ),
-                  );
-                } else if (snapshot.hasError) {
-                  return const Center(
-                    child: Text(
-                      'Something went wrong',
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 20,
-                          fontFamily: 'Sofia Pro'),
-                    ),
-                  );
-                }
-
-                return Visibility(
-                  visible: viewStudentResult,
-                  replacement: viewStudentResultWidget(),
-                  child: ListView(
-                    shrinkWrap: true,
-                    children:
-                        snapshot.data!.docs.map((DocumentSnapshot document) {
-                      Map<String, dynamic> data =
-                          document.data() as Map<String, dynamic>;
-                      // final String fullName =
-                      //     '${data['firstName']} ${data['lastName']}';
-                      if (data['appointedUser'] == null ||
-                          data['appointedUserPriority'] == null) {
-                        return const SizedBox.shrink();
+          child: SizedBox(
+              width: double.infinity,
+              height: double.infinity,
+              // margin: const EdgeInsets.symmetric(vertical: 10),
+              child: Column(
+                children: [
+                  const SizedBox(height: 30),
+                  Container(
+                    alignment: Alignment.center,
+                    child: const Text('Student\'s Results',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontFamily: 'Sofia Pro',
+                          fontWeight: FontWeight.bold,
+                        )),
+                  ),
+                  const SizedBox(height: 30),
+                  StreamBuilder<QuerySnapshot>(
+                    stream: userAppointmentStream,
+                    builder: (BuildContext context,
+                        AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (!snapshot.hasData ||
+                          snapshot.connectionState == ConnectionState.waiting) {
+                        return const LoadingAdmin();
+                      } else if (snapshot.data!.docs.isEmpty) {
+                        return const Center(
+                          child: Text(
+                            'No results yet',
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 20,
+                                fontFamily: 'Sofia Pro'),
+                          ),
+                        );
+                      } else if (snapshot.hasError) {
+                        return const Center(
+                          child: Text(
+                            'Something went wrong',
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 20,
+                                fontFamily: 'Sofia Pro'),
+                          ),
+                        );
                       }
 
-                      final String userId = data['appointedUser'];
-                      final String priority = data['appointedUserPriority'];
+                      return Visibility(
+                        visible: viewStudentResult,
+                        replacement: viewStudentResultWidget(),
+                        child: ListView(
+                          shrinkWrap: true,
+                          children: snapshot.data!.docs
+                              .map((DocumentSnapshot document) {
+                            Map<String, dynamic> data =
+                                document.data() as Map<String, dynamic>;
+                            // final String fullName =
+                            //     '${data['firstName']} ${data['lastName']}';
+                            if (data['appointedUser'] == null ||
+                                data['appointedUserPriority'] == null) {
+                              return const SizedBox.shrink();
+                            }
 
-                      return StreamBuilder<DocumentSnapshot>(
-                        stream: FirebaseFirestore.instance
-                            .collection('users')
-                            .doc(userId)
-                            .snapshots(),
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData ||
-                              snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                            return const Center(
-                              child: SpinKitChasingDots(
-                                color: primaryColor,
-                                size: 50,
-                              ),
-                            );
-                          } else if (snapshot.hasError) {
-                            return const Center(
-                              child: Text('Something went wrong'),
-                            );
-                          }
+                            final String userId = data['appointedUser'];
+                            final String priority =
+                                data['appointedUserPriority'] == 1
+                                    ? 'high priority'
+                                    : data['appointedUserPriority'] == 2
+                                        ? 'mid priority'
+                                        : 'low priority';
 
-                          Map<String, dynamic> userData =
-                              snapshot.data!.data() as Map<String, dynamic>;
-
-                          // fullNameView =
-                          //     '${userData['firstName']} ${userData['lastName']}';
-                          String fullName =
-                              '${userData['firstName']} ${userData['lastName']}';
-                          String studentId = userData['studentId'];
-
-                          return Column(
-                            children: [
-                              ListTile(
-                                onTap: () async {
-                                  //TODO to be implemented
-
-                                  setState(() {
-                                    viewStudentResult = false;
-                                    fullNameView = fullName;
-                                    userIdView = userId;
-                                    priorityView = priority;
-                                    dateOfAppointmentDocId = document.id;
-                                    studentIdView = studentId;
-                                  });
-
-                                  List<StudentResultData>? results =
-                                      await _getResults(userId);
-                                  setState(() {
-                                    _results = results;
-                                  });
-
-                                  String category =
-                                      await _getHighestCategory(userId);
-                                  setState(() {
-                                    highestCategory = category;
-                                  });
-                                },
-                                contentPadding:
-                                    const EdgeInsets.symmetric(vertical: 5),
-                                title: Row(
-                                  children: [
-                                    const SizedBox(width: 50),
-                                    Text(fullName),
-                                    const Spacer(),
-                                    const SizedBox(width: 50),
-                                  ],
-                                ),
-                                subtitle: Row(
-                                  children: [
-                                    const SizedBox(width: 50),
-                                    Text(
-                                      priority,
-                                      style: TextStyle(
-                                        fontFamily: 'Sofia Pro',
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w600,
-                                        color: priority == 'high priority'
-                                            ? Colors.red
-                                            : priority == 'low priority'
-                                                ? Colors.green
-                                                : Colors.amber,
-                                      ),
+                            return StreamBuilder<DocumentSnapshot>(
+                              stream: FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(userId)
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+                                if (!snapshot.hasData ||
+                                    snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                  return const Center(
+                                    child: SpinKitChasingDots(
+                                      color: primaryColor,
+                                      size: 50,
                                     ),
-                                    const SizedBox(width: 50),
-                                  ],
-                                ),
-                                trailing: const Padding(
-                                  padding: EdgeInsets.only(right: 50),
-                                  child: Text(
-                                    'view',
-                                    style: TextStyle(
-                                      fontFamily: 'Sofia Pro',
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const Divider(
-                                height: 0,
-                                thickness: 1,
-                              ),
-                            ],
-                          );
-                        },
+                                  );
+                                } else if (snapshot.hasError) {
+                                  return const Center(
+                                    child: Text('Something went wrong'),
+                                  );
+                                }
+
+                                Map<String, dynamic> userData = snapshot.data!
+                                    .data() as Map<String, dynamic>;
+
+                                // fullNameView =
+                                //     '${userData['firstName']} ${userData['lastName']}';
+                                String fullName =
+                                    '${userData['firstName']} ${userData['lastName']}';
+                                String studentId = userData['studentId'];
+
+                                return StreamBuilder<QuerySnapshot>(
+                                    stream: FirebaseFirestore.instance
+                                        .collection('users')
+                                        .doc(userId)
+                                        .collection('questionnaireResult')
+                                        .snapshots(),
+                                    builder: (context, snapshot) {
+                                      if (!snapshot.hasData ||
+                                          snapshot.connectionState ==
+                                              ConnectionState.waiting) {
+                                        return const LoadingAdmin();
+                                      } else if (snapshot.data!.docs.isEmpty) {
+                                        return const Center(
+                                          child: Text(
+                                            'No results yet',
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 20,
+                                                fontFamily: 'Sofia Pro'),
+                                          ),
+                                        );
+                                      } else if (snapshot.hasError) {
+                                        return const Center(
+                                          child: Text(
+                                            'Something went wrong',
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 20,
+                                                fontFamily: 'Sofia Pro'),
+                                          ),
+                                        );
+                                      }
+
+                                      final Map<String, dynamic> data =
+                                          snapshot.data!.docs.first.data()
+                                              as Map<String, dynamic>;
+                                      grandMeanView =
+                                          data['grandMean'].toStringAsFixed(1);
+
+                                      categoryNonacceptance =
+                                          data['categoryNonacceptanceMEAN']
+                                              .toStringAsFixed(1);
+                                      categoryGoals = data['categoryGoalsMEAN']
+                                          .toStringAsFixed(1);
+                                      categoryImpulse =
+                                          data['categoryImpulseMEAN']
+                                              .toStringAsFixed(1);
+                                      categoryAwareness =
+                                          data['categoryAwarenessMEAN']
+                                              .toStringAsFixed(1);
+                                      categoryStrategies =
+                                          data['categoryStrategiesMEAN']
+                                              .toStringAsFixed(1);
+                                      categoryClarity =
+                                          data['categoryClarityMEAN']
+                                              .toStringAsFixed(1);
+
+                                      return Column(
+                                        children: [
+                                          const Divider(
+                                            height: 0,
+                                            thickness: 5,
+                                          ),
+                                          ListTile(
+                                            onTap: () async {
+                                              //TODO to be implemented
+
+                                              setState(() {
+                                                viewStudentResult = false;
+                                                fullNameView = fullName;
+                                                userIdView = userId;
+                                                priorityView = priority;
+                                                dateOfAppointmentDocId =
+                                                    document.id;
+                                                studentIdView = studentId;
+                                              });
+
+                                              List<StudentResultData>? results =
+                                                  await _getResults(userId);
+                                              setState(() {
+                                                _results = results;
+                                              });
+
+                                              String category =
+                                                  await _getHighestCategory(
+                                                      userId);
+                                              setState(() {
+                                                highestCategory = category;
+                                              });
+                                            },
+                                            contentPadding:
+                                                const EdgeInsets.symmetric(
+                                                    vertical: 5),
+                                            title: Row(
+                                              children: [
+                                                const SizedBox(width: 50),
+                                                Text(fullName),
+                                                const Spacer(),
+                                                const SizedBox(width: 50),
+                                              ],
+                                            ),
+                                            subtitle: Row(
+                                              children: [
+                                                const SizedBox(width: 50),
+                                                Text(
+                                                  priority,
+                                                  style: TextStyle(
+                                                    fontFamily: 'Sofia Pro',
+                                                    fontSize: 13,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: priority ==
+                                                            'high priority'
+                                                        ? Colors.red
+                                                        : priority ==
+                                                                'low priority'
+                                                            ? Colors.green
+                                                            : Colors.amber,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 50),
+                                              ],
+                                            ),
+                                            trailing: const Padding(
+                                              padding:
+                                                  EdgeInsets.only(right: 50),
+                                              child: Text(
+                                                'view',
+                                                style: TextStyle(
+                                                  fontFamily: 'Sofia Pro',
+                                                  fontSize: 13,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          const Divider(
+                                            height: 0,
+                                            thickness: 5,
+                                          ),
+                                        ],
+                                      );
+                                    });
+                              },
+                            );
+                          }).toList(),
+                        ),
                       );
-                    }).toList(),
+                    },
                   ),
-                );
-              },
-            ),
-          ),
+                ],
+              )),
         ),
       ),
     );
@@ -347,73 +436,412 @@ class _StudentsResultsState extends State<StudentsResults> {
           ),
         ),
         const SizedBox(height: 20),
-        Container(
-          alignment: Alignment.topLeft,
-          padding: const EdgeInsets.only(left: 30, top: 10),
-          child: const Text(
-            'Visual Summary',
-            style: TextStyle(
-              fontFamily: 'Sofia Pro',
-            ),
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.only(top: 20, left: 10, bottom: 0),
-          child: SfCircularChart(
-            margin: const EdgeInsets.symmetric(horizontal: 10),
-            tooltipBehavior: _tooltipBehavior,
-            onTooltipRender: (tooltipArgs) {
-              tooltipArgs.text = tooltipArgs.text!.split(' ')[0];
-            },
-            title: ChartTitle(
-                borderWidth: 8,
-                text: 'Visual Summary',
-                alignment: ChartAlignment.near,
-                textStyle: const TextStyle(
-                    fontFamily: 'Sofia Pro',
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black)),
-            legend: Legend(
-              textStyle: const TextStyle(
-                  fontFamily: 'Sofia Pro',
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500),
-              isVisible: true,
-              overflowMode: LegendItemOverflowMode.wrap,
-              iconHeight: 19,
-              iconWidth: 19,
-              position: LegendPosition.right,
-              padding: 7,
-              itemPadding: 12,
-              isResponsive: true,
-            ),
-            series: <CircularSeries>[
-              RadialBarSeries<StudentResultData, String>(
-                dataSource: _results,
-                xValueMapper: (StudentResultData result, _) => result.category,
-                yValueMapper: (StudentResultData result, _) => result.score,
-                dataLabelSettings: DataLabelSettings(
-                    isVisible: true,
-                    textStyle: TextStyle(
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Spacer(),
+            Container(
+              // height: 500,
+              width: 500,
+              child: SfCircularChart(
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                tooltipBehavior: _tooltipBehavior,
+                onTooltipRender: (tooltipArgs) {
+                  tooltipArgs.text = tooltipArgs.text!.split(' ')[0];
+                },
+                title: ChartTitle(
+                    borderWidth: 8,
+                    text: 'Visual Summary',
+                    alignment: ChartAlignment.near,
+                    textStyle: const TextStyle(
+                        fontFamily: 'Sofia Pro',
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black)),
+                legend: Legend(
+                  textStyle: const TextStyle(
                       fontFamily: 'Sofia Pro',
-                      fontSize: 16,
-                      color: Colors.black.withOpacity(0.8),
-                    )),
-                enableTooltip: true,
-                maximumValue: 5,
-                radius: '100%',
-                innerRadius: '10%',
-                cornerStyle: CornerStyle.bothCurve,
-                trackOpacity: 0.7,
-                gap: '3%',
-                selectionBehavior:
-                    SelectionBehavior(enable: true, unselectedOpacity: 0.4),
-                onPointTap: (pointInteractionDetails) {},
-              )
-            ],
-          ),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500),
+                  isVisible: true,
+                  overflowMode: LegendItemOverflowMode.wrap,
+                  iconHeight: 19,
+                  iconWidth: 19,
+                  position: LegendPosition.right,
+                  padding: 7,
+                  itemPadding: 12,
+                  isResponsive: true,
+                ),
+                series: <CircularSeries>[
+                  RadialBarSeries<StudentResultData, String>(
+                    dataSource: _results,
+                    xValueMapper: (StudentResultData result, _) =>
+                        result.category,
+                    yValueMapper: (StudentResultData result, _) => result.score,
+                    dataLabelSettings: DataLabelSettings(
+                        isVisible: true,
+                        textStyle: TextStyle(
+                          fontFamily: 'Sofia Pro',
+                          fontSize: 16,
+                          color: Colors.black.withOpacity(0.8),
+                        )),
+                    enableTooltip: true,
+                    maximumValue: 6,
+                    radius: '90%',
+                    innerRadius: '10%',
+                    cornerStyle: CornerStyle.bothCurve,
+                    trackOpacity: 0.7,
+                    gap: '3%',
+                    selectionBehavior:
+                        SelectionBehavior(enable: true, unselectedOpacity: 0.4),
+                    onPointTap: (pointInteractionDetails) {},
+                  )
+                ],
+              ),
+            ),
+            const SizedBox(width: 200),
+            SizedBox(
+              height: 300,
+              width: 350,
+              child: Card(
+                elevation: 3,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 7),
+                      const Text(
+                        'Overall Result',
+                        style: TextStyle(
+                          decoration: TextDecoration.underline,
+                          fontFamily: 'Sofia Pro',
+                          fontSize: 22,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      RichText(
+                        text: TextSpan(
+                          style: const TextStyle(
+                            fontFamily: 'Sofia Pro',
+                            fontSize: 19,
+                          ),
+                          children: [
+                            const TextSpan(
+                              text: 'Grand Mean: ',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            TextSpan(
+                              text: grandMeanView,
+                              style: const TextStyle(
+                                fontFamily: 'Sofia Pro',
+                                fontSize: 19,
+                                color: Color(0xFF3B61E8),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      RichText(
+                        text: TextSpan(
+                          style: const TextStyle(
+                            fontFamily: 'Sofia Pro',
+                            fontSize: 19,
+                          ),
+                          children: [
+                            const TextSpan(
+                              text: 'Priority: ',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black,
+                              ),
+                            ),
+                            TextSpan(
+                              text: userPriorityView,
+                              style: TextStyle(
+                                fontFamily: 'Sofia Pro',
+                                fontSize: 19,
+                                color: userPriorityView == 'High'
+                                    ? Colors.red
+                                    : userPriorityView == 'Low'
+                                        ? Colors.green
+                                        : Colors.amber,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Category:',
+                        style: TextStyle(
+                          fontFamily: 'Sofia Pro',
+                          fontSize: 18,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          RichText(
+                            text: TextSpan(
+                              style: const TextStyle(
+                                fontFamily: 'Sofia Pro',
+                                fontSize: 18,
+                              ),
+                              children: [
+                                const TextSpan(
+                                  text: 'Nonacceptance - ',
+                                  style: TextStyle(),
+                                ),
+                                TextSpan(
+                                  text: categoryNonacceptance,
+                                  style: const TextStyle(
+                                    fontFamily: 'Sofia Pro',
+                                    fontSize: 18,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          RichText(
+                            text: TextSpan(
+                              style: const TextStyle(
+                                fontFamily: 'Sofia Pro',
+                                fontSize: 18,
+                              ),
+                              children: [
+                                const TextSpan(
+                                  text: 'Goals - ',
+                                  style: TextStyle(),
+                                ),
+                                TextSpan(
+                                  text: categoryGoals,
+                                  style: const TextStyle(
+                                    fontFamily: 'Sofia Pro',
+                                    fontSize: 18,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          RichText(
+                            text: TextSpan(
+                              style: const TextStyle(
+                                fontFamily: 'Sofia Pro',
+                                fontSize: 18,
+                              ),
+                              children: [
+                                const TextSpan(
+                                  text: 'Impulse - ',
+                                  style: TextStyle(),
+                                ),
+                                TextSpan(
+                                  text: categoryImpulse,
+                                  style: const TextStyle(
+                                    fontFamily: 'Sofia Pro',
+                                    fontSize: 18,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          RichText(
+                            text: TextSpan(
+                              style: const TextStyle(
+                                fontFamily: 'Sofia Pro',
+                                fontSize: 18,
+                              ),
+                              children: [
+                                const TextSpan(
+                                  text: 'Awareness - ',
+                                  style: TextStyle(),
+                                ),
+                                TextSpan(
+                                  text: categoryAwareness,
+                                  style: const TextStyle(
+                                    fontFamily: 'Sofia Pro',
+                                    fontSize: 18,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          RichText(
+                            text: TextSpan(
+                              style: const TextStyle(
+                                fontFamily: 'Sofia Pro',
+                                fontSize: 18,
+                              ),
+                              children: [
+                                const TextSpan(
+                                  text: 'Strategies - ',
+                                  style: TextStyle(),
+                                ),
+                                TextSpan(
+                                  text: categoryStrategies,
+                                  style: const TextStyle(
+                                    fontFamily: 'Sofia Pro',
+                                    fontSize: 18,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          RichText(
+                            text: TextSpan(
+                              style: const TextStyle(
+                                fontFamily: 'Sofia Pro',
+                                fontSize: 18,
+                              ),
+                              children: [
+                                const TextSpan(
+                                  text: 'Clarity - ',
+                                  style: TextStyle(),
+                                ),
+                                TextSpan(
+                                  text: categoryClarity,
+                                  style: const TextStyle(
+                                    fontFamily: 'Sofia Pro',
+                                    fontSize: 18,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const Spacer()
+          ],
         ),
+        Row(
+          children: [
+            const Spacer(),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Category Description',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  nonAcceptanceDescription,
+                  style: const TextStyle(fontSize: 14),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  goalsDescription,
+                  style: const TextStyle(fontSize: 14),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  impulseDescription,
+                  style: const TextStyle(fontSize: 14),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  awarenessDescription,
+                  style: const TextStyle(fontSize: 14),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  strategiesDescription,
+                  style: const TextStyle(fontSize: 14),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  clarityDescription,
+                  style: const TextStyle(fontSize: 14),
+                ),
+              ],
+            ),
+            const Spacer(),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                Text(
+                  'Grand Mean Scale',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontFamily: 'Sofia Pro',
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 10),
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: '3.49 - below = ',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontFamily: 'Sofia Pro',
+                        ),
+                      ),
+                      TextSpan(
+                        text: 'low priority\n',
+                        style: TextStyle(
+                          height: 1.5,
+                          fontSize: 18,
+                          fontFamily: 'Sofia Pro',
+                        ),
+                      ),
+                      TextSpan(
+                        text: '3.5 - 3.9 = ',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontFamily: 'Sofia Pro',
+                        ),
+                      ),
+                      TextSpan(
+                        text: 'mid priority\n',
+                        style: TextStyle(
+                          height: 1.5,
+                          fontSize: 18,
+                          fontFamily: 'Sofia Pro',
+                        ),
+                      ),
+                      TextSpan(
+                        text: '4 - above = ',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontFamily: 'Sofia Pro',
+                        ),
+                      ),
+                      TextSpan(
+                        text: 'high priority',
+                        style: TextStyle(
+                          height: 1.5,
+                          fontSize: 18,
+                          fontFamily: 'Sofia Pro',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(width: 10),
+            const Spacer(),
+          ],
+        )
       ],
     );
   }

@@ -106,7 +106,7 @@ class _YourAppointmentState extends State<YourAppointment> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: const [
-                          SizedBox(width: 20),
+                          SizedBox(width: 25),
                           Text('Date',
                               style: TextStyle(
                                 fontSize: 15.5,
@@ -114,6 +114,7 @@ class _YourAppointmentState extends State<YourAppointment> {
                                 fontWeight: FontWeight.w400,
                               )),
                           Spacer(),
+                          SizedBox(width: 15),
                           Text('Time',
                               style: TextStyle(
                                 fontSize: 15.5,
@@ -127,7 +128,7 @@ class _YourAppointmentState extends State<YourAppointment> {
                                 fontFamily: 'Sofia Pro',
                                 fontWeight: FontWeight.w400,
                               )),
-                          SizedBox(width: 20),
+                          // SizedBox(width: 10),
                         ],
                       ),
                     ),
@@ -195,7 +196,7 @@ class _YourAppointmentState extends State<YourAppointment> {
                                               fontFamily: 'Sofia Pro',
                                               fontWeight: FontWeight.w400,
                                             )),
-                                        const SizedBox(width: 20),
+                                        // const SizedBox(width: 20),
                                       ],
                                     ),
                                   ),
@@ -219,8 +220,8 @@ class _YourAppointmentState extends State<YourAppointment> {
                   visible: ifLowAndMidPriority,
                   child: ElevatedButton(
                     onPressed: () async {
-                      await DatabaseService()
-                          .addSchedule(context, '01-01-2023', '10:00 AM');
+                      // await DatabaseService().addSchedule(
+                      //     context, '01-01-2023', '10:00 AM', 'fprDocID');
                     },
                     style: ButtonStyle(
                       fixedSize:

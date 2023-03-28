@@ -246,7 +246,7 @@ class _SignUpPhoneState extends State<SignUpPhone> {
     String? phoneNumberCollected = countryCode == null
         ? '${defaultCountryCode.dialCode}$fromController'
         : '${countryCode?.dialCode}$fromController';
-    if (fromController.length == 10 && fromController.startsWith('9', 0)) {
+    if (fromController.length == 10 && fromController.startsWith('9')) {
       await HelperFunctions.saveUserLoggedInStatus(true);
       if (!mounted) return;
       await AuthService().signUpPhone(

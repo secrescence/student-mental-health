@@ -19,6 +19,8 @@ class _AdminScheduleState extends State<AdminSchedule> {
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
 
+  String forDocId = '';
+
   Stream<QuerySnapshot>? scheduleStream;
 
   //dropdown
@@ -88,136 +90,143 @@ class _AdminScheduleState extends State<AdminSchedule> {
           elevation: 3,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          child: Container(
+          child: SizedBox(
             width: double.infinity,
             height: double.infinity,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 40.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Container(
-                  //   padding:
-                  //       const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                  //   alignment: Alignment.topLeft,
-                  //   child: const Text('Schedule',
-                  //       style: TextStyle(
-                  //         fontSize: 20,
-                  //         fontFamily: 'Sofia Pro',
-                  //         fontWeight: FontWeight.w500,
-                  //       )),
-                  // ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: const [
-                      Spacer(),
-                      SizedBox(width: 30),
-                      Text('Date',
-                          style: TextStyle(
-                            fontSize: 23,
-                            fontFamily: 'Sofia Pro',
-                            fontWeight: FontWeight.w400,
-                          )),
-                      Spacer(),
-                      Text('Time',
-                          style: TextStyle(
-                            fontSize: 23,
-                            fontFamily: 'Sofia Pro',
-                            fontWeight: FontWeight.w400,
-                          )),
-                      SizedBox(width: 30),
-                      Spacer(),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  const Divider(
-                    thickness: 1,
-                  ),
-                  SizedBox(
-                    height: 400,
-                    child: StreamBuilder<QuerySnapshot>(
-                      stream: scheduleStream,
-                      builder: (context, snapshot) {
-                        if (!snapshot.hasData ||
-                            snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                          return const Center(
-                            child: SpinKitSpinningLines(
-                              color: primaryColor,
-                              size: 50,
-                            ),
-                          );
-                        }
-                        List<DocumentSnapshot> schedule = snapshot.data!.docs;
-                        if (schedule.isEmpty) {
-                          return const Center(
-                            child: Text(
-                              'No schedule available',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontFamily: 'Sofia Pro',
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          );
-                        }
-                        return ListView.builder(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          itemCount: schedule.length,
-                          itemBuilder: (context, index) {
-                            Map<String, dynamic> data =
-                                schedule[index].data() as Map<String, dynamic>;
-                            return Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 30, vertical: 10),
-                                  child: Row(
-                                    children: [
-                                      const Spacer(),
-                                      const SizedBox(width: 35),
-                                      Text(data['date'],
-                                          style: const TextStyle(
-                                            fontSize: 20,
-                                            fontFamily: 'Sofia Pro',
-                                            fontWeight: FontWeight.w400,
-                                          )),
-                                      const Spacer(),
-                                      Text(data['time'],
-                                          style: const TextStyle(
-                                            fontSize: 20,
-                                            fontFamily: 'Sofia Pro',
-                                            fontWeight: FontWeight.w400,
-                                          )),
-                                      const SizedBox(width: 40),
-                                      const Spacer(),
-                                    ],
-                                  ),
-                                ),
-                                const Divider(
-                                  thickness: 1,
-                                ),
-                              ],
-                            );
-                          },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 30),
+                Container(
+                  alignment: Alignment.center,
+                  child: const Text('Schedule',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontFamily: 'Sofia Pro',
+                        fontWeight: FontWeight.bold,
+                      )),
+                ),
+                const SizedBox(height: 30),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: const [
+                    Spacer(),
+                    SizedBox(width: 30),
+                    Text('Date',
+                        style: TextStyle(
+                          fontSize: 23,
+                          fontFamily: 'Sofia Pro',
+                          fontWeight: FontWeight.w400,
+                        )),
+                    Spacer(),
+                    Text('Time',
+                        style: TextStyle(
+                          fontSize: 23,
+                          fontFamily: 'Sofia Pro',
+                          fontWeight: FontWeight.w400,
+                        )),
+                    SizedBox(width: 50),
+                    Spacer(),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                const Divider(
+                  height: 0,
+                  thickness: 5,
+                ),
+                SizedBox(
+                  height: 500,
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream: scheduleStream,
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData ||
+                          snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(
+                          child: SpinKitSpinningLines(
+                            color: primaryColor,
+                            size: 50,
+                          ),
                         );
-                      },
-                    ),
+                      }
+                      List<DocumentSnapshot> schedule = snapshot.data!.docs;
+                      if (schedule.isEmpty) {
+                        return const Center(
+                          child: Text(
+                            'No schedule available',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontFamily: 'Sofia Pro',
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        );
+                      }
+                      return ListView.builder(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        itemCount: schedule.length,
+                        itemBuilder: (context, index) {
+                          Map<String, dynamic> data =
+                              schedule[index].data() as Map<String, dynamic>;
+                          return Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 30, vertical: 15),
+                                child: Row(
+                                  children: [
+                                    const Spacer(),
+                                    const SizedBox(width: 35),
+                                    Text(data['date'],
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontFamily: 'Sofia Pro',
+                                          fontWeight: FontWeight.w400,
+                                        )),
+                                    const Spacer(),
+                                    Text(data['time'],
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontFamily: 'Sofia Pro',
+                                          fontWeight: FontWeight.w400,
+                                        )),
+                                    const SizedBox(width: 40),
+                                    const Spacer(),
+                                    IconButton(
+                                      icon: const Icon(Icons.delete),
+                                      onPressed: () {
+                                        FirebaseFirestore.instance
+                                            .collection('appointments')
+                                            .doc(schedule[index].id)
+                                            .delete();
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const Divider(
+                                height: 0,
+                                thickness: 5,
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 40, vertical: 10),
-                    alignment: Alignment.bottomRight,
-                    child: FloatingActionButton(
-                      splashColor: primaryColor,
-                      backgroundColor: primaryColor,
-                      elevation: 5,
-                      onPressed: () => _addScheduleForm(),
-                      child: const Icon(Icons.add),
-                    ),
+                ),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+                  alignment: Alignment.bottomRight,
+                  child: FloatingActionButton(
+                    splashColor: primaryColor,
+                    backgroundColor: primaryColor,
+                    elevation: 5,
+                    onPressed: () => _addScheduleForm(),
+                    child: const Icon(Icons.add),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
@@ -433,8 +442,11 @@ class _AdminScheduleState extends State<AdminSchedule> {
     if (_formKey.currentState!.validate()) {
       nextScreenPop(context);
 
-      await DatabaseService()
-          .addSchedule(context, dateController.text, _selectedTimeValue!);
+      await DatabaseService().addSchedule(
+          context: context,
+          date: dateController.text,
+          forDocId: forDocId,
+          time: _selectedTimeValue!);
 
       dateController.clear();
       _selectedTimeValue = null;
@@ -451,6 +463,7 @@ class _AdminScheduleState extends State<AdminSchedule> {
       setState(() {
         _selectedDate = picked;
         dateController.text = DateFormat('MMMM d, y').format(picked);
+        forDocId = DateFormat('MM-dd-yyyy').format(picked);
       });
     }
   }

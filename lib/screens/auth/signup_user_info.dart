@@ -135,6 +135,7 @@ class _SignUpUserInfoState extends State<SignUpUserInfo> {
                                 controller: firstNameController,
                                 style: const TextStyle(color: Colors.black),
                                 cursorColor: primaryColor,
+                                textCapitalization: TextCapitalization.words,
                                 decoration: textInputDeco.copyWith(
                                   errorMaxLines: 1,
                                   errorStyle: const TextStyle(
@@ -193,6 +194,7 @@ class _SignUpUserInfoState extends State<SignUpUserInfo> {
                                 controller: lastNameController,
                                 style: const TextStyle(color: Colors.black),
                                 cursorColor: primaryColor,
+                                textCapitalization: TextCapitalization.words,
                                 decoration: textInputDeco.copyWith(
                                   errorMaxLines: 1,
                                   errorStyle: const TextStyle(
@@ -730,7 +732,13 @@ class _SignUpUserInfoState extends State<SignUpUserInfo> {
                   child: CustomButton(
                     color: phoneFieldButtonColor,
                     onPressed: () {
-                      if (passwordController.text.trim().length < 8) {
+                      if (firstNameController.text.isEmpty ||
+                          lastNameController.text.isEmpty ||
+                          emailController.text.isEmpty ||
+                          studentIdController.text.isEmpty) {
+                        errorSnackbar(context, 'Oops!',
+                            'Please fill in all fields correctly');
+                      } else if (passwordController.text.trim().length < 8) {
                         errorSnackbar(context, 'Oops!',
                             'Password must be at least 8 characters');
                       } else if (studentIdController.text.trim().length != 11) {

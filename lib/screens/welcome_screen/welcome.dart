@@ -21,17 +21,7 @@ class _WelcomeState extends State<Welcome> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
-        // automaticallyImplyLeading: false,
-        leading: IconButton(
-          onPressed: () {
-            AuthService().signOutUser().then(
-                (value) => nextScreenReplace(context, const Onboarding()));
-          },
-          icon: const Icon(
-            Icons.logout,
-            color: Color(0xFF000000),
-          ),
-        ),
+        automaticallyImplyLeading: false,
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 30),

@@ -338,6 +338,7 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                 ),
                 child: TextField(
                   controller: _chatController,
+                  textCapitalization: TextCapitalization.words,
                   decoration: InputDecoration(
                     hintText: 'You can call me...',
                     hintStyle: const TextStyle(

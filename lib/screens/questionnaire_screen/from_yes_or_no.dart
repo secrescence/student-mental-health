@@ -30,33 +30,13 @@ class FromYesOrNo extends StatelessWidget {
                 visible: yesOrNo == 'yes' ? true : false,
                 child: Column(
                   children: [
-                    AnimatedTextKit(
-                      animatedTexts: [
-                        TypewriterAnimatedText(
-                          'Alright!',
-                          textStyle: const TextStyle(
-                            fontFamily: 'Sofia Pro',
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          speed: const Duration(milliseconds: 100),
-                          cursor: '|',
-                        ),
-                        TypewriterAnimatedText(
-                          'Please click the button below.',
-                          textStyle: const TextStyle(
-                            fontFamily: 'Sofia Pro',
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          speed: const Duration(milliseconds: 100),
-                          cursor: '|',
-                        ),
-                      ],
-                      totalRepeatCount: 1,
-                      // pause: const Duration(milliseconds: 500),
-                      // displayFullTextOnTap: true,
-                      // stopPauseOnTap: true,
+                    const Text(
+                      'Great! Let\'s get started.',
+                      style: TextStyle(
+                        fontFamily: 'Sofia Pro',
+                        fontSize: 23,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 30),
                     SizedBox(
@@ -80,33 +60,13 @@ class FromYesOrNo extends StatelessWidget {
                 visible: yesOrNo == 'no' ? true : false,
                 child: Column(
                   children: [
-                    AnimatedTextKit(
-                      animatedTexts: [
-                        TypewriterAnimatedText(
-                          'Alright!',
-                          textStyle: const TextStyle(
-                            fontFamily: 'Sofia Pro',
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          speed: const Duration(milliseconds: 100),
-                          cursor: '|',
-                        ),
-                        TypewriterAnimatedText(
-                          'Tell me when you\'re ready.',
-                          textStyle: const TextStyle(
-                            fontFamily: 'Sofia Pro',
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          speed: const Duration(milliseconds: 100),
-                          cursor: '|',
-                        ),
-                      ],
-                      totalRepeatCount: 1,
-                      // pause: const Duration(milliseconds: 500),
-                      // displayFullTextOnTap: true,
-                      // stopPauseOnTap: true,
+                    const Text(
+                      'Alright! Tell me when you\'re ready.',
+                      style: TextStyle(
+                        fontFamily: 'Sofia Pro',
+                        fontSize: 23,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     SizedBox(
                       height: 400,
