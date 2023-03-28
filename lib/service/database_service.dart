@@ -22,10 +22,6 @@ class DatabaseService {
   final CollectionReference journalCollection =
       FirebaseFirestore.instance.collection('journal');
 
-  String currentDate = DateFormat('MM-dd-yyyy').format(DateTime.now());
-  String dateCanAnswerAgain = DateFormat('MM-dd-yyyy').format(
-      DateTime.now().add(const Duration(days: 7))); //TODO change to 60 days
-
   StreamSubscription<QuerySnapshot>? queueSubscription;
 
   //delete user
@@ -163,8 +159,7 @@ class DatabaseService {
     double categoryClarityMEAN,
   ) async {
     userCollection.doc(uid).collection('questionnaireResult').doc(uid).set({
-      'dateAnswered': currentDate, //TODO make this a regular date time now
-      'dateCanAnswerAgain': dateCanAnswerAgain,
+      'dateAnswered': DateTime.now(),
       'grandMean': grandMean,
       'categoryNonacceptanceMEAN': categoryNonacceptanceMEAN,
       'categoryGoalsMEAN': categoryGoalsMEAN,
@@ -635,7 +630,7 @@ class DatabaseService {
       'title': '',
       'content': '',
       'mood': 'neutral',
-      'date': currentDate,
+      'date': DateFormat('MMMM d, y').format(DateTime.now()),
     });
 
     return docId;

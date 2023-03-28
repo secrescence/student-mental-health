@@ -163,7 +163,6 @@ class _ResultOverallAlsoDashboardState
       setState(() {
         highestCategory = value;
       });
-      print(highestCategory);
     });
   }
 
@@ -334,9 +333,9 @@ class _ResultOverallAlsoDashboardState
         ),
         builder: (context) => DraggableScrollableSheet(
               expand: false,
-              initialChildSize: 0.28,
-              maxChildSize: 0.28,
-              minChildSize: 0.28,
+              initialChildSize: 0.246,
+              maxChildSize: 0.246,
+              minChildSize: 0.246,
               builder: (context, scrollController) => SingleChildScrollView(
                 controller: scrollController,
                 child: _bottomSheetUI(),
@@ -363,17 +362,22 @@ class _ResultOverallAlsoDashboardState
       child: Column(
         children: [
           const SizedBox(height: 10),
-          Container(
-            height: 7,
-            width: 70,
-            decoration: BoxDecoration(
-              color: Colors.grey[400],
-              borderRadius: BorderRadius.circular(20),
+          GestureDetector(
+            onVerticalDragDown: (details) {
+              nextScreenPop(context);
+            },
+            child: Container(
+              height: 7,
+              width: 70,
+              decoration: BoxDecoration(
+                color: Colors.grey[400],
+                borderRadius: BorderRadius.circular(20),
+              ),
             ),
           ),
           const SizedBox(height: 25),
           Container(
-            height: 200,
+            height: 170,
             padding: const EdgeInsets.symmetric(horizontal: 30),
             child: Column(
               children: [
@@ -456,26 +460,26 @@ class _ResultOverallAlsoDashboardState
                             fontFamily: 'Sofia Pro')),
                   ),
                 ),
-                const SizedBox(height: 13),
-                GestureDetector(
-                  onTap: () async {
-                    print('Add schedule');
+                // const SizedBox(height: 13),
+                // GestureDetector(
+                //   onTap: () async {
+                //     print('Add schedule');
 
-                    // await DatabaseService().addSchedule(
-                    //   context,
-                    //   '03-20-2023',
-                    //   '10:00 AM',
-                    // );
-                  },
-                  child: const SizedBox(
-                    width: double.infinity,
-                    child: Text('Add appointment',
-                        style: TextStyle(
-                            color: Colors.black54,
-                            fontSize: 17,
-                            fontFamily: 'Sofia Pro')),
-                  ),
-                ),
+                //     // await DatabaseService().addSchedule(
+                //     //   context,
+                //     //   '03-20-2023',
+                //     //   '10:00 AM',
+                //     // );
+                //   },
+                //   child: const SizedBox(
+                //     width: double.infinity,
+                //     child: Text('Add appointment',
+                //         style: TextStyle(
+                //             color: Colors.black54,
+                //             fontSize: 17,
+                //             fontFamily: 'Sofia Pro')),
+                //   ),
+                // ),
                 // const SizedBox(height: 13),
                 // GestureDetector(
                 //   onTap: () async {

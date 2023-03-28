@@ -255,28 +255,33 @@ class _AdminScheduleState extends State<AdminSchedule> {
                           style: TextStyle(fontFamily: 'Sofia Pro')),
                       const SizedBox(width: 10),
                       SizedBox(
-                        child: SizedBox(
-                          height: 70,
-                          width: 300,
+                        height: 70,
+                        width: 280,
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              top: 0, right: 0, bottom: 0, left: 5),
                           child: TextFormField(
                             decoration: textInputDeco.copyWith(
                               suffixIcon: const Padding(
                                 padding: EdgeInsets.only(
-                                    top: 0, right: 7, bottom: 0, left: 8),
+                                    top: 0, right: 8, bottom: 0, left: 2),
                                 child: Icon(Icons.date_range),
                               ),
                               suffixIconColor: primaryColor,
+                              suffixIconConstraints:
+                                  const BoxConstraints(maxHeight: 20),
                               prefixIcon: const Padding(
-                                padding: EdgeInsets.only(left: 8),
+                                padding: EdgeInsets.only(
+                                    top: 0, right: 10.5, bottom: 0, left: 2),
                               ),
+                              prefixIconConstraints:
+                                  const BoxConstraints(maxHeight: 20),
                               errorMaxLines: 1,
                               errorStyle: const TextStyle(
                                   height: 0,
                                   color: Colors.transparent,
                                   fontSize: 0),
                               contentPadding: const EdgeInsets.all(0),
-                              suffixIconConstraints:
-                                  const BoxConstraints(maxHeight: 35),
                             ),
                             controller: dateController,
                             readOnly: true,
@@ -303,7 +308,7 @@ class _AdminScheduleState extends State<AdminSchedule> {
                       const SizedBox(width: 10),
                       SizedBox(
                         height: 70,
-                        width: 300,
+                        width: 280,
                         child: Padding(
                           padding: const EdgeInsets.only(
                               top: 0, right: 0, bottom: 0, left: 5),
@@ -317,26 +322,15 @@ class _AdminScheduleState extends State<AdminSchedule> {
                               contentPadding: const EdgeInsets.all(0),
                               prefixIconConstraints:
                                   const BoxConstraints(maxHeight: 20),
+                              prefixIcon: const Padding(
+                                padding: EdgeInsets.only(
+                                    top: 0, right: 10.5, bottom: 0, left: 2),
+                              ),
                               suffixIconConstraints:
                                   const BoxConstraints(maxHeight: 20),
                               suffixIcon: const Padding(
                                 padding: EdgeInsets.only(
                                     top: 0, right: 8, bottom: 0, left: 2),
-                              ),
-                              floatingLabelStyle: const TextStyle(
-                                  color: Colors.black,
-                                  fontFamily: 'Sofia Pro',
-                                  fontSize: 17),
-                              floatingLabelAlignment:
-                                  FloatingLabelAlignment.start,
-                              floatingLabelBehavior:
-                                  FloatingLabelBehavior.always,
-                              alignLabelWithHint: false,
-                              hintStyle: const TextStyle(
-                                  fontSize: 13, fontFamily: 'Sofia Pro'),
-                              prefixIcon: const Padding(
-                                padding: EdgeInsets.only(
-                                    top: 0, right: 10.5, bottom: 0, left: 2),
                               ),
                             ),
                             value: _selectedTimeValue,
@@ -456,7 +450,7 @@ class _AdminScheduleState extends State<AdminSchedule> {
     if (picked != null) {
       setState(() {
         _selectedDate = picked;
-        dateController.text = DateFormat('MM-dd-yyyy').format(picked);
+        dateController.text = DateFormat('MMMM d, y').format(picked);
       });
     }
   }

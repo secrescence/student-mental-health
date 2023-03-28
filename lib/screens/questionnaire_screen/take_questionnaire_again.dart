@@ -17,55 +17,35 @@ class TakeQuestionnaireAgain extends StatefulWidget {
 
 class _TakeQuestionnaireAgainState extends State<TakeQuestionnaireAgain> {
   String currentDate = DateFormat('MM-dd-yyyy').format(DateTime.now());
+  String after60days = DateFormat('MM-dd-yyyy')
+      .format(DateTime.now().add(const Duration(days: 7)));
 
-  DateTime? dateAnswered;
+  String dateAnswered = '';
   DateTime? canAnswerAgain;
 
-  bool _isButtonVisible = true;
+  bool _isButtonVisible = false;
+  int daysLeftToTakeQAgain = 0;
 
   @override
   void initState() {
-    getData();
+    getDateAnswered();
     super.initState();
   }
 
-  getData() async {
+  getDateAnswered() async {
     await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
         .getDateAnswered()
-        .then((dateAnswered) {
-      DateTime dateAnsweredParsed =
-          DateFormat('MM-dd-yyyy').parse(dateAnswered);
-      setState(() {
-        dateAnswered = dateAnsweredParsed;
-      });
-      print(dateAnswered);
-      // DateTime dateCanAnswerAgain =
-      //     dateAnsweredParsed.add(const Duration(days: 60));
-      // if (dateAnsweredParsed.millisecondsSinceEpoch >=
-      //     dateCanAnswerAgain.millisecondsSinceEpoch) {
-      //   setState(() {
-      //     _isButtonVisible = false;
-      //   });
-      // }
-    });
+        .then((value) {
+      DateTime currentDate = DateTime.now();
+      DateTime dateAnswered = DateTime.parse(value);
+      int daysSinceAnswered = currentDate.difference(dateAnswered).inDays;
+      int daysLeft = 60 - daysSinceAnswered;
 
-    await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
-        .getDateCanAnswerAgain()
-        .then((dateCanAnswerAgain) {
-      DateTime dateCanAnswerAgainParsed =
-          DateFormat('MM-dd-yyyy').parse(dateCanAnswerAgain);
       setState(() {
-        canAnswerAgain = dateCanAnswerAgainParsed;
+        daysLeftToTakeQAgain = daysLeft;
+        _isButtonVisible = daysLeft <= 0 ? true : false;
       });
-      print(canAnswerAgain);
     });
-
-    if (dateAnswered!.millisecondsSinceEpoch >=
-        canAnswerAgain!.millisecondsSinceEpoch) {
-      setState(() {
-        _isButtonVisible = false;
-      });
-    }
   }
 
   @override
@@ -90,9 +70,14 @@ class _TakeQuestionnaireAgainState extends State<TakeQuestionnaireAgain> {
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
+            children: [
               Text(
-                'Take the questionnaire again.',
+                daysLeftToTakeQAgain == 1
+                    ? 'You can take the questionnaire\nagain in $daysLeftToTakeQAgain day.'
+                    : daysLeftToTakeQAgain <= 0
+                        ? 'Please click the start button to proceed.'
+                        : 'You can take the questionnaire\nagain in $daysLeftToTakeQAgain days.',
+                textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontFamily: 'Sofia Pro',
                   fontSize: 20.0,
@@ -110,17 +95,6 @@ class _TakeQuestionnaireAgainState extends State<TakeQuestionnaireAgain> {
           const SizedBox(height: 40),
           Visibility(
             visible: _isButtonVisible,
-            replacement: const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: Text(
-                'You have already taken the questionnaire recently. Please come back for some more time.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: 'Sofia Pro',
-                  fontSize: 20.0,
-                ),
-              ),
-            ),
             child: CustomButton(
               text: 'Start',
               onPressed: () {
