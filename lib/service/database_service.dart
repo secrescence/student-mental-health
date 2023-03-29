@@ -395,7 +395,7 @@ class DatabaseService {
         // If the slot is empty, update it with the uid and return
         await appointmentsCollection.doc(scheduleId).update({
           'appointedUser': uid,
-          'appointedUserPriority': priority,
+          'priorityNumber': priority,
         });
         return;
       }
@@ -429,7 +429,7 @@ class DatabaseService {
 
             await appointmentsCollection.doc(documentSnapshot.id).update({
               'appointedUser': waitingListDoc.get('uid'),
-              'appointedUserPriority': waitingListDoc.get('priority'),
+              'priorityNumber': waitingListDoc.get('priority'),
             });
           }
         }

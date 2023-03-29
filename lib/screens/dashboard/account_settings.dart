@@ -135,14 +135,14 @@ class _AccountSettingsState extends State<AccountSettings> {
                     textCapitalization: TextCapitalization.words,
                     style: const TextStyle(
                       color: Colors.black,
-                      fontSize: 17,
+                      fontSize: 15,
                       fontFamily: 'Sofia Pro',
                     ),
                     cursorColor: primaryColor,
                     decoration: textInputDecoForSettings.copyWith(
                       prefixText: 'First Name: ',
                       prefixStyle: const TextStyle(
-                        fontSize: 17,
+                        fontSize: 15,
                         fontFamily: 'Sofia Pro',
                         color: Colors.black,
                       ),
@@ -178,14 +178,14 @@ class _AccountSettingsState extends State<AccountSettings> {
                     textCapitalization: TextCapitalization.words,
                     style: const TextStyle(
                       color: Colors.black,
-                      fontSize: 17,
+                      fontSize: 15,
                       fontFamily: 'Sofia Pro',
                     ),
                     cursorColor: primaryColor,
                     decoration: textInputDecoForSettings.copyWith(
                       prefixText: 'Last Name: ',
                       prefixStyle: const TextStyle(
-                        fontSize: 17,
+                        fontSize: 15,
                         fontFamily: 'Sofia Pro',
                         color: Colors.black,
                       ),
@@ -219,7 +219,7 @@ class _AccountSettingsState extends State<AccountSettings> {
                     readOnly: !_isEmailEditing,
                     style: const TextStyle(
                       color: Colors.black,
-                      fontSize: 17,
+                      fontSize: 15,
                       fontFamily: 'Sofia Pro',
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -227,7 +227,7 @@ class _AccountSettingsState extends State<AccountSettings> {
                     decoration: textInputDecoForSettings.copyWith(
                       prefixText: 'Email: ',
                       prefixStyle: const TextStyle(
-                        fontSize: 17,
+                        fontSize: 15,
                         fontFamily: 'Sofia Pro',
                         color: Colors.black,
                       ),
@@ -263,7 +263,7 @@ class _AccountSettingsState extends State<AccountSettings> {
                     keyboardType: TextInputType.phone,
                     style: const TextStyle(
                       color: Colors.black,
-                      fontSize: 17,
+                      fontSize: 15,
                       fontFamily: 'Sofia Pro',
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -271,7 +271,7 @@ class _AccountSettingsState extends State<AccountSettings> {
                     decoration: textInputDecoForSettings.copyWith(
                       prefixText: 'Phone Number: ',
                       prefixStyle: const TextStyle(
-                        fontSize: 17,
+                        fontSize: 15,
                         fontFamily: 'Sofia Pro',
                         color: Colors.black,
                       ),
@@ -298,39 +298,33 @@ class _AccountSettingsState extends State<AccountSettings> {
               //change password
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  children: [
-                    TextFormField(
-                      readOnly: true,
-                      style: const TextStyle(color: Colors.black),
-                      cursorColor: primaryColor,
-                      decoration: textInputDecoForSettings.copyWith(
-                        contentPadding: const EdgeInsets.all(0),
-                        prefixIconConstraints:
-                            const BoxConstraints(maxHeight: 15),
-                        suffixIconConstraints:
-                            const BoxConstraints(maxHeight: 40),
-                        hintStyle: const TextStyle(
-                            fontSize: 13, fontFamily: 'Sofia Pro'),
-                        prefixIcon: const Padding(
-                          padding: EdgeInsets.only(
-                              top: 0, right: 0, bottom: 0, left: 10),
-                          child: Text(
-                            'Change Password',
-                            style: TextStyle(
-                              fontSize: 17,
-                              fontFamily: 'Sofia Pro',
-                            ),
+                child: SizedBox(
+                  height: 50,
+                  child: TextFormField(
+                    readOnly: true,
+                    style: const TextStyle(color: Colors.black),
+                    cursorColor: primaryColor,
+                    decoration: textInputDecoForSettings.copyWith(
+                      // contentPadding: const EdgeInsets.all(0),
+                      // prefixIconConstraints:
+                      //     const BoxConstraints(maxHeight: 15),
+                      // suffixIconConstraints:
+                      //     const BoxConstraints(maxHeight: 40),
+                      prefixIcon: const Padding(
+                        padding: EdgeInsets.only(
+                            top: 15, right: 0, bottom: 0, left: 10),
+                        child: Text(
+                          'Change Password',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontFamily: 'Sofia Pro',
                           ),
                         ),
-                        suffixIconColor: primaryColor,
-                        suffixIcon: const Padding(
-                          padding: EdgeInsets.only(right: 12),
-                          child: Icon(Icons.arrow_forward_ios),
-                        ),
                       ),
+                      suffixIconColor: primaryColor,
+                      suffixIcon: const Icon(Icons.arrow_forward_ios),
                     ),
-                  ],
+                  ),
                 ),
               ),
 
@@ -372,7 +366,7 @@ class _AccountSettingsState extends State<AccountSettings> {
                           child: Text(
                             'Help',
                             style: TextStyle(
-                              fontSize: 17,
+                              fontSize: 15,
                               fontFamily: 'Sofia Pro',
                             ),
                           ),
@@ -411,7 +405,7 @@ class _AccountSettingsState extends State<AccountSettings> {
                           child: Text(
                             'Terms of Service',
                             style: TextStyle(
-                              fontSize: 17,
+                              fontSize: 15,
                               fontFamily: 'Sofia Pro',
                             ),
                           ),
@@ -449,7 +443,7 @@ class _AccountSettingsState extends State<AccountSettings> {
                           child: Text(
                             'About Us',
                             style: TextStyle(
-                              fontSize: 17,
+                              fontSize: 15,
                               fontFamily: 'Sofia Pro',
                             ),
                           ),
