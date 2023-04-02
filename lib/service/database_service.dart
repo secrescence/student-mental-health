@@ -159,7 +159,7 @@ class DatabaseService {
     double categoryClarityMEAN,
   ) async {
     userCollection.doc(uid).collection('questionnaireResult').doc(uid).set({
-      'dateAnswered': DateTime.now(),
+      'dateAnswered': DateTime.now().toString(),
       'grandMean': grandMean,
       'categoryNonacceptanceMEAN': categoryNonacceptanceMEAN,
       'categoryGoalsMEAN': categoryGoalsMEAN,

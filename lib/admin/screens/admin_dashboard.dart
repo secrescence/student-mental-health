@@ -42,7 +42,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       child: Column(
                         children: [
                           const Text(
-                            'Total Users',
+                            'Overview',
                             textAlign: TextAlign.start,
                             style: TextStyle(
                               fontSize: 20,

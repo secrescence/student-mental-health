@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -448,8 +449,16 @@ class _ResultOverallAlsoDashboardState
                 const SizedBox(height: 13),
                 GestureDetector(
                   onTap: () async {
-                    print('Questionnaire');
+                    // print(DateTime.now().toIso8601String());
                     nextScreen(context, const TakeQuestionnaireAgain());
+                    // FirebaseFirestore.instance
+                    //     .collection('users')
+                    //     .doc('QVyl4dVWJeg3ruVPbKkcuOcPcgu2')
+                    //     .collection('questionnaireResult')
+                    //     .doc('QVyl4dVWJeg3ruVPbKkcuOcPcgu2')
+                    //     .update({
+                    //   'dateAnswered': DateTime.now().toString(),
+                    // });
                   },
                   child: const SizedBox(
                     width: double.infinity,

@@ -21,6 +21,8 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
 
   bool viewAppointment = true;
 
+  bool isBannerVisible = true;
+
   int currentIndex = 0;
   final List<String> labels = ['Pending', 'Ongoing', 'Completed'];
 
@@ -28,22 +30,6 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: adminContentBGColor,
-      // appBar: AppBar(
-      //   elevation: 0,
-      //   backgroundColor: Colors.transparent,
-      //   title: const Padding(
-      //     padding: EdgeInsets.symmetric(horizontal: 40),
-      //     child: Text(
-      //       'Appointments',
-      //       style: TextStyle(
-      //           color: Colors.black,
-      //           fontSize: 20,
-      //           fontWeight: FontWeight.w600,
-      //           fontFamily: 'Sofia Pro'),
-      //     ),
-      //   ),
-      //   automaticallyImplyLeading: false,
-      // ),
       body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 50),
         child: Card(
@@ -57,20 +43,28 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
               child: Column(
                 // mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 30),
-                  Container(
-                    alignment: Alignment.center,
-                    child: const Text('Appointments',
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontFamily: 'Sofia Pro',
-                          fontWeight: FontWeight.bold,
-                        )),
+                  Visibility(
+                    visible: viewAppointment,
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 30),
+                        Container(
+                          alignment: Alignment.center,
+                          child: const Text('Appointments',
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontFamily: 'Sofia Pro',
+                                fontWeight: FontWeight.bold,
+                              )),
+                        ),
+                        const SizedBox(height: 30),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 30),
                   StreamBuilder<QuerySnapshot>(
                     stream: FirebaseFirestore.instance
                         .collection('appointments')
+                        .where('appointedUser', isNotEqualTo: '')
                         .snapshots(),
                     builder: (BuildContext context,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -78,9 +72,11 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
                           snapshot.connectionState == ConnectionState.waiting) {
                         return const LoadingAdmin();
                       } else if (snapshot.data!.docs.isEmpty) {
-                        return const Center(
-                          child: Text(
-                            'No appointments yet',
+                        return Container(
+                          alignment: Alignment.center,
+                          height: 650,
+                          child: const Text(
+                            'No appointments yet.',
                             style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 20,
@@ -100,243 +96,9 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
                         );
                       }
 
-                      List<DocumentSnapshot> documents = snapshot.data!.docs;
-                      if (documents[0]['appointedUser'] == '') {
-                        return const Center(
-                          child: Text(
-                            'No appointments yet',
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 20,
-                                fontFamily: 'Sofia Pro'),
-                          ),
-                        );
-                      }
-
                       return Visibility(
                         visible: viewAppointment,
-                        replacement: Column(
-                          children: [
-                            Container(
-                              alignment: Alignment.centerLeft,
-                              padding: const EdgeInsets.only(left: 20, top: 20),
-                              child: IconButton(
-                                  onPressed: () => setState(() {
-                                        viewAppointment = true;
-                                      }),
-                                  icon: const Icon(Icons.arrow_back_ios)),
-                            ),
-                            Container(
-                              alignment: Alignment.topLeft,
-                              padding: const EdgeInsets.only(left: 30, top: 10),
-                              child: Text(
-                                fullNameView,
-                                style: const TextStyle(
-                                  fontFamily: 'Sofia Pro',
-                                  fontSize: 19,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 5),
-                            Row(
-                              children: [
-                                const SizedBox(width: 30),
-                                Icon(
-                                  Icons.circle,
-                                  size: 12,
-                                  color: statusView == 'pending'
-                                      ? Colors.red
-                                      : statusView == 'completed'
-                                          ? Colors.green
-                                          : Colors.amber,
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                Text(
-                                  statusView,
-                                  style: TextStyle(
-                                    fontFamily: 'Sofia Pro',
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
-                                    color: statusView == 'pending'
-                                        ? Colors.red
-                                        : statusView == 'completed'
-                                            ? Colors.green
-                                            : Colors.amber,
-                                  ),
-                                ),
-                                const SizedBox(width: 50),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
-                            Row(
-                              children: [
-                                const SizedBox(width: 30),
-                                const Text(
-                                  'Status: ',
-                                  style: TextStyle(
-                                    fontFamily: 'Sofia Pro',
-                                    fontSize: 15,
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.2,
-                                  child: FlutterToggleTab(
-                                    isShadowEnable: true,
-                                    width: 20,
-                                    height: 50,
-                                    borderRadius: 10,
-                                    marginSelected: const EdgeInsets.all(3),
-                                    selectedTextStyle: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w600,
-                                        fontFamily: 'Sofia Pro'),
-                                    unSelectedTextStyle: const TextStyle(
-                                        fontFamily: 'Sofia Pro',
-                                        color: Colors.black54),
-                                    labels: labels,
-                                    selectedIndex: statusView == 'pending'
-                                        ? currentIndex = 0
-                                        : statusView == 'ongoing'
-                                            ? currentIndex = 1
-                                            : currentIndex = 2,
-                                    selectedBackgroundColors: [
-                                      currentIndex == 0
-                                          ? Colors.red
-                                          : currentIndex == 1
-                                              ? Colors.amber
-                                              : Colors.green,
-                                    ],
-                                    selectedLabelIndex: (int index) async {
-                                      if (currentIndex != index && index == 0) {
-                                        await DatabaseService()
-                                            .updateAppointmentStatus(
-                                                dateOfAppointmentDocId,
-                                                'pending');
-                                      } else if (currentIndex != index &&
-                                          index == 1) {
-                                        await DatabaseService()
-                                            .updateAppointmentStatus(
-                                                dateOfAppointmentDocId,
-                                                'ongoing');
-                                      } else if (currentIndex != index &&
-                                          index == 2) {
-                                        await DatabaseService()
-                                            .updateAppointmentStatus(
-                                                dateOfAppointmentDocId,
-                                                'completed');
-                                      }
-
-                                      setState(() {
-                                        currentIndex = index;
-                                        if (index == 0) {
-                                          statusView = 'pending';
-                                        } else if (index == 1) {
-                                          statusView = 'ongoing';
-                                        } else {
-                                          statusView = 'completed';
-                                        }
-                                      });
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
-                            Card(
-                              elevation: 3,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10)),
-                              child: SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.5,
-                                width: MediaQuery.of(context).size.width * 0.7,
-                                child: Column(
-                                  children: [
-                                    Container(
-                                      width: MediaQuery.of(context).size.width,
-                                      height: 40,
-                                      decoration: const BoxDecoration(
-                                        color: primaryColor,
-                                        borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(10),
-                                          topRight: Radius.circular(10),
-                                        ),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          const Spacer(),
-                                          const Text(
-                                            'Notes',
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              fontFamily: 'Sofia Pro',
-                                              fontSize: 18,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                          const Spacer(),
-                                          //TODO remove this
-                                          InkWell(
-                                            onTap: () {
-                                              // await DatabaseService().updateAppointmentNotes(
-                                              //     dateOfAppointmentDocId, notesController.text);
-                                              // setState(() {
-                                              //   notes = notesController.text;
-                                              // });
-                                              print('');
-                                            },
-                                            child: const Text(
-                                              '',
-                                              style: TextStyle(
-                                                fontFamily: 'Sofia Pro',
-                                                fontSize: 13,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 15),
-                                        ],
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.all(10),
-                                      child: TextFormField(
-                                        onChanged: (value) async {
-                                          await DatabaseService()
-                                              .updateAppointmentNotes(
-                                                  dateOfAppointmentDocId,
-                                                  value);
-                                        },
-                                        initialValue: notesView,
-                                        maxLines: 20,
-                                        style: const TextStyle(
-                                          fontFamily: 'Sofia Pro',
-                                          fontSize: 15,
-                                        ),
-                                        cursorColor: primaryColor,
-                                        cursorHeight: 15,
-                                        mouseCursor: MouseCursor.defer,
-                                        decoration: const InputDecoration(
-                                          border: InputBorder.none,
-                                          hintText: 'Add notes...',
-                                          alignLabelWithHint: true,
-                                          hintStyle: TextStyle(
-                                            fontFamily: 'Sofia Pro',
-                                            fontSize: 13,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
+                        replacement: viewAppointmentWidget(),
                         child: ListView(
                           shrinkWrap: true,
                           children: snapshot.data!.docs
@@ -386,14 +148,13 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
                                     ListTile(
                                       onTap: () {
                                         setState(() {
+                                          isBannerVisible = false;
                                           viewAppointment = false;
                                           fullNameView = fullName;
                                           userIdView = userId;
                                           statusView = status;
                                           dateOfAppointmentDocId = document.id;
-                                          notesView = data['notes'];
                                         });
-                                        print('userIdView: $userIdView');
                                       },
                                       contentPadding:
                                           const EdgeInsets.symmetric(

@@ -60,46 +60,13 @@ class _StudentsResultsState extends State<StudentsResults> {
   void initState() {
     _tooltipBehavior = TooltipBehavior(enable: true);
 
-    getData();
     super.initState();
-  }
-
-  getData() async {
-    await DatabaseService().getUserAppointment().then((snapshot) {
-      setState(() {
-        userAppointmentStream = snapshot;
-      });
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: adminContentBGColor,
-      // appBar: AppBar(
-      //   elevation: 0,
-      //   backgroundColor: Colors.transparent,
-      //   title: const Padding(
-      //     padding: EdgeInsets.symmetric(horizontal: 40),
-      //     child: Text(
-      //       'Student\'s Results',
-      //       style: TextStyle(
-      //           color: Colors.black,
-      //           fontSize: 20,
-      //           fontWeight: FontWeight.w600,
-      //           fontFamily: 'Sofia Pro'),
-      //     ),
-      //   ),
-      //   automaticallyImplyLeading: false,
-      //   // leading: IconButton(
-      //   //     onPressed: (() {
-      //   //       //TODO: Add back button functionality
-      //   //     }),
-      //   //     icon: const Icon(
-      //   //       Icons.arrow_back_ios,
-      //   //       color: Color(0xFF000000),
-      //   //     )),
-      // ),
       body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 50),
         child: Card(
@@ -107,221 +74,274 @@ class _StudentsResultsState extends State<StudentsResults> {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           child: SizedBox(
-              width: double.infinity,
-              height: double.infinity,
-              // margin: const EdgeInsets.symmetric(vertical: 10),
-              child: Column(
-                children: [
-                  const SizedBox(height: 30),
-                  Container(
-                    alignment: Alignment.center,
-                    child: const Text('Student\'s Results',
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontFamily: 'Sofia Pro',
-                          fontWeight: FontWeight.bold,
-                        )),
+            width: double.infinity,
+            height: double.infinity,
+            // margin: const EdgeInsets.symmetric(vertical: 10),
+            child: Column(
+              children: [
+                Visibility(
+                  visible: viewStudentResult,
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 30),
+                      Container(
+                        alignment: Alignment.center,
+                        child: const Text('Student\'s Results',
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontFamily: 'Sofia Pro',
+                              fontWeight: FontWeight.bold,
+                            )),
+                      ),
+                      const SizedBox(height: 30),
+                    ],
                   ),
-                  const SizedBox(height: 30),
-                  StreamBuilder<QuerySnapshot>(
-                    stream: FirebaseFirestore.instance
-                        .collectionGroup('questionnaireResult')
-                        .snapshots(),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (!snapshot.hasData ||
-                          snapshot.connectionState == ConnectionState.waiting) {
-                        return const LoadingAdmin();
-                      } else if (snapshot.data!.docs.isEmpty) {
-                        return const Center(
-                          child: Text(
-                            'No results yet',
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 20,
-                                fontFamily: 'Sofia Pro'),
-                          ),
-                        );
-                      } else if (snapshot.hasError) {
-                        return const Center(
-                          child: Text(
-                            'Something went wrong',
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 20,
-                                fontFamily: 'Sofia Pro'),
-                          ),
-                        );
-                      }
+                ),
+                StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('users')
+                      .where('isUserDoneWithQuestionnaire', isEqualTo: true)
+                      .snapshots(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (!snapshot.hasData ||
+                        snapshot.connectionState == ConnectionState.waiting) {
+                      return const LoadingAdmin();
+                    } else if (snapshot.data!.docs.isEmpty) {
+                      return Container(
+                        alignment: Alignment.center,
+                        height: 650,
+                        child: const Text(
+                          'No results yet.',
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 20,
+                              fontFamily: 'Sofia Pro'),
+                        ),
+                      );
+                    } else if (snapshot.hasError) {
+                      return const Center(
+                        child: Text(
+                          'Something went wrong',
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'Sofia Pro'),
+                        ),
+                      );
+                    }
 
-                      return Visibility(
-                        visible: viewStudentResult,
-                        replacement: viewStudentResultWidget(),
-                        child: ListView(
-                          shrinkWrap: true,
-                          children: snapshot.data!.docs
-                              .map((DocumentSnapshot document) {
-                            Map<String, dynamic> data =
-                                document.data() as Map<String, dynamic>;
-                            // if (data['appointedUser'] == null) {
-                            //   return const SizedBox.shrink();
-                            // }
+                    return Visibility(
+                      visible: viewStudentResult,
+                      replacement: viewStudentResultWidget(),
+                      child: ListView(
+                        shrinkWrap: true,
+                        children: snapshot.data!.docs
+                            .map((DocumentSnapshot document) {
+                          Map<String, dynamic> data =
+                              document.data() as Map<String, dynamic>;
 
-                            // final String userId = data['appointedUser'];
-                            // final String priority =
-                            //     data['priorityNumber'] == '1'
-                            //         ? 'high priority'
-                            //         : data['priorityNumber'] == '2'
-                            //             ? 'mid priority'
-                            //             : 'low priority';
+                          final String userId = data['uid'];
 
-                            grandMeanView =
-                                data['grandMean'].toStringAsFixed(1);
+                          return StreamBuilder<DocumentSnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(userId)
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              if (!snapshot.hasData ||
+                                  snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                return const LoadingAdmin();
+                              } else if (snapshot.data == null ||
+                                  snapshot.data!.data() == null) {
+                                return const Center(
+                                  child: Text(
+                                    'No data',
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w600,
+                                        fontFamily: 'Sofia Pro'),
+                                  ),
+                                );
+                              }
 
-                            categoryNonacceptance =
-                                data['categoryNonacceptanceMEAN']
-                                    .toStringAsFixed(1);
-                            categoryGoals =
-                                data['categoryGoalsMEAN'].toStringAsFixed(1);
-                            categoryImpulse =
-                                data['categoryImpulseMEAN'].toStringAsFixed(1);
-                            categoryAwareness = data['categoryAwarenessMEAN']
-                                .toStringAsFixed(1);
-                            categoryStrategies = data['categoryStrategiesMEAN']
-                                .toStringAsFixed(1);
-                            categoryClarity =
-                                data['categoryClarityMEAN'].toStringAsFixed(1);
+                              Map<String, dynamic> userData =
+                                  snapshot.data!.data() as Map<String, dynamic>;
 
-                            return StreamBuilder<QuerySnapshot>(
-                                stream: FirebaseFirestore.instance
-                                    .collection('users')
-                                    .where('questionnaireResult',
-                                        isNotEqualTo: null)
-                                    .snapshots(),
-                                builder: (context, snapshot) {
-                                  if (!snapshot.hasData ||
-                                      snapshot.connectionState ==
-                                          ConnectionState.waiting) {
-                                    return const LoadingAdmin();
-                                  } else if (snapshot.data!.docs.isEmpty) {
-                                    return const Center(
-                                      child: Text(
-                                        'No results yet',
-                                        style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 20,
-                                            fontFamily: 'Sofia Pro'),
-                                      ),
-                                    );
-                                  } else if (snapshot.hasError) {
-                                    return const Center(
-                                      child: Text(
-                                        'Something went wrong',
-                                        style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 20,
-                                            fontFamily: 'Sofia Pro'),
-                                      ),
-                                    );
-                                  }
+                              String fullName =
+                                  '${userData['firstName']} ${userData['lastName']}';
+                              String studentId = userData['studentId'];
 
-                                  final Map<String, dynamic> userData =
-                                      snapshot.data!.docs.first.data()
-                                          as Map<String, dynamic>;
+                              return StreamBuilder<DocumentSnapshot>(
+                                  stream: FirebaseFirestore.instance
+                                      .collection('users')
+                                      .doc(userId)
+                                      .collection('questionnaireResult')
+                                      .doc(userId)
+                                      .snapshots(),
+                                  builder: (context, snapshot) {
+                                    Map<String, dynamic> questionnaireData =
+                                        snapshot.data!.data()
+                                            as Map<String, dynamic>;
 
-                                  return Column(
-                                    children: [
-                                      const Divider(
-                                        height: 0,
-                                        thickness: 5,
-                                      ),
-                                      ListTile(
-                                        onTap: () async {
-                                          //TODO to be implemented
+                                    String grandMean =
+                                        questionnaireData['grandMean']
+                                            .toStringAsFixed(1);
+                                    String nonacceptance = questionnaireData[
+                                            'categoryNonacceptanceMEAN']
+                                        .toStringAsFixed(1);
+                                    String goals =
+                                        questionnaireData['categoryGoalsMEAN']
+                                            .toStringAsFixed(1);
+                                    String impulse =
+                                        questionnaireData['categoryImpulseMEAN']
+                                            .toStringAsFixed(1);
+                                    String awareness = questionnaireData[
+                                            'categoryAwarenessMEAN']
+                                        .toStringAsFixed(1);
+                                    String strategies = questionnaireData[
+                                            'categoryStrategiesMEAN']
+                                        .toStringAsFixed(1);
+                                    String clarity =
+                                        questionnaireData['categoryClarityMEAN']
+                                            .toStringAsFixed(1);
+                                    String userPriority = questionnaireData[
+                                                'isHighPriority'] ==
+                                            true
+                                        ? 'High'
+                                        : questionnaireData['isLowPriority'] ==
+                                                true
+                                            ? 'Low'
+                                            : 'Mid';
+                                    String priority = questionnaireData[
+                                                'isHighPriority'] ==
+                                            true
+                                        ? 'high priority'
+                                        : questionnaireData['isLowPriority'] ==
+                                                true
+                                            ? 'low priority'
+                                            : 'mid priority';
 
-                                          setState(() {
-                                            viewStudentResult = false;
-                                            fullNameView =
-                                                '${userData['firstName']} ${userData['lastName']}';
-                                            // userIdView = userId;
-                                            // priorityView = priority;
-                                            // dateOfAppointmentDocId =
-                                            //     document.id;
-                                            studentIdView = data['studentId'];
-                                          });
-
-                                          // List<StudentResultData>? results =
-                                          //     await _getResults(userId);
-                                          // setState(() {
-                                          //   _results = results;
-                                          // });
-
-                                          // String category =
-                                          //     await _getHighestCategory(userId);
-                                          // setState(() {
-                                          //   highestCategory = category;
-                                          // });
-                                        },
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                                vertical: 5),
-                                        title: Row(
-                                          children: [
-                                            const SizedBox(width: 50),
-                                            Text(
-                                                '${userData['firstName']} ${userData['lastName']}'),
-                                            const Spacer(),
-                                            const SizedBox(width: 50),
-                                          ],
+                                    return Column(
+                                      children: [
+                                        const Divider(
+                                          height: 0,
+                                          thickness: 5,
                                         ),
-                                        subtitle: Row(
-                                          children: [
-                                            const SizedBox(width: 50),
-                                            Text(
-                                              data['isHighPriority']
-                                                  ? 'high priority'
-                                                  : data['isMidPriority']
-                                                      ? 'mid priority'
-                                                      : 'low priority',
+                                        ListTile(
+                                          onTap: () async {
+                                            //TODO to be implemented
+
+                                            setState(() {
+                                              viewStudentResult = false;
+                                              fullNameView = fullName;
+                                              // userIdView = userId;
+                                              priorityView = priority;
+                                              dateOfAppointmentDocId =
+                                                  document.id;
+                                              studentIdView = studentId;
+
+                                              grandMeanView = grandMean;
+                                              categoryNonacceptance =
+                                                  nonacceptance;
+                                              categoryGoals = goals;
+                                              categoryImpulse = impulse;
+                                              categoryAwareness = awareness;
+                                              categoryStrategies = strategies;
+                                              categoryClarity = clarity;
+                                              userPriorityView = userPriority;
+                                            });
+
+                                            List<StudentResultData>? results =
+                                                await _getResults(userId);
+                                            setState(() {
+                                              _results = results;
+                                            });
+
+                                            String category =
+                                                await _getHighestCategory(
+                                                    userId);
+                                            setState(() {
+                                              highestCategory = category;
+                                            });
+                                          },
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                  vertical: 5),
+                                          title: Row(
+                                            children: [
+                                              const SizedBox(width: 50),
+                                              Text(fullName,
+                                                  style: const TextStyle(
+                                                    fontFamily: 'Sofia Pro',
+                                                    fontSize: 18,
+                                                  )),
+                                              const Spacer(),
+                                              const SizedBox(width: 50),
+                                            ],
+                                          ),
+                                          subtitle: Row(
+                                            children: [
+                                              const SizedBox(width: 50),
+                                              Text(
+                                                questionnaireData[
+                                                            'isHighPriority'] ==
+                                                        true
+                                                    ? 'high priority'
+                                                    : questionnaireData[
+                                                                'isLowPriority'] ==
+                                                            true
+                                                        ? 'low priority'
+                                                        : 'mid priority',
+                                                style: TextStyle(
+                                                  fontFamily: 'Sofia Pro',
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: questionnaireData[
+                                                              'isHighPriority'] ==
+                                                          true
+                                                      ? Colors.red
+                                                      : questionnaireData[
+                                                                  'isLowPriority'] ==
+                                                              true
+                                                          ? Colors.green
+                                                          : Colors.amber,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 50),
+                                            ],
+                                          ),
+                                          trailing: const Padding(
+                                            padding: EdgeInsets.only(right: 50),
+                                            child: Text(
+                                              'view',
                                               style: TextStyle(
                                                 fontFamily: 'Sofia Pro',
                                                 fontSize: 13,
-                                                fontWeight: FontWeight.w600,
-                                                color: data['isHighPriority']
-                                                    ? Colors.red
-                                                    : data['isMidPriority']
-                                                        ? Colors.amber
-                                                        : Colors.green,
                                               ),
-                                            ),
-                                            const SizedBox(width: 50),
-                                          ],
-                                        ),
-                                        trailing: const Padding(
-                                          padding: EdgeInsets.only(right: 50),
-                                          child: Text(
-                                            'view',
-                                            style: TextStyle(
-                                              fontFamily: 'Sofia Pro',
-                                              fontSize: 13,
                                             ),
                                           ),
                                         ),
-                                      ),
-                                      const Divider(
-                                        height: 0,
-                                        thickness: 5,
-                                      ),
-                                    ],
-                                  );
-                                });
-                          }).toList(),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              )),
+                                        const Divider(
+                                          height: 0,
+                                          thickness: 5,
+                                        ),
+                                      ],
+                                    );
+                                  });
+                            },
+                          );
+                        }).toList(),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -406,7 +426,7 @@ class _StudentsResultsState extends State<StudentsResults> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Spacer(),
-            Container(
+            SizedBox(
               // height: 500,
               width: 500,
               child: SfCircularChart(

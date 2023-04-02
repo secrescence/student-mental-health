@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
+import 'package:student_mental_health/widgets/widgets/loading_admin.dart';
 import 'package:student_mental_health/widgets/widgets/widgets.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
@@ -61,29 +62,6 @@ class _AdminScheduleState extends State<AdminSchedule> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: adminContentBGColor,
-      // appBar: AppBar(
-      //   elevation: 0,
-      //   backgroundColor: Colors.transparent,
-      //   title: const Padding(
-      //     padding: EdgeInsets.symmetric(horizontal: 40),
-      //     child: Text(
-      //       'Schedule',
-      //       style: TextStyle(
-      //           color: Colors.black,
-      //           fontSize: 20,
-      //           fontWeight: FontWeight.w600,
-      //           fontFamily: 'Sofia Pro'),
-      //     ),
-      //   ),
-      //   automaticallyImplyLeading: false,
-      //   // leading: IconButton(
-      //   //     onPressed: (() {
-      //   //       //TODO: Add back button functionality
-      //   //     }),
-      //   //     icon: const Icon(
-      //   //       Icons.arrow_back_ios,
-      //   //       color: Color(0xFF000000),
-      // ),
       body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 50),
         child: Card(
@@ -108,16 +86,16 @@ class _AdminScheduleState extends State<AdminSchedule> {
                 ),
                 const SizedBox(height: 30),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
                   children: const [
                     Spacer(),
-                    SizedBox(width: 30),
+                    SizedBox(width: 40),
                     Text('Date',
                         style: TextStyle(
                           fontSize: 23,
                           fontFamily: 'Sofia Pro',
                           fontWeight: FontWeight.w400,
                         )),
+                    SizedBox(width: 20),
                     Spacer(),
                     Text('Time',
                         style: TextStyle(
@@ -125,57 +103,52 @@ class _AdminScheduleState extends State<AdminSchedule> {
                           fontFamily: 'Sofia Pro',
                           fontWeight: FontWeight.w400,
                         )),
-                    SizedBox(width: 50),
+                    SizedBox(width: 70),
                     Spacer(),
                   ],
                 ),
                 const SizedBox(height: 20),
-                const Divider(
-                  height: 0,
-                  thickness: 5,
-                ),
                 SizedBox(
-                  height: 500,
+                  height: MediaQuery.of(context).size.height - 350,
                   child: StreamBuilder<QuerySnapshot>(
                     stream: scheduleStream,
                     builder: (context, snapshot) {
                       if (!snapshot.hasData ||
                           snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(
-                          child: SpinKitSpinningLines(
-                            color: primaryColor,
-                            size: 50,
-                          ),
-                        );
+                        return const LoadingAdmin();
                       }
                       List<DocumentSnapshot> schedule = snapshot.data!.docs;
                       if (schedule.isEmpty) {
-                        return const Center(
-                          child: Text(
-                            'No schedule available',
+                        return Container(
+                          alignment: Alignment.center,
+                          height: 600,
+                          child: const Text(
+                            'No schedule yet.',
                             style: TextStyle(
-                              fontSize: 18,
-                              fontFamily: 'Sofia Pro',
-                              fontWeight: FontWeight.w400,
-                            ),
+                                color: Colors.black,
+                                fontSize: 20,
+                                fontFamily: 'Sofia Pro'),
                           ),
                         );
                       }
                       return ListView.builder(
-                        physics: const AlwaysScrollableScrollPhysics(),
                         itemCount: schedule.length,
                         itemBuilder: (context, index) {
                           Map<String, dynamic> data =
                               schedule[index].data() as Map<String, dynamic>;
                           return Column(
                             children: [
+                              const Divider(
+                                height: 0,
+                                thickness: 5,
+                              ),
                               Padding(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 30, vertical: 15),
                                 child: Row(
                                   children: [
                                     const Spacer(),
-                                    const SizedBox(width: 35),
+                                    // const SizedBox(width: 35),
                                     Text(data['date'],
                                         style: const TextStyle(
                                           fontSize: 18,
@@ -189,7 +162,7 @@ class _AdminScheduleState extends State<AdminSchedule> {
                                           fontFamily: 'Sofia Pro',
                                           fontWeight: FontWeight.w400,
                                         )),
-                                    const SizedBox(width: 40),
+                                    // const SizedBox(width: 40),
                                     const Spacer(),
                                     IconButton(
                                       icon: const Icon(Icons.delete),
@@ -215,8 +188,7 @@ class _AdminScheduleState extends State<AdminSchedule> {
                   ),
                 ),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 40),
                   alignment: Alignment.bottomRight,
                   child: FloatingActionButton(
                     splashColor: primaryColor,
@@ -226,6 +198,7 @@ class _AdminScheduleState extends State<AdminSchedule> {
                     child: const Icon(Icons.add),
                   ),
                 ),
+                const SizedBox(height: 50),
               ],
             ),
           ),

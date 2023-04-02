@@ -9,7 +9,7 @@ class LoadingAdmin extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: 1350,
-      height: 750,
+      height: 650,
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
