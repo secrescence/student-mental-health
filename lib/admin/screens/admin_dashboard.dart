@@ -37,8 +37,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         borderRadius: BorderRadius.circular(10)),
                     child: Container(
                       padding: const EdgeInsets.all(20),
-                      width: 400,
-                      height: 200,
+                      width: MediaQuery.of(context).size.width / 2.75,
+                      height: 270,
                       child: Column(
                         children: [
                           const Text(
@@ -53,8 +53,52 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       ),
                     ),
                   ),
+                  Card(
+                    elevation: 3,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      width: MediaQuery.of(context).size.width - 1110,
+                      height: 270,
+                      child: Column(
+                        children: [
+                          const Text(
+                            'Student\'s Results',
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
-              )
+              ),
+              Card(
+                elevation: 3,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  width: MediaQuery.of(context).size.width,
+                  height: 380,
+                  child: Column(
+                    children: [
+                      const Text(
+                        'Monthly Report',
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),

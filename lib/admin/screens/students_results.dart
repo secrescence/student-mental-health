@@ -1,12 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:flutter_toggle_tab/flutter_toggle_tab.dart';
 import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
-import 'package:student_mental_health/widgets/widgets/loading_admin.dart';
-import 'package:student_mental_health/widgets/widgets/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
@@ -104,10 +100,27 @@ class _StudentsResultsState extends State<StudentsResults> {
                       .snapshots(),
                   builder: (BuildContext context,
                       AsyncSnapshot<QuerySnapshot> snapshot) {
-                    if (!snapshot.hasData ||
-                        snapshot.connectionState == ConnectionState.waiting) {
-                      return const LoadingAdmin();
-                    } else if (snapshot.data!.docs.isEmpty) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          SizedBox(height: viewStudentResult ? 300 : 400),
+                          const SpinKitChasingDots(
+                              color: primaryColor, size: 50),
+                          const SizedBox(height: 20),
+                          const Text(
+                            'Loading...',
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: primaryColor,
+                              fontFamily: 'Sofia Pro',
+                            ),
+                          ),
+                        ],
+                      );
+                    } else if (!snapshot.hasData ||
+                        snapshot.data!.docs.isEmpty) {
                       return Container(
                         alignment: Alignment.center,
                         height: 650,
@@ -120,13 +133,14 @@ class _StudentsResultsState extends State<StudentsResults> {
                         ),
                       );
                     } else if (snapshot.hasError) {
-                      return const Center(
-                        child: Text(
-                          'Something went wrong',
+                      return Container(
+                        alignment: Alignment.center,
+                        height: 650,
+                        child: const Text(
+                          'Something went wrong.',
                           style: TextStyle(
                               color: Colors.black,
                               fontSize: 20,
-                              fontWeight: FontWeight.w600,
                               fontFamily: 'Sofia Pro'),
                         ),
                       );
@@ -142,7 +156,7 @@ class _StudentsResultsState extends State<StudentsResults> {
                           Map<String, dynamic> data =
                               document.data() as Map<String, dynamic>;
 
-                          final String userId = data['uid'];
+                          String userId = data['uid'];
 
                           return StreamBuilder<DocumentSnapshot>(
                             stream: FirebaseFirestore.instance
@@ -150,19 +164,32 @@ class _StudentsResultsState extends State<StudentsResults> {
                                 .doc(userId)
                                 .snapshots(),
                             builder: (context, snapshot) {
-                              if (!snapshot.hasData ||
-                                  snapshot.connectionState ==
-                                      ConnectionState.waiting) {
-                                return const LoadingAdmin();
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return Container();
                               } else if (snapshot.data == null ||
-                                  snapshot.data!.data() == null) {
-                                return const Center(
-                                  child: Text(
-                                    'No data',
+                                  snapshot.data!.data() == null ||
+                                  !snapshot.hasData) {
+                                return Container(
+                                  alignment: Alignment.center,
+                                  height: 650,
+                                  child: const Text(
+                                    'No data.',
                                     style: TextStyle(
                                         color: Colors.black,
                                         fontSize: 20,
-                                        fontWeight: FontWeight.w600,
+                                        fontFamily: 'Sofia Pro'),
+                                  ),
+                                );
+                              } else if (snapshot.hasError) {
+                                return Container(
+                                  alignment: Alignment.center,
+                                  height: 650,
+                                  child: const Text(
+                                    'Something went wrong.',
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 20,
                                         fontFamily: 'Sofia Pro'),
                                   ),
                                 );
@@ -183,6 +210,37 @@ class _StudentsResultsState extends State<StudentsResults> {
                                       .doc(userId)
                                       .snapshots(),
                                   builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return Container();
+                                    } else if (snapshot.data == null ||
+                                        snapshot.data!.data() == null ||
+                                        !snapshot.hasData) {
+                                      return Container(
+                                        alignment: Alignment.center,
+                                        height: 650,
+                                        child: const Text(
+                                          'No data.',
+                                          style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 20,
+                                              fontFamily: 'Sofia Pro'),
+                                        ),
+                                      );
+                                    } else if (snapshot.hasError) {
+                                      return Container(
+                                        alignment: Alignment.center,
+                                        height: 650,
+                                        child: const Text(
+                                          'Something went wrong.',
+                                          style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 20,
+                                              fontFamily: 'Sofia Pro'),
+                                        ),
+                                      );
+                                    }
+
                                     Map<String, dynamic> questionnaireData =
                                         snapshot.data!.data()
                                             as Map<String, dynamic>;
@@ -233,8 +291,6 @@ class _StudentsResultsState extends State<StudentsResults> {
                                         ),
                                         ListTile(
                                           onTap: () async {
-                                            //TODO to be implemented
-
                                             setState(() {
                                               viewStudentResult = false;
                                               fullNameView = fullName;

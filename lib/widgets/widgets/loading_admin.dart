@@ -7,26 +7,22 @@ class LoadingAdmin extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 1350,
-      height: 650,
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            SpinKitChasingDots(color: primaryColor, size: 50),
-            SizedBox(height: 20),
-            Text(
-              'Loading...',
-              style: TextStyle(
-                fontSize: 15,
-                color: primaryColor,
-                fontFamily: 'Sofia Pro',
-              ),
-            ),
-          ],
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: const [
+        SizedBox(height: 300),
+        SpinKitChasingDots(color: primaryColor, size: 50),
+        SizedBox(height: 20),
+        Text(
+          'Loading...',
+          style: TextStyle(
+            fontSize: 15,
+            color: primaryColor,
+            fontFamily: 'Sofia Pro',
+          ),
         ),
-      ),
+      ],
     );
   }
 }
