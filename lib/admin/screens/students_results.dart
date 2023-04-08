@@ -287,7 +287,7 @@ class _StudentsResultsState extends State<StudentsResults> {
                                       children: [
                                         const Divider(
                                           height: 0,
-                                          thickness: 5,
+                                          thickness: 1,
                                         ),
                                         ListTile(
                                           onTap: () async {
@@ -383,7 +383,7 @@ class _StudentsResultsState extends State<StudentsResults> {
                                         ),
                                         const Divider(
                                           height: 0,
-                                          thickness: 5,
+                                          thickness: 1,
                                         ),
                                       ],
                                     );

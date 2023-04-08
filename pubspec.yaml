@@ -51,9 +51,11 @@ dependencies:
   pinput: ^2.2.31
   shared_preferences: ^2.0.15
   smooth_page_indicator: ^1.0.0+2
-  syncfusion_flutter_charts: ^20.4.44
+  syncfusion_flutter_charts: ^21.1.38
   toggle_switch: ^2.0.1
   youtube_player_flutter: ^8.1.2
+  syncfusion_flutter_gauges: ^21.1.38
+  syncfusion_flutter_core: ^21.1.38
 
 dev_dependencies:
   flutter_lints: ^2.0.0

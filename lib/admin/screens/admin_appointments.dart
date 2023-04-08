@@ -143,7 +143,7 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
                                   children: [
                                     const Divider(
                                       height: 0,
-                                      thickness: 5,
+                                      thickness: 1,
                                     ),
                                     ListTile(
                                       onTap: () {
@@ -215,7 +215,7 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
                                     ),
                                     const Divider(
                                       height: 0,
-                                      thickness: 5,
+                                      thickness: 1,
                                     ),
                                   ],
                                 );

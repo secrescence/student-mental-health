@@ -140,7 +140,7 @@ class _AdminScheduleState extends State<AdminSchedule> {
                             children: [
                               const Divider(
                                 height: 0,
-                                thickness: 5,
+                                thickness: 1,
                               ),
                               Padding(
                                 padding: const EdgeInsets.symmetric(
@@ -178,7 +178,7 @@ class _AdminScheduleState extends State<AdminSchedule> {
                               ),
                               const Divider(
                                 height: 0,
-                                thickness: 5,
+                                thickness: 1,
                               ),
                             ],
                           );
