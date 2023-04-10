@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:student_mental_health/admin/screens/admin_navigation.dart';
 import 'package:student_mental_health/service/auth_service.dart';
-import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 import 'package:student_mental_health/widgets/widgets/custom_snackbar.dart';
 import 'package:student_mental_health/widgets/widgets/widgets.dart';

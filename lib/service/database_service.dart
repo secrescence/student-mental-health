@@ -58,6 +58,7 @@ class DatabaseService {
       'isUserDoneWithQuestionnaire': false,
       'isUserDoneWithResults': false,
       'whatShouldICallYou': '',
+      'dateSignedUpUsingEmailOnly': DateTime.now(),
     });
   }
 
@@ -756,6 +757,12 @@ class DatabaseService {
     } else {
       return null;
     }
+  }
+
+  Future dateDoneWithQuestionnaire() async {
+    return await userCollection.doc(uid).update({
+      'dateDoneWithQuestionnaire': DateTime.now(),
+    });
   }
 
   //end of db service class

@@ -71,7 +71,6 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
           'assets/logo-violet.png',
           fit: BoxFit.cover,
         ),
-        //TODO - disable back button
         //automaticallyImplyLeading: false,
       ),
       body: Column(

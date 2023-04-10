@@ -12,6 +12,11 @@ class AdminDashboard extends StatefulWidget {
 }
 
 class _AdminDashboardState extends State<AdminDashboard> {
+  DateTime firstDayOfMonth =
+      DateTime(DateTime.now().year, DateTime.now().month, 1);
+  DateTime lastDayOfMonth =
+      DateTime(DateTime.now().year, DateTime.now().month + 1, 0);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -524,106 +529,113 @@ class _AdminDashboardState extends State<AdminDashboard> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        StreamBuilder<QuerySnapshot>(
-                            stream: FirebaseFirestore.instance
-                                .collection('users')
-                                .snapshots(),
-                            builder: (context, snapshot) {
-                              if (!snapshot.hasData || snapshot.data == null) {
-                                return Container(
-                                  height: 15,
-                                );
-                              }
+                        Expanded(
+                          child: StreamBuilder<QuerySnapshot>(
+                              stream: FirebaseFirestore.instance
+                                  .collection('users')
+                                  .where('dateSignedUpUsingEmailOnly',
+                                      isGreaterThanOrEqualTo:
+                                          Timestamp.fromDate(firstDayOfMonth))
+                                  .where('dateSignedUpUsingEmailOnly',
+                                      isLessThanOrEqualTo:
+                                          Timestamp.fromDate(lastDayOfMonth))
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+                                if (!snapshot.hasData ||
+                                    snapshot.data == null) {
+                                  return Container(
+                                    height: 15,
+                                  );
+                                }
 
-                              final getData = snapshot.data!.docs;
-                              final usedTheApp = getData
-                                  .where((result) =>
-                                      result.get(
-                                          'isUserSingedInUsingEmailOnly') ==
-                                      true)
-                                  .length;
-                              final usedTheAppCount = usedTheApp;
+                                final getData = snapshot.data!.docs;
+                                final usedTheApp = getData
+                                    .where((result) =>
+                                        result.get(
+                                            'isUserSingedInUsingEmailOnly') ==
+                                        true)
+                                    .length;
+                                final usedTheAppCount = usedTheApp;
 
-                              final tookQuestionnaire = getData
-                                  .where((result) =>
-                                      result
-                                          .get('isUserDoneWithQuestionnaire') ==
-                                      true)
-                                  .length;
-                              final tookQuestionnaireCount = tookQuestionnaire;
+                                final tookQuestionnaire = getData
+                                    .where((result) =>
+                                        result.get(
+                                            'isUserDoneWithQuestionnaire') ==
+                                        true)
+                                    .length;
+                                final tookQuestionnaireCount =
+                                    tookQuestionnaire;
 
-                              print(usedTheAppCount);
-                              print(tookQuestionnaire);
+                                return StreamBuilder<QuerySnapshot>(
+                                    stream: FirebaseFirestore.instance
+                                        .collection('appointments')
+                                        .where('status', isEqualTo: 'completed')
+                                        .snapshots(),
+                                    builder: (context, snapshot) {
+                                      if (!snapshot.hasData ||
+                                          snapshot.data == null) {
+                                        return Container(
+                                          height: 15,
+                                        );
+                                      }
 
-                              return StreamBuilder<QuerySnapshot>(
-                                  stream: FirebaseFirestore.instance
-                                      .collection('appointments')
-                                      .where('status', isEqualTo: 'completed')
-                                      .snapshots(),
-                                  builder: (context, snapshot) {
-                                    if (!snapshot.hasData ||
-                                        snapshot.data == null) {
-                                      return Container(
-                                        height: 15,
+                                      int visitedGuidanceCount =
+                                          snapshot.data!.docs.length;
+
+                                      return SfCartesianChart(
+                                        // title: ChartTitle(text: 'Internet Users - 2016'),
+                                        plotAreaBorderWidth: 0,
+
+                                        /// X axis as category axis placed here.
+                                        primaryXAxis: CategoryAxis(
+                                          majorGridLines:
+                                              const MajorGridLines(width: 0),
+                                        ),
+                                        primaryYAxis: NumericAxis(
+                                            minimum: 0,
+                                            maximum: 80,
+                                            isVisible: false,
+                                            labelFormat: '{value} Students'),
+                                        series: <
+                                            ColumnSeries<ChartSampleData,
+                                                String>>[
+                                          ColumnSeries<ChartSampleData, String>(
+                                            dataSource: <ChartSampleData>[
+                                              ChartSampleData(
+                                                  category:
+                                                      'Overall no. of students that used the app',
+                                                  value: usedTheAppCount,
+                                                  color: primaryColor),
+                                              ChartSampleData(
+                                                  category:
+                                                      'No. of students who took the questionnaire',
+                                                  value: tookQuestionnaireCount,
+                                                  color: primaryColor),
+                                              ChartSampleData(
+                                                  category:
+                                                      'No. of students that visit the Guidance office',
+                                                  value: visitedGuidanceCount,
+                                                  color: primaryColor),
+                                            ],
+                                            xValueMapper:
+                                                (ChartSampleData data, _) =>
+                                                    data.category as String,
+                                            yValueMapper:
+                                                (ChartSampleData data, _) =>
+                                                    data.value,
+                                            pointColorMapper:
+                                                (ChartSampleData data, _) =>
+                                                    data.color,
+                                            dataLabelSettings:
+                                                const DataLabelSettings(
+                                                    isVisible: true),
+                                          )
+                                        ],
+                                        // tooltipBehavior: _tooltipBehavior,
                                       );
-                                    }
-
-                                    int visitedGuidanceCount =
-                                        snapshot.data!.docs.length;
-
-                                    return SfCartesianChart(
-                                      // title: ChartTitle(text: 'Internet Users - 2016'),
-                                      plotAreaBorderWidth: 0,
-
-                                      /// X axis as category axis placed here.
-                                      primaryXAxis: CategoryAxis(
-                                        majorGridLines:
-                                            const MajorGridLines(width: 0),
-                                      ),
-                                      primaryYAxis: NumericAxis(
-                                          minimum: 0,
-                                          maximum: 80,
-                                          isVisible: false,
-                                          labelFormat: '{value} Students'),
-                                      series: <
-                                          ColumnSeries<ChartSampleData,
-                                              String>>[
-                                        ColumnSeries<ChartSampleData, String>(
-                                          dataSource: <ChartSampleData>[
-                                            ChartSampleData(
-                                                category:
-                                                    'Overall no. of students that used the app',
-                                                value: usedTheAppCount,
-                                                color: primaryColor),
-                                            ChartSampleData(
-                                                category:
-                                                    'No. of students who took the questionnaire',
-                                                value: tookQuestionnaireCount,
-                                                color: primaryColor),
-                                            ChartSampleData(
-                                                category:
-                                                    'No. of students that visit the Guidance office',
-                                                value: visitedGuidanceCount,
-                                                color: primaryColor),
-                                          ],
-                                          xValueMapper:
-                                              (ChartSampleData data, _) =>
-                                                  data.category as String,
-                                          yValueMapper:
-                                              (ChartSampleData data, _) =>
-                                                  data.value,
-                                          pointColorMapper:
-                                              (ChartSampleData data, _) =>
-                                                  data.color,
-                                          dataLabelSettings:
-                                              const DataLabelSettings(
-                                                  isVisible: true),
-                                        )
-                                      ],
-                                      // tooltipBehavior: _tooltipBehavior,
-                                    );
-                                  });
-                            }),
+                                    });
+                              }),
+                        ),
                       ],
                     ),
                   ),

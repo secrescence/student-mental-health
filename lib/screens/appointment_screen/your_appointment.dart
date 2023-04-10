@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:student_mental_health/service/database_service.dart';
@@ -85,7 +84,6 @@ class _YourAppointmentState extends State<YourAppointment> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -106,7 +104,8 @@ class _YourAppointmentState extends State<YourAppointment> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: const [
-                          SizedBox(width: 25),
+                          // SizedBox(width: 20),
+                          // Spacer(),
                           Text('Date',
                               style: TextStyle(
                                 fontSize: 15.5,
@@ -114,7 +113,7 @@ class _YourAppointmentState extends State<YourAppointment> {
                                 fontWeight: FontWeight.w400,
                               )),
                           Spacer(),
-                          SizedBox(width: 15),
+                          // SizedBox(width: 30),
                           Text('Time',
                               style: TextStyle(
                                 fontSize: 15.5,
@@ -122,6 +121,7 @@ class _YourAppointmentState extends State<YourAppointment> {
                                 fontWeight: FontWeight.w400,
                               )),
                           Spacer(),
+                          // SizedBox(width: 30),
                           Text('Status',
                               style: TextStyle(
                                 fontSize: 15.5,
@@ -129,119 +129,113 @@ class _YourAppointmentState extends State<YourAppointment> {
                                 fontWeight: FontWeight.w400,
                               )),
                           // SizedBox(width: 10),
+                          // Spacer(),
                         ],
                       ),
                     ),
-                    SizedBox(
-                      height: 300,
-                      child: StreamBuilder<QuerySnapshot>(
-                        stream: dateOfAppointmentStream,
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData ||
-                              snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                            return const Center(
-                              child: SpinKitChasingDots(
-                                color: primaryColor,
-                                size: 50,
-                              ),
-                            );
-                          }
-                          final List<DocumentSnapshot> document =
-                              snapshot.data!.docs;
-
-                          if (document.isEmpty) {
-                            return const Center(
-                              child: Text(
-                                'No schedule available',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontFamily: 'Sofia Pro',
-                                  fontWeight: FontWeight.w400,
+                    Expanded(
+                      child: SizedBox(
+                        height: 300,
+                        child: StreamBuilder<QuerySnapshot>(
+                          stream: dateOfAppointmentStream,
+                          builder: (context, snapshot) {
+                            if (!snapshot.hasData ||
+                                snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                              return const Center(
+                                child: SpinKitChasingDots(
+                                  color: primaryColor,
+                                  size: 50,
                                 ),
-                              ),
-                            );
-                          }
-
-                          return ListView.builder(
-                            itemCount: document.length,
-                            itemBuilder: (context, index) {
-                              Map<String, dynamic> data = document[index].data()
-                                  as Map<String, dynamic>;
-                              return Column(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 30, vertical: 10),
-                                    child: Row(
-                                      children: [
-                                        // const SizedBox(width: 20),
-                                        Text(data['date'],
-                                            style: const TextStyle(
-                                              fontSize: 15,
-                                              fontFamily: 'Sofia Pro',
-                                              fontWeight: FontWeight.w400,
-                                            )),
-                                        const Spacer(),
-                                        Text(data['time'],
-                                            style: const TextStyle(
-                                              fontSize: 15,
-                                              fontFamily: 'Sofia Pro',
-                                              fontWeight: FontWeight.w400,
-                                            )),
-                                        const SizedBox(width: 35),
-                                        Text(data['status'],
-                                            style: const TextStyle(
-                                              fontSize: 15,
-                                              fontFamily: 'Sofia Pro',
-                                              fontWeight: FontWeight.w400,
-                                            )),
-                                        // const SizedBox(width: 20),
-                                      ],
-                                    ),
-                                  ),
-                                ],
                               );
-                            },
-                          );
-                        },
+                            }
+                            final List<DocumentSnapshot> document =
+                                snapshot.data!.docs;
+
+                            if (document.isEmpty) {
+                              return const Center(
+                                child: Text(
+                                  'You have no appointment yet.',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontFamily: 'Sofia Pro',
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              );
+                            }
+
+                            return ListView.builder(
+                              itemCount: document.length,
+                              itemBuilder: (context, index) {
+                                Map<String, dynamic> data = document[index]
+                                    .data() as Map<String, dynamic>;
+                                return Column(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20, vertical: 10),
+                                      child: Row(
+                                        children: [
+                                          // const SizedBox(width: 20),
+                                          // const Spacer(),
+                                          Text(data['date'],
+                                              style: const TextStyle(
+                                                fontSize: 15,
+                                                fontFamily: 'Sofia Pro',
+                                                fontWeight: FontWeight.w400,
+                                              )),
+                                          // const Spacer(),
+                                          // const SizedBox(width: 30),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 40),
+                                            child: Text(data['time'],
+                                                style: const TextStyle(
+                                                  fontSize: 15,
+                                                  fontFamily: 'Sofia Pro',
+                                                  fontWeight: FontWeight.w400,
+                                                )),
+                                          ),
+                                          // const SizedBox(width: 30),
+                                          Text(data['status'],
+                                              style: const TextStyle(
+                                                fontSize: 15,
+                                                fontFamily: 'Sofia Pro',
+                                                fontWeight: FontWeight.w400,
+                                              )),
+                                          const Spacer(),
+                                          // const SizedBox(width: 20),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        ),
                       ),
                     ),
                   ],
                 )),
           ),
           const SizedBox(height: 40),
-          Padding(
-            padding: const EdgeInsets.only(right: 30),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Visibility(
-                  visible: ifLowAndMidPriority,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      // await DatabaseService().addSchedule(
-                      //     context, '01-01-2023', '10:00 AM', 'fprDocID');
-                    },
-                    style: ButtonStyle(
-                      fixedSize:
-                          MaterialStateProperty.all<Size>(const Size(190, 48)),
-                      foregroundColor:
-                          MaterialStateProperty.all<Color>(Colors.white),
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                          phoneFieldButtonColor),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(7),
-                        ),
-                      ),
-                    ),
-                    child: const Text('Create Appointment',
-                        style:
-                            TextStyle(fontSize: 16, fontFamily: 'Sofia Pro')),
-                  ),
+          Container(
+            alignment: Alignment.center,
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: Visibility(
+              visible: ifLowAndMidPriority,
+              child: const Text(
+                'Note: You are now in our waiting list. Mind that appointment may take long to make way for others who needs urgent attention. For the mean time you can explore other resources while waiting. We will immediately notify you in your email once slot is available. Thank you.',
+                // textAlign: TextAlign.center,
+                style: TextStyle(
+                  height: 1.3,
+                  fontSize: 15,
+                  fontFamily: 'Sofia Pro',
+                  fontWeight: FontWeight.w400,
                 ),
-              ],
+              ),
             ),
           ),
         ],

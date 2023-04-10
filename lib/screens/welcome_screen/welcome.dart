@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:student_mental_health/screens/auth/onboarding.dart';
 import 'package:student_mental_health/screens/welcome_screen/your_privacy_matters.dart';
-import 'package:student_mental_health/service/auth_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 import 'package:student_mental_health/widgets/widgets/custom_button.dart';
 import 'package:student_mental_health/widgets/widgets/widgets.dart';

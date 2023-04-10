@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_toggle_tab/flutter_toggle_tab.dart';
 import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
-import 'package:student_mental_health/widgets/widgets/loading_admin.dart';
 
 class AdminAppointments extends StatefulWidget {
   const AdminAppointments({super.key});
@@ -70,7 +70,24 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
                         AsyncSnapshot<QuerySnapshot> snapshot) {
                       if (!snapshot.hasData ||
                           snapshot.connectionState == ConnectionState.waiting) {
-                        return const LoadingAdmin();
+                        return Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SizedBox(height: viewAppointment ? 300 : 400),
+                            const SpinKitChasingDots(
+                                color: primaryColor, size: 50),
+                            const SizedBox(height: 20),
+                            const Text(
+                              'Loading...',
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: primaryColor,
+                                fontFamily: 'Sofia Pro',
+                              ),
+                            ),
+                          ],
+                        );
                       } else if (snapshot.data!.docs.isEmpty) {
                         return Container(
                           alignment: Alignment.center,
@@ -118,7 +135,7 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
                                 if (!snapshot.hasData ||
                                     snapshot.connectionState ==
                                         ConnectionState.waiting) {
-                                  return const LoadingAdmin();
+                                  return Container();
                                 } else if (snapshot.hasError) {
                                   return const Center(
                                     child: Text(

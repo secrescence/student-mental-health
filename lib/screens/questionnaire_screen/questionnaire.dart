@@ -216,6 +216,9 @@ class _QuestionnaireState extends State<Questionnaire> {
                 await DatabaseService(
                         uid: FirebaseAuth.instance.currentUser!.uid)
                     .userDoneWithQuestionnaire();
+                await DatabaseService(
+                        uid: FirebaseAuth.instance.currentUser!.uid)
+                    .dateDoneWithQuestionnaire();
                 //what priority is the user
                 if (grandMean > 4) {
                   await DatabaseService(

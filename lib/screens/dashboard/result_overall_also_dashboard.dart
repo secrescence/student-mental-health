@@ -264,12 +264,6 @@ class _ResultOverallAlsoDashboardState
           Visibility(
             visible: showLowAndMidPriority,
             child: GestureDetector(
-              // onTap: () {
-              //   _showBottomSheet(context);
-              //   setState(() {
-              //     showLowAndMidPriority = true;
-              //   });
-              // },
               onVerticalDragStart: (details) {
                 _showBottomSheet(context);
                 setState(() {
@@ -299,28 +293,6 @@ class _ResultOverallAlsoDashboardState
       ),
     );
   }
-
-  // _showBottomSheet(BuildContext context) {
-  //   showModalBottomSheet(
-  //     context: context,
-  //     barrierColor: Colors.transparent,
-  //     isDismissible: false,
-  //     isScrollControlled: true,
-  //     backgroundColor: Colors.grey[200],
-  //     shape: const RoundedRectangleBorder(
-  //       borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-  //     ),
-  //     builder: (context) => DraggableScrollableSheet(
-  //       expand: false,
-  //       initialChildSize: 0.2,
-  //       maxChildSize: 0.2,
-  //       minChildSize: 0.1,
-  //       builder: (context, scrollController) => SingleChildScrollView(
-  //         child: _bottomSheetUI(),
-  //       ),
-  //     ),
-  //   );
-  // }
 
   _showBottomSheet(BuildContext context) {
     showModalBottomSheet(
@@ -378,13 +350,11 @@ class _ResultOverallAlsoDashboardState
           ),
           const SizedBox(height: 25),
           Container(
-            height: 170,
             padding: const EdgeInsets.symmetric(horizontal: 30),
             child: Column(
               children: [
                 GestureDetector(
                   onTap: () async {
-                    print('Articles');
                     nextScreen(
                         context, Articles(highestCategory: highestCategory));
                   },
@@ -402,7 +372,6 @@ class _ResultOverallAlsoDashboardState
                 const SizedBox(height: 13),
                 GestureDetector(
                   onTap: () {
-                    print('Videos');
                     nextScreen(
                         context, Videos(highestCategory: highestCategory));
                   },
@@ -435,7 +404,6 @@ class _ResultOverallAlsoDashboardState
                 GestureDetector(
                   onTap: () {
                     nextScreen(context, const Journal());
-                    print('Journal');
                   },
                   child: const SizedBox(
                     width: double.infinity,
@@ -449,16 +417,7 @@ class _ResultOverallAlsoDashboardState
                 const SizedBox(height: 13),
                 GestureDetector(
                   onTap: () async {
-                    // print(DateTime.now().toIso8601String());
                     nextScreen(context, const TakeQuestionnaireAgain());
-                    // FirebaseFirestore.instance
-                    //     .collection('users')
-                    //     .doc('QVyl4dVWJeg3ruVPbKkcuOcPcgu2')
-                    //     .collection('questionnaireResult')
-                    //     .doc('QVyl4dVWJeg3ruVPbKkcuOcPcgu2')
-                    //     .update({
-                    //   'dateAnswered': DateTime.now().toString(),
-                    // });
                   },
                   child: const SizedBox(
                     width: double.infinity,
@@ -469,40 +428,6 @@ class _ResultOverallAlsoDashboardState
                             fontFamily: 'Sofia Pro')),
                   ),
                 ),
-                // const SizedBox(height: 13),
-                // GestureDetector(
-                //   onTap: () async {
-                //     print('Add schedule');
-
-                //     // await DatabaseService().addSchedule(
-                //     //   context,
-                //     //   '03-20-2023',
-                //     //   '10:00 AM',
-                //     // );
-                //   },
-                //   child: const SizedBox(
-                //     width: double.infinity,
-                //     child: Text('Add appointment',
-                //         style: TextStyle(
-                //             color: Colors.black54,
-                //             fontSize: 17,
-                //             fontFamily: 'Sofia Pro')),
-                //   ),
-                // ),
-                // const SizedBox(height: 13),
-                // GestureDetector(
-                //   onTap: () async {
-                //     print('appoint user');
-                //   },
-                //   child: const SizedBox(
-                //     width: double.infinity,
-                //     child: Text('Appoint user',
-                //         style: TextStyle(
-                //             color: Colors.black54,
-                //             fontSize: 17,
-                //             fontFamily: 'Sofia Pro')),
-                //   ),
-                // ),
                 const SizedBox(height: 25),
               ],
             ),

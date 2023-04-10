@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:pinput/pinput.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 import 'package:student_mental_health/service/auth_service.dart';
 import 'package:student_mental_health/widgets/widgets/custom_snackbar.dart';
@@ -371,7 +370,6 @@ class _SignUpUserInfoState extends State<SignUpUserInfo> {
                                     ))
                                 .toList(),
                             onChanged: ((value) {
-                              print(value);
                               setState(() {
                                 _departmentSelectedValue = value;
                               });

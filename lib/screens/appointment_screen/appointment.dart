@@ -126,7 +126,7 @@ class _AppointmentState extends State<Appointment> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: const [
-                          SizedBox(width: 45),
+                          Spacer(),
                           Text('Date',
                               style: TextStyle(
                                 fontSize: 15.5,
@@ -134,13 +134,14 @@ class _AppointmentState extends State<Appointment> {
                                 fontWeight: FontWeight.w400,
                               )),
                           Spacer(),
+                          SizedBox(width: 70),
                           Text('Time',
                               style: TextStyle(
                                 fontSize: 15.5,
                                 fontFamily: 'Sofia Pro',
                                 fontWeight: FontWeight.w400,
                               )),
-                          SizedBox(width: 28),
+                          Spacer(),
                         ],
                       ),
                     ),
@@ -179,12 +180,17 @@ class _AppointmentState extends State<Appointment> {
                                   as Map<String, dynamic>;
                               return Column(
                                 children: [
+                                  // const Divider(
+                                  //   height: 0,
+                                  //   thickness: 0.7,
+                                  // ),
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 30, vertical: 10),
                                     child: Row(
                                       children: [
-                                        const SizedBox(width: 35),
+                                        // const SizedBox(width: 35),
+                                        const Spacer(),
                                         Text(data['date'],
                                             style: const TextStyle(
                                               fontSize: 15,
@@ -192,16 +198,22 @@ class _AppointmentState extends State<Appointment> {
                                               fontWeight: FontWeight.w400,
                                             )),
                                         const Spacer(),
+                                        const SizedBox(width: 40),
                                         Text(data['time'],
                                             style: const TextStyle(
                                               fontSize: 15,
                                               fontFamily: 'Sofia Pro',
                                               fontWeight: FontWeight.w400,
                                             )),
-                                        const SizedBox(width: 40),
+                                        // const SizedBox(width: 40),
+                                        const Spacer(),
                                       ],
                                     ),
                                   ),
+                                  // const Divider(
+                                  //   height: 0,
+                                  //   thickness: 0.7,
+                                  // ),
                                 ],
                               );
                             },
@@ -221,8 +233,76 @@ class _AppointmentState extends State<Appointment> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   ElevatedButton(
-                    onPressed: () async {
-                      //TODO to be implemented create appointment
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (context) => AlertDialog(
+                          title: const Text(
+                            'Create Appointment',
+                            style: TextStyle(
+                                fontFamily: 'Sofia Pro',
+                                fontWeight: FontWeight.w600),
+                          ),
+                          content: const SizedBox(
+                            height: 50,
+                            child: SingleChildScrollView(
+                              child: Text(
+                                  'Are you sure you want to create an appointment?',
+                                  style: TextStyle(
+                                    fontFamily: 'Sofia Pro',
+                                    height: 1.50,
+                                  )),
+                            ),
+                          ),
+                          actions: [
+                            TextButton(
+                                onPressed: () {
+                                  nextScreenPop(context);
+                                },
+                                child: const Text(
+                                  'Cancel',
+                                  style: TextStyle(
+                                      color: primaryColor,
+                                      fontFamily: 'Sofia Pro'),
+                                )),
+                            ElevatedButton(
+                                onPressed: () async {
+                                  await DatabaseService(
+                                          uid: FirebaseAuth
+                                              .instance.currentUser!.uid)
+                                      .appointUser(context, '3')
+                                      .then((value) {
+                                    nextScreenPop(context);
+                                    nextScreen(
+                                        context, const YourAppointment());
+                                  });
+                                },
+                                style: ButtonStyle(
+                                  fixedSize: MaterialStateProperty.all<Size>(
+                                      const Size(80, 40)),
+                                  foregroundColor:
+                                      MaterialStateProperty.all<Color>(
+                                          Colors.white),
+                                  backgroundColor:
+                                      MaterialStateProperty.all<Color>(
+                                          phoneFieldButtonColor),
+                                  shape: MaterialStateProperty.all<
+                                      RoundedRectangleBorder>(
+                                    RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(7),
+                                    ),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Okay',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontFamily: 'Sofia Pro'),
+                                ))
+                          ],
+                        ),
+                      );
                     },
                     style: ButtonStyle(
                       fixedSize:
