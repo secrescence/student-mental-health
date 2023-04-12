@@ -7,6 +7,7 @@ import 'package:student_mental_health/screens/appointment_screen/your_appointmen
 import 'package:student_mental_health/screens/dashboard/articles.dart';
 import 'package:student_mental_health/screens/dashboard/journal.dart';
 import 'package:student_mental_health/screens/dashboard/account_settings.dart';
+import 'package:student_mental_health/screens/dashboard/my_result.dart';
 import 'package:student_mental_health/screens/dashboard/videos.dart';
 import 'package:student_mental_health/screens/questionnaire_screen/take_questionnaire_again.dart';
 import 'package:student_mental_health/service/database_service.dart';
@@ -306,13 +307,10 @@ class _ResultOverallAlsoDashboardState
         ),
         builder: (context) => DraggableScrollableSheet(
               expand: false,
-              initialChildSize: 0.246,
-              maxChildSize: 0.246,
-              minChildSize: 0.246,
-              builder: (context, scrollController) => SingleChildScrollView(
-                controller: scrollController,
-                child: _bottomSheetUI(),
-              ),
+              initialChildSize: 0.258,
+              maxChildSize: 0.258,
+              minChildSize: 0.258,
+              builder: (context, scrollController) => _bottomSheetUI(),
             ));
   }
 
@@ -348,7 +346,7 @@ class _ResultOverallAlsoDashboardState
               ),
             ),
           ),
-          const SizedBox(height: 25),
+          const SizedBox(height: 20),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 30),
             child: Column(
@@ -428,7 +426,21 @@ class _ResultOverallAlsoDashboardState
                             fontFamily: 'Sofia Pro')),
                   ),
                 ),
-                const SizedBox(height: 25),
+                const SizedBox(height: 13),
+                GestureDetector(
+                  onTap: () async {
+                    nextScreen(context, const MyResult());
+                  },
+                  child: const SizedBox(
+                    width: double.infinity,
+                    child: Text('My Result',
+                        style: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 17,
+                            fontFamily: 'Sofia Pro')),
+                  ),
+                ),
+                const SizedBox(height: 12),
               ],
             ),
           ),

@@ -15,11 +15,6 @@ class Appointment extends StatefulWidget {
 }
 
 class _AppointmentState extends State<Appointment> {
-  Map<String, dynamic> schedule = {
-    "date": "8-23-20",
-    "time": "1:00",
-    "availability": false,
-  };
 
   Stream<QuerySnapshot>? scheduleStream;
 
@@ -114,111 +109,111 @@ class _AppointmentState extends State<Appointment> {
                           style: TextStyle(
                             fontSize: 19,
                             fontFamily: 'Sofia Pro',
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.w700,
                           )),
                     ),
                     const Divider(
                         thickness: 1, color: Color(0xFFE5E5E5), height: 0),
-                    const SizedBox(height: 5),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 40, vertical: 5),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: const [
-                          Spacer(),
-                          Text('Date',
-                              style: TextStyle(
-                                fontSize: 15.5,
-                                fontFamily: 'Sofia Pro',
-                                fontWeight: FontWeight.w400,
-                              )),
-                          Spacer(),
-                          SizedBox(width: 70),
-                          Text('Time',
-                              style: TextStyle(
-                                fontSize: 15.5,
-                                fontFamily: 'Sofia Pro',
-                                fontWeight: FontWeight.w400,
-                              )),
-                          Spacer(),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: 300,
-                      child: StreamBuilder<QuerySnapshot>(
-                        stream: scheduleStream,
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData ||
-                              snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                            return const Center(
-                              child: SpinKitChasingDots(
-                                color: primaryColor,
-                                size: 50,
-                              ),
-                            );
-                          }
-                          List<DocumentSnapshot> schedule = snapshot.data!.docs;
-                          if (schedule.isEmpty) {
-                            return const Center(
-                              child: Text(
-                                'No schedule available',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontFamily: 'Sofia Pro',
-                                  fontWeight: FontWeight.w400,
+                    Expanded(
+                      child: SizedBox(
+                        height: 300,
+                        child: StreamBuilder<QuerySnapshot>(
+                          stream: scheduleStream,
+                          builder: (context, snapshot) {
+                            if (!snapshot.hasData ||
+                                snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                              return const Center(
+                                child: SpinKitChasingDots(
+                                  color: primaryColor,
+                                  size: 50,
                                 ),
-                              ),
-                            );
-                          }
-                          return ListView.builder(
-                            itemCount: schedule.length,
-                            itemBuilder: (context, index) {
-                              Map<String, dynamic> data = schedule[index].data()
-                                  as Map<String, dynamic>;
-                              return Column(
-                                children: [
-                                  // const Divider(
-                                  //   height: 0,
-                                  //   thickness: 0.7,
-                                  // ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 30, vertical: 10),
-                                    child: Row(
-                                      children: [
-                                        // const SizedBox(width: 35),
-                                        const Spacer(),
-                                        Text(data['date'],
-                                            style: const TextStyle(
-                                              fontSize: 15,
-                                              fontFamily: 'Sofia Pro',
-                                              fontWeight: FontWeight.w400,
-                                            )),
-                                        const Spacer(),
-                                        const SizedBox(width: 40),
-                                        Text(data['time'],
-                                            style: const TextStyle(
-                                              fontSize: 15,
-                                              fontFamily: 'Sofia Pro',
-                                              fontWeight: FontWeight.w400,
-                                            )),
-                                        // const SizedBox(width: 40),
-                                        const Spacer(),
-                                      ],
-                                    ),
-                                  ),
-                                  // const Divider(
-                                  //   height: 0,
-                                  //   thickness: 0.7,
-                                  // ),
-                                ],
                               );
-                            },
-                          );
-                        },
+                            }
+                            List<DocumentSnapshot> schedule =
+                                snapshot.data!.docs;
+                            if (schedule.isEmpty) {
+                              return const Center(
+                                child: Text(
+                                  'No schedule available',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontFamily: 'Sofia Pro',
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              );
+                            }
+                            return Table(
+                              children: [
+                                const TableRow(
+                                  children: [
+                                    TableCell(
+                                      child: Center(
+                                        child: Padding(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: Text(
+                                            'Date',
+                                            style: TextStyle(
+                                                fontFamily: 'Sofia Pro',
+                                                fontWeight: FontWeight.w600),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    TableCell(
+                                      child: Center(
+                                        child: Padding(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: Text(
+                                            'Time',
+                                            style: TextStyle(
+                                                fontFamily: 'Sofia Pro',
+                                                fontWeight: FontWeight.w600),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                ...schedule.map((snapshot) {
+                                  Map<String, dynamic> data =
+                                      snapshot.data() as Map<String, dynamic>;
+                                  return TableRow(
+                                    children: [
+                                      TableCell(
+                                        child: Center(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              data['date'],
+                                              style: const TextStyle(
+                                                fontFamily: 'Sofia Pro',
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      TableCell(
+                                        child: Center(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              data['time'],
+                                              style: const TextStyle(
+                                                fontFamily: 'Sofia Pro',
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                }).toList(),
+                              ],
+                            );
+                          },
+                        ),
                       ),
                     ),
                   ],

@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:student_mental_health/widgets/widgets/custom_snackbar.dart';
+import 'package:http/http.dart' as http;
 
 class DatabaseService {
   final String? uid;
@@ -23,6 +26,38 @@ class DatabaseService {
       FirebaseFirestore.instance.collection('journal');
 
   StreamSubscription<QuerySnapshot>? queueSubscription;
+
+  Future sendEmail() async {
+    String userName =
+        await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
+            .getUserName();
+    String userEmail =
+        await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
+            .getUserEmail();
+    String message =
+        'Good day! you have an appointment with the guidance counselor. Please check your appointment screen for more details.';
+
+    const serviceId = 'service_9jrgmse';
+    const templateId = 'template_3avfj5g';
+    const userId = 'V2rX-nEaZfwpSl1uI';
+    final url = Uri.parse('https://api.emailjs.com/api/v1.0/email/send');
+    await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'service_id': serviceId,
+        'template_id': templateId,
+        'user_id': userId,
+        'template_params': {
+          'user_name': userName,
+          'to_email': userEmail,
+          'message': message,
+        },
+      }),
+    );
+  }
 
   //delete user
   Future deleteUser() async {
@@ -57,6 +92,7 @@ class DatabaseService {
       'isUserDoneWithChatbot': false,
       'isUserDoneWithQuestionnaire': false,
       'isUserDoneWithResults': false,
+      'inWaitingList': false,
       'whatShouldICallYou': '',
       'dateSignedUpUsingEmailOnly': DateTime.now(),
     });
@@ -398,6 +434,7 @@ class DatabaseService {
           'appointedUser': uid,
           'priorityNumber': priority,
         });
+        sendEmail();
         return;
       }
     }
@@ -407,6 +444,10 @@ class DatabaseService {
       'uid': uid,
       'priority': priority,
       'timestamp': Timestamp.now(),
+    });
+
+    await userCollection.doc(uid).update({
+      'inWaitingList': true,
     });
 
     // Listen to the waiting list collection and automatically appoint a user when a new schedule becomes available
@@ -432,6 +473,7 @@ class DatabaseService {
               'appointedUser': waitingListDoc.get('uid'),
               'priorityNumber': waitingListDoc.get('priority'),
             });
+            sendEmail();
           }
         }
       }
@@ -763,6 +805,16 @@ class DatabaseService {
     return await userCollection.doc(uid).update({
       'dateDoneWithQuestionnaire': DateTime.now(),
     });
+  }
+
+  Future getIsInWaitingList() async {
+    DocumentReference d = userCollection.doc(uid);
+    DocumentSnapshot documentSnapshot = await d.get();
+    if (documentSnapshot.exists) {
+      return documentSnapshot['inWaitingList'];
+    } else {
+      return null;
+    }
   }
 
   //end of db service class

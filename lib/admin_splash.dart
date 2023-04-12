@@ -6,6 +6,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:student_mental_health/admin/auth/admin_signin.dart';
 import 'package:student_mental_health/admin/screens/admin_navigation.dart';
 import 'package:student_mental_health/helper/helper_function.dart';
+import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 import 'package:student_mental_health/widgets/widgets/widgets.dart';
 
@@ -23,7 +24,7 @@ class _AdminSplashState extends State<AdminSplash> {
 
   @override
   void initState() {
-    handleAppointments();
+    DatabaseService().listenToAppointmentsCollection();
     getAdminLoggedInStatus();
     Future.delayed(const Duration(milliseconds: 500)).then((value) =>
         _isAdminSignedIn
@@ -38,40 +39,6 @@ class _AdminSplashState extends State<AdminSplash> {
         setState(() {
           _isAdminSignedIn = value;
         });
-      }
-    });
-  }
-
-  Future<void> handleAppointments() async {
-    queueSubscription = FirebaseFirestore.instance
-        .collection('appointmentsQueue')
-        .orderBy('priority')
-        .orderBy('timestamp')
-        .snapshots()
-        .listen((snapshot) async {
-      // Find an available slot
-      for (QueryDocumentSnapshot doc in snapshot.docs) {
-        final int priority = doc.get('priority');
-        final String userId = doc.get('userId');
-        final QuerySnapshot appointmentsSnapshot = await FirebaseFirestore
-            .instance
-            .collection('appointments')
-            .where('appointedUser', isEqualTo: '')
-            .where('appointedUserPriority', isEqualTo: priority)
-            .orderBy('date')
-            .orderBy('time')
-            .limit(1)
-            .get();
-        if (appointmentsSnapshot.docs.isNotEmpty) {
-          final String appointmentId = appointmentsSnapshot.docs[0].id;
-          await FirebaseFirestore.instance
-              .collection('appointments')
-              .doc(appointmentId)
-              .update({
-            'appointedUser': userId,
-          });
-          await doc.reference.delete();
-        }
       }
     });
   }

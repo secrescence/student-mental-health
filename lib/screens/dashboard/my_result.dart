@@ -9,14 +9,14 @@ import 'package:student_mental_health/widgets/widgets/widgets.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'dart:core';
 
-class ResultCategories extends StatefulWidget {
-  const ResultCategories({super.key});
+class MyResult extends StatefulWidget {
+  const MyResult({super.key});
 
   @override
-  State<ResultCategories> createState() => _ResultCategoriesState();
+  State<MyResult> createState() => _MyResultState();
 }
 
-class _ResultCategoriesState extends State<ResultCategories> {
+class _MyResultState extends State<MyResult> {
   List<QuestionnaireResult>? _results;
   TooltipBehavior? _tooltipBehavior;
   String? highestCategory;
@@ -55,11 +55,24 @@ class _ResultCategoriesState extends State<ResultCategories> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          leading: IconButton(
+            onPressed: () {
+              nextScreenPop(context);
+            },
+            icon: const Icon(
+              Icons.arrow_back_ios,
+              color: Color(0xFF000000),
+            ),
+          ),
+        ),
         body: SingleChildScrollView(
           child: Column(
             children: [
               const Padding(
-                padding: EdgeInsets.only(top: 30, bottom: 25),
+                padding: EdgeInsets.only(top: 10, bottom: 25),
                 child: Text('Results',
                     style: TextStyle(
                       fontFamily: 'Sofia Pro',
@@ -148,7 +161,7 @@ class _ResultCategoriesState extends State<ResultCategories> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.only(top: 20, left: 10, bottom: 0),
+                padding: const EdgeInsets.only(top: 30, left: 10, bottom: 0),
                 child: SfCircularChart(
                   margin: const EdgeInsets.symmetric(horizontal: 10),
                   tooltipBehavior: _tooltipBehavior,
@@ -208,7 +221,7 @@ class _ResultCategoriesState extends State<ResultCategories> {
               ),
               Container(
                 alignment: Alignment.centerLeft,
-                padding: const EdgeInsets.only(left: 35, bottom: 20, top: 20),
+                padding: const EdgeInsets.only(left: 35, bottom: 20, top: 30),
                 child: const Text('Find out more about the categories:',
                     style: TextStyle(
                       fontFamily: 'Sofia Pro',
@@ -267,18 +280,6 @@ class _ResultCategoriesState extends State<ResultCategories> {
                   ),
                 ),
               ),
-              const SizedBox(height: 50),
-              CustomButton(
-                text: 'Next',
-                onPressed: () async {
-                  await DatabaseService(
-                          uid: FirebaseAuth.instance.currentUser?.uid)
-                      .userDoneWithResults();
-                  if (!mounted) return;
-                  nextScreen(context, const ResultOverallAlsoDashboard());
-                },
-                color: phoneFieldButtonColor,
-              )
             ],
           ),
         ),

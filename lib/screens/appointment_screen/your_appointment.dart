@@ -17,7 +17,8 @@ class _YourAppointmentState extends State<YourAppointment> {
   Stream<QuerySnapshot>? dateOfAppointmentStream;
   String dateThatCurrentUserIsAppointed = '';
   String? priority;
-  bool ifLowAndMidPriority = false;
+  bool ifLowPriority = false;
+  bool ifInWaitingList = false;
 
   @override
   void initState() {
@@ -27,14 +28,11 @@ class _YourAppointmentState extends State<YourAppointment> {
 
   getPriority() async {
     await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
-        .checkPriority()
+        .getIsInWaitingList()
         .then((value) async {
-      setState(() {
-        priority = value;
-      });
-      if (priority == 'Low Priority') {
+      if (value == true) {
         setState(() {
-          ifLowAndMidPriority = true;
+          ifInWaitingList = true;
         });
       }
     });
@@ -45,14 +43,6 @@ class _YourAppointmentState extends State<YourAppointment> {
       setState(() {
         dateOfAppointmentStream = value;
       });
-      // await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
-      //     .getOnlySpecificScheduleDate(dateThatCurrentUserIsAppointed)
-      //     .then((value) {
-      //   setState(() {
-      //     scheduleStream = value;
-      //   });
-      //   print(value);
-      // });
     });
   }
 
@@ -93,46 +83,10 @@ class _YourAppointmentState extends State<YourAppointment> {
                           style: TextStyle(
                               fontSize: 19,
                               fontFamily: 'Sofia Pro',
-                              fontWeight: FontWeight.w500)),
+                              fontWeight: FontWeight.w700)),
                     ),
                     const Divider(
                         thickness: 1, color: Color(0xFFE5E5E5), height: 0),
-                    const SizedBox(height: 5),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 40, vertical: 5),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: const [
-                          // SizedBox(width: 20),
-                          // Spacer(),
-                          Text('Date',
-                              style: TextStyle(
-                                fontSize: 15.5,
-                                fontFamily: 'Sofia Pro',
-                                fontWeight: FontWeight.w400,
-                              )),
-                          Spacer(),
-                          // SizedBox(width: 30),
-                          Text('Time',
-                              style: TextStyle(
-                                fontSize: 15.5,
-                                fontFamily: 'Sofia Pro',
-                                fontWeight: FontWeight.w400,
-                              )),
-                          Spacer(),
-                          // SizedBox(width: 30),
-                          Text('Status',
-                              style: TextStyle(
-                                fontSize: 15.5,
-                                fontFamily: 'Sofia Pro',
-                                fontWeight: FontWeight.w400,
-                              )),
-                          // SizedBox(width: 10),
-                          // Spacer(),
-                        ],
-                      ),
-                    ),
                     Expanded(
                       child: SizedBox(
                         height: 300,
@@ -165,53 +119,99 @@ class _YourAppointmentState extends State<YourAppointment> {
                               );
                             }
 
-                            return ListView.builder(
-                              itemCount: document.length,
-                              itemBuilder: (context, index) {
-                                Map<String, dynamic> data = document[index]
-                                    .data() as Map<String, dynamic>;
-                                return Column(
+                            return Table(
+                              children: [
+                                const TableRow(
                                   children: [
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 20, vertical: 10),
-                                      child: Row(
-                                        children: [
-                                          // const SizedBox(width: 20),
-                                          // const Spacer(),
-                                          Text(data['date'],
-                                              style: const TextStyle(
-                                                fontSize: 15,
+                                    TableCell(
+                                      child: Center(
+                                        child: Padding(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: Text(
+                                            'Date',
+                                            style: TextStyle(
                                                 fontFamily: 'Sofia Pro',
-                                                fontWeight: FontWeight.w400,
-                                              )),
-                                          // const Spacer(),
-                                          // const SizedBox(width: 30),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 40),
-                                            child: Text(data['time'],
-                                                style: const TextStyle(
-                                                  fontSize: 15,
-                                                  fontFamily: 'Sofia Pro',
-                                                  fontWeight: FontWeight.w400,
-                                                )),
+                                                fontWeight: FontWeight.w600),
                                           ),
-                                          // const SizedBox(width: 30),
-                                          Text(data['status'],
-                                              style: const TextStyle(
-                                                fontSize: 15,
+                                        ),
+                                      ),
+                                    ),
+                                    TableCell(
+                                      child: Center(
+                                        child: Padding(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: Text(
+                                            'Time',
+                                            style: TextStyle(
                                                 fontFamily: 'Sofia Pro',
-                                                fontWeight: FontWeight.w400,
-                                              )),
-                                          const Spacer(),
-                                          // const SizedBox(width: 20),
-                                        ],
+                                                fontWeight: FontWeight.w600),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    TableCell(
+                                      child: Center(
+                                        child: Padding(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: Text(
+                                            'Status',
+                                            style: TextStyle(
+                                                fontFamily: 'Sofia Pro',
+                                                fontWeight: FontWeight.w600),
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ],
-                                );
-                              },
+                                ),
+                                ...document.map((snapshot) {
+                                  Map<String, dynamic> data =
+                                      snapshot.data() as Map<String, dynamic>;
+                                  return TableRow(
+                                    children: [
+                                      TableCell(
+                                        child: Center(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              data['date'],
+                                              style: const TextStyle(
+                                                fontFamily: 'Sofia Pro',
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      TableCell(
+                                        child: Center(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              data['time'],
+                                              style: const TextStyle(
+                                                fontFamily: 'Sofia Pro',
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      TableCell(
+                                        child: Center(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              data['status'],
+                                              style: const TextStyle(
+                                                fontFamily: 'Sofia Pro',
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                }).toList(),
+                              ],
                             );
                           },
                         ),
@@ -221,14 +221,29 @@ class _YourAppointmentState extends State<YourAppointment> {
                 )),
           ),
           const SizedBox(height: 40),
-          Container(
-            alignment: Alignment.center,
-            padding: const EdgeInsets.symmetric(horizontal: 40),
-            child: Visibility(
-              visible: ifLowAndMidPriority,
+          Visibility(
+            visible: ifLowPriority,
+            child: Container(
+              alignment: Alignment.center,
+              padding: const EdgeInsets.symmetric(horizontal: 40),
               child: const Text(
                 'Note: You are now in our waiting list. Mind that appointment may take long to make way for others who needs urgent attention. For the mean time you can explore other resources while waiting. We will immediately notify you in your email once slot is available. Thank you.',
-                // textAlign: TextAlign.center,
+                style: TextStyle(
+                  height: 1.3,
+                  fontSize: 15,
+                  fontFamily: 'Sofia Pro',
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ),
+          ),
+          Visibility(
+            visible: ifInWaitingList,
+            child: Container(
+              alignment: Alignment.center,
+              padding: const EdgeInsets.symmetric(horizontal: 40),
+              child: const Text(
+                'Note: The appointment slots are full as of the moment. We will notify you via email once you get a slot. You are our priority so waiting won\'t take that long. Thank you for understanding.',
                 style: TextStyle(
                   height: 1.3,
                   fontSize: 15,

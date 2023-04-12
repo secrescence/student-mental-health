@@ -61,187 +61,194 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
                       ],
                     ),
                   ),
-                  StreamBuilder<QuerySnapshot>(
-                    stream: FirebaseFirestore.instance
-                        .collection('appointments')
-                        .where('appointedUser', isNotEqualTo: '')
-                        .snapshots(),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (!snapshot.hasData ||
-                          snapshot.connectionState == ConnectionState.waiting) {
-                        return Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            SizedBox(height: viewAppointment ? 300 : 400),
-                            const SpinKitChasingDots(
-                                color: primaryColor, size: 50),
-                            const SizedBox(height: 20),
-                            const Text(
-                              'Loading...',
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: primaryColor,
-                                fontFamily: 'Sofia Pro',
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: StreamBuilder<QuerySnapshot>(
+                        stream: FirebaseFirestore.instance
+                            .collection('appointments')
+                            .where('appointedUser', isNotEqualTo: '')
+                            .snapshots(),
+                        builder: (BuildContext context,
+                            AsyncSnapshot<QuerySnapshot> snapshot) {
+                          if (!snapshot.hasData ||
+                              snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                            return Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                SizedBox(height: viewAppointment ? 300 : 400),
+                                const SpinKitChasingDots(
+                                    color: primaryColor, size: 50),
+                                const SizedBox(height: 20),
+                                const Text(
+                                  'Loading...',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: primaryColor,
+                                    fontFamily: 'Sofia Pro',
+                                  ),
+                                ),
+                              ],
+                            );
+                          } else if (snapshot.data!.docs.isEmpty) {
+                            return Container(
+                              alignment: Alignment.center,
+                              height: 650,
+                              child: const Text(
+                                'No appointments yet.',
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 20,
+                                    fontFamily: 'Sofia Pro'),
                               ),
-                            ),
-                          ],
-                        );
-                      } else if (snapshot.data!.docs.isEmpty) {
-                        return Container(
-                          alignment: Alignment.center,
-                          height: 650,
-                          child: const Text(
-                            'No appointments yet.',
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 20,
-                                fontFamily: 'Sofia Pro'),
-                          ),
-                        );
-                      } else if (snapshot.hasError) {
-                        return const Center(
-                          child: Text(
-                            'Something went wrong',
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                                fontFamily: 'Sofia Pro'),
-                          ),
-                        );
-                      }
+                            );
+                          } else if (snapshot.hasError) {
+                            return const Center(
+                              child: Text(
+                                'Something went wrong',
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w600,
+                                    fontFamily: 'Sofia Pro'),
+                              ),
+                            );
+                          }
 
-                      return Visibility(
-                        visible: viewAppointment,
-                        replacement: viewAppointmentWidget(),
-                        child: ListView(
-                          shrinkWrap: true,
-                          children: snapshot.data!.docs
-                              .map((DocumentSnapshot document) {
-                            Map<String, dynamic> data =
-                                document.data() as Map<String, dynamic>;
+                          return Visibility(
+                            visible: viewAppointment,
+                            replacement: viewAppointmentWidget(),
+                            child: ListView(
+                              shrinkWrap: true,
+                              children: snapshot.data!.docs
+                                  .map((DocumentSnapshot document) {
+                                Map<String, dynamic> data =
+                                    document.data() as Map<String, dynamic>;
 
-                            final String userId = data['appointedUser'];
-                            final String status = data['status'];
+                                final String userId = data['appointedUser'];
+                                final String status = data['status'];
 
-                            return StreamBuilder<DocumentSnapshot>(
-                              stream: FirebaseFirestore.instance
-                                  .collection('users')
-                                  .doc(userId)
-                                  .snapshots(),
-                              builder: (context, snapshot) {
-                                if (!snapshot.hasData ||
-                                    snapshot.connectionState ==
-                                        ConnectionState.waiting) {
-                                  return Container();
-                                } else if (snapshot.hasError) {
-                                  return const Center(
-                                    child: Text(
-                                      'Something went wrong',
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w600,
-                                          fontFamily: 'Sofia Pro'),
-                                    ),
-                                  );
-                                }
-                                Map<String, dynamic> userData = snapshot.data!
-                                    .data() as Map<String, dynamic>;
-
-                                // fullNameView =
-                                //     '${userData['firstName']} ${userData['lastName']}';
-                                String fullName =
-                                    '${userData['firstName']} ${userData['lastName']}';
-
-                                return Column(
-                                  children: [
-                                    const Divider(
-                                      height: 0,
-                                      thickness: 1,
-                                    ),
-                                    ListTile(
-                                      onTap: () {
-                                        setState(() {
-                                          isBannerVisible = false;
-                                          viewAppointment = false;
-                                          fullNameView = fullName;
-                                          userIdView = userId;
-                                          statusView = status;
-                                          dateOfAppointmentDocId = document.id;
-                                        });
-                                      },
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                              vertical: 5),
-                                      title: Row(
-                                        children: [
-                                          const SizedBox(width: 50),
-                                          Text(fullName,
-                                              style: const TextStyle(
-                                                fontFamily: 'Sofia Pro',
-                                                fontSize: 18,
-                                              )),
-                                          const Spacer(),
-                                          const SizedBox(width: 50),
-                                        ],
-                                      ),
-                                      subtitle: Row(
-                                        children: [
-                                          const SizedBox(width: 50),
-                                          Icon(
-                                            Icons.circle,
-                                            size: 12,
-                                            color: status == 'pending'
-                                                ? Colors.red
-                                                : status == 'completed'
-                                                    ? Colors.green
-                                                    : Colors.amber,
-                                          ),
-                                          const SizedBox(
-                                            width: 5,
-                                          ),
-                                          Text(
-                                            status,
-                                            style: TextStyle(
-                                              fontFamily: 'Sofia Pro',
-                                              fontSize: 13,
+                                return StreamBuilder<DocumentSnapshot>(
+                                  stream: FirebaseFirestore.instance
+                                      .collection('users')
+                                      .doc(userId)
+                                      .snapshots(),
+                                  builder: (context, snapshot) {
+                                    if (!snapshot.hasData ||
+                                        snapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                      return Container();
+                                    } else if (snapshot.hasError) {
+                                      return const Center(
+                                        child: Text(
+                                          'Something went wrong',
+                                          style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 20,
                                               fontWeight: FontWeight.w600,
-                                              color: status == 'pending'
-                                                  ? Colors.red
-                                                  : status == 'completed'
-                                                      ? Colors.green
-                                                      : Colors.amber,
+                                              fontFamily: 'Sofia Pro'),
+                                        ),
+                                      );
+                                    }
+                                    Map<String, dynamic> userData =
+                                        snapshot.data!.data()
+                                            as Map<String, dynamic>;
+
+                                    // fullNameView =
+                                    //     '${userData['firstName']} ${userData['lastName']}';
+                                    String fullName =
+                                        '${userData['firstName']} ${userData['lastName']}';
+
+                                    return Column(
+                                      children: [
+                                        const Divider(
+                                          height: 0,
+                                          thickness: 1,
+                                        ),
+                                        ListTile(
+                                          onTap: () {
+                                            setState(() {
+                                              isBannerVisible = false;
+                                              viewAppointment = false;
+                                              fullNameView = fullName;
+                                              userIdView = userId;
+                                              statusView = status;
+                                              dateOfAppointmentDocId =
+                                                  document.id;
+                                            });
+                                          },
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                  vertical: 5),
+                                          title: Row(
+                                            children: [
+                                              const SizedBox(width: 50),
+                                              Text(fullName,
+                                                  style: const TextStyle(
+                                                    fontFamily: 'Sofia Pro',
+                                                    fontSize: 18,
+                                                  )),
+                                              const Spacer(),
+                                              const SizedBox(width: 50),
+                                            ],
+                                          ),
+                                          subtitle: Row(
+                                            children: [
+                                              const SizedBox(width: 50),
+                                              Icon(
+                                                Icons.circle,
+                                                size: 12,
+                                                color: status == 'pending'
+                                                    ? Colors.red
+                                                    : status == 'completed'
+                                                        ? Colors.green
+                                                        : Colors.amber,
+                                              ),
+                                              const SizedBox(
+                                                width: 5,
+                                              ),
+                                              Text(
+                                                status,
+                                                style: TextStyle(
+                                                  fontFamily: 'Sofia Pro',
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: status == 'pending'
+                                                      ? Colors.red
+                                                      : status == 'completed'
+                                                          ? Colors.green
+                                                          : Colors.amber,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 50),
+                                            ],
+                                          ),
+                                          trailing: const Padding(
+                                            padding: EdgeInsets.only(right: 50),
+                                            child: Text(
+                                              'view',
+                                              style: TextStyle(
+                                                fontFamily: 'Sofia Pro',
+                                                fontSize: 13,
+                                              ),
                                             ),
                                           ),
-                                          const SizedBox(width: 50),
-                                        ],
-                                      ),
-                                      trailing: const Padding(
-                                        padding: EdgeInsets.only(right: 50),
-                                        child: Text(
-                                          'view',
-                                          style: TextStyle(
-                                            fontFamily: 'Sofia Pro',
-                                            fontSize: 13,
-                                          ),
                                         ),
-                                      ),
-                                    ),
-                                    const Divider(
-                                      height: 0,
-                                      thickness: 1,
-                                    ),
-                                  ],
+                                        const Divider(
+                                          height: 0,
+                                          thickness: 1,
+                                        ),
+                                      ],
+                                    );
+                                  },
                                 );
-                              },
-                            );
-                          }).toList(),
-                        ),
-                      );
-                    },
+                              }).toList(),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                   ),
                 ],
               )),
