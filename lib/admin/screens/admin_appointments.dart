@@ -176,6 +176,7 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
                                               statusView = status;
                                               dateOfAppointmentDocId =
                                                   document.id;
+                                              notesView = data['notes'];
                                             });
                                           },
                                           contentPadding:
@@ -399,9 +400,9 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
                     ),
                   ),
                   child: Row(
-                    children: [
-                      const Spacer(),
-                      const Text(
+                    children: const [
+                      Spacer(),
+                      Text(
                         'Notes',
                         textAlign: TextAlign.center,
                         style: TextStyle(
@@ -410,27 +411,8 @@ class _AdminAppointmentsState extends State<AdminAppointments> {
                           color: Colors.white,
                         ),
                       ),
-                      const Spacer(),
-                      //TODO remove this
-                      InkWell(
-                        onTap: () {
-                          // await DatabaseService().updateAppointmentNotes(
-                          //     dateOfAppointmentDocId, notesController.text);
-                          // setState(() {
-                          //   notes = notesController.text;
-                          // });
-                          print('');
-                        },
-                        child: const Text(
-                          '',
-                          style: TextStyle(
-                            fontFamily: 'Sofia Pro',
-                            fontSize: 13,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 15),
+                      Spacer(),
+                      SizedBox(width: 15),
                     ],
                   ),
                 ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 import 'package:student_mental_health/service/auth_service.dart';
 import 'package:student_mental_health/widgets/widgets/custom_snackbar.dart';
@@ -763,15 +762,13 @@ class _SignUpUserInfoState extends State<SignUpUserInfo> {
   }
 
   void signUp() async {
-    String? firstName = toBeginningOfSentenceCase(
-        firstNameController.text.trim().toLowerCase());
-    String? lastName =
-        toBeginningOfSentenceCase(lastNameController.text.trim().toLowerCase());
+    String firstName = firstNameController.text.trim();
+    String lastName = lastNameController.text.trim();
 
     if (formKey.currentState!.validate()) {
       AuthService().signUpUserInfo(
-        firstName: firstName!,
-        lastName: lastName!,
+        firstName: firstName,
+        lastName: lastName,
         email: emailController.text.trim(),
         department: _departmentSelectedValue!,
         year: _schoolYearSelectedValue!,

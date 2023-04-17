@@ -15,7 +15,6 @@ class Appointment extends StatefulWidget {
 }
 
 class _AppointmentState extends State<Appointment> {
-
   Stream<QuerySnapshot>? scheduleStream;
 
   bool isCreateAppointmentButtonVisible = true;
@@ -60,9 +59,7 @@ class _AppointmentState extends State<Appointment> {
         ),
         leading: IconButton(
             onPressed: (() {
-              //TODO change this to navigate pop
               nextScreenPop(context);
-              // nextScreenPop(context);
             }),
             icon: const Icon(
               Icons.arrow_back_ios,

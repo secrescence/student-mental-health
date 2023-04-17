@@ -98,8 +98,6 @@ class _QuestionnaireState extends State<Questionnaire> {
               fontSize: 40,
               fontWeight: FontWeight.w500,
             ),
-            // textAlign: TextAlign.center,
-            //TODO format text alignment
           ),
         ),
       ],
@@ -182,8 +180,8 @@ class _QuestionnaireState extends State<Questionnaire> {
               selectedAnswer = answer;
             });
             if (selectedAnswer != null) {
-              print(
-                  'selectedAnswer: ${selectedAnswer!.answerText} and category: ${answer.category} and score: ${answer.score} and total scrore is: $totalScore');
+              // print(
+              //     'selectedAnswer: ${selectedAnswer!.answerText} and category: ${answer.category} and score: ${answer.score} and total scrore is: $totalScore');
 
               //if last question then save the result
               if (currentQuestionIndex == questionList.length - 1) {

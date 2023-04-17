@@ -44,6 +44,8 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
   bool textFieldVisible = true;
   String userCallName = '';
 
+  bool showYouCanCallMe = false;
+
   @override
   void dispose() {
     _chatController.dispose();
@@ -55,6 +57,7 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
     Future.delayed(const Duration(milliseconds: 3500)).then((value) {
       setState(() {
         helloImChatbotVisible = false;
+        showYouCanCallMe = true;
       });
     });
     super.initState();
@@ -71,7 +74,7 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
           'assets/logo-violet.png',
           fit: BoxFit.cover,
         ),
-        //automaticallyImplyLeading: false,
+        automaticallyImplyLeading: false,
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -335,32 +338,35 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                             TextStyle(fontSize: 20, fontFamily: 'Sofia Pro')),
                   ),
                 ),
-                child: TextField(
-                  controller: _chatController,
-                  textCapitalization: TextCapitalization.words,
-                  decoration: InputDecoration(
-                    hintText: 'You can call me...',
-                    hintStyle: const TextStyle(
-                      fontFamily: 'Sofia Pro',
-                      fontSize: 16,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(
-                          color: Color(0xFF1D3557), width: 1.8),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    focusedBorder: const OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Color(0xFF1D3557), width: 1.8),
-                        borderRadius: BorderRadius.all(Radius.circular(10))),
-                    suffixIcon: GestureDetector(
-                      onTap: () {
-                        FocusScope.of(context).unfocus();
-                        _onChatSend();
-                      },
-                      child: const Icon(
-                        Icons.send,
-                        color: primaryColor,
+                child: Visibility(
+                  visible: showYouCanCallMe,
+                  child: TextField(
+                    controller: _chatController,
+                    textCapitalization: TextCapitalization.words,
+                    decoration: InputDecoration(
+                      hintText: 'You can call me...',
+                      hintStyle: const TextStyle(
+                        fontFamily: 'Sofia Pro',
+                        fontSize: 16,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(
+                            color: Color(0xFF1D3557), width: 1.8),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      focusedBorder: const OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Color(0xFF1D3557), width: 1.8),
+                          borderRadius: BorderRadius.all(Radius.circular(10))),
+                      suffixIcon: GestureDetector(
+                        onTap: () {
+                          FocusScope.of(context).unfocus();
+                          _onChatSend();
+                        },
+                        child: const Icon(
+                          Icons.send,
+                          color: primaryColor,
+                        ),
                       ),
                     ),
                   ),

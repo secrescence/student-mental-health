@@ -29,14 +29,6 @@ class _JournalState extends State<Journal> {
     "https://i.ibb.co/W0rbnfB/scared.png",
     "https://i.ibb.co/dDh3M0K/stressed.png",
   ];
-  final List _mood = [
-    "neutral",
-    "happy",
-    "sad",
-    "angry",
-    "scared",
-    "stressed",
-  ];
 
   @override
   Widget build(BuildContext context) {

@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -38,7 +37,6 @@ class _ResultOverallAlsoDashboardState
   bool isRepeat = true;
 
   //priority dialog
-  //TODO put this to firestore
   String highPriority1 =
       'As a result, I strongly encourage you\nto talk with our school\'s guidance\ncounselor. Our expert will help and\ngive the necessary support that you\nneed.';
   String highPriority2 = 'Click next to continue';
@@ -69,7 +67,7 @@ class _ResultOverallAlsoDashboardState
 
   //is high mid/low priority
   bool isHighPriority = false;
-  bool showHighPriority = false;
+  bool showHighAndMidPriority = false;
   bool isLowAndMidPriority = false;
   bool showLowAndMidPriority = false;
 
@@ -123,7 +121,7 @@ class _ResultOverallAlsoDashboardState
               _showBottomSheet(context);
             } else if (isHighPriority == true) {
               setState(() {
-                showHighPriority = true;
+                showHighAndMidPriority = true;
               });
             }
           });
@@ -151,9 +149,9 @@ class _ResultOverallAlsoDashboardState
           fourthDialog = highPriority2;
           isHighPriority = true;
         } else if (overallScore! >= 3.5 && overallScore! <= 3.9) {
-          thirdDialog = midPriority1;
-          fourthDialog = midPriority2;
-          isLowAndMidPriority = true;
+          thirdDialog = highPriority1;
+          fourthDialog = highPriority2;
+          isHighPriority = true;
         } else if (overallScore! < 3.49) {
           thirdDialog = lowPriority1;
           fourthDialog = lowPriority2;
@@ -221,14 +219,14 @@ class _ResultOverallAlsoDashboardState
 
           //next button
           Visibility(
-            visible: showHighPriority,
+            visible: showHighAndMidPriority,
             child: Padding(
               padding: const EdgeInsets.only(left: 15, right: 15, bottom: 23),
               child: ElevatedButton(
                 onPressed: () {
                   setState(() {
                     showLowAndMidPriority = true;
-                    showHighPriority = false;
+                    showHighAndMidPriority = false;
                   });
                   Future.delayed(const Duration(milliseconds: 20))
                       .then((value) {

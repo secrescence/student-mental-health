@@ -49,9 +49,6 @@ class _VideoPlayerState extends State<VideoPlayer> {
           playedColor: primaryColor,
           handleColor: Colors.grey,
         ),
-        onReady: () {
-          print('Player is ready.');
-        },
       ),
       builder: (context, player) {
         return Scaffold(

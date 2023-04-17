@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:student_mental_health/service/database_service.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
+import 'package:student_mental_health/widgets/widgets/custom_snackbar.dart';
 import 'package:student_mental_health/widgets/widgets/loading_admin.dart';
 import 'package:student_mental_health/widgets/widgets/widgets.dart';
 // ignore: depend_on_referenced_packages
@@ -165,10 +166,15 @@ class _AdminScheduleState extends State<AdminSchedule> {
                                     IconButton(
                                       icon: const Icon(Icons.delete),
                                       onPressed: () {
-                                        FirebaseFirestore.instance
-                                            .collection('appointments')
-                                            .doc(schedule[index].id)
-                                            .delete();
+                                        if (data['appointedUser'] == '') {
+                                          FirebaseFirestore.instance
+                                              .collection('appointments')
+                                              .doc(schedule[index].id)
+                                              .delete();
+                                        } else {
+                                          errorSnackbar(context, 'Uh-oh',
+                                              'You cannot delete this schedule because a user is already appointed.');
+                                        }
                                       },
                                     ),
                                   ],
@@ -192,7 +198,9 @@ class _AdminScheduleState extends State<AdminSchedule> {
                     splashColor: primaryColor,
                     backgroundColor: primaryColor,
                     elevation: 5,
-                    onPressed: () => _addScheduleForm(),
+                    onPressed: () async {
+                      _addScheduleForm();
+                    },
                     child: const Icon(Icons.add),
                   ),
                 ),
@@ -438,24 +446,4 @@ class _AdminScheduleState extends State<AdminSchedule> {
       });
     }
   }
-
-  // _selectTime(BuildContext context) async {
-  //   final TimeOfDay? picked = await showTimePicker(
-  //     context: context,
-  //     initialTime: _selectedTime,
-  //     builder: (context, child) {
-  //       return MediaQuery(
-  //         data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-  //         child: child ?? Container(),
-  //       );
-  //     },
-  //   );
-  //   if (picked != null) {
-  //     setState(() {
-  //       _selectedTime = picked;
-  //       timeController.text =
-  //           '${_selectedTime.hour}:${_selectedTime.minute.toString().padLeft(2, '0')}';
-  //     });
-  //   }
-  // }
 }

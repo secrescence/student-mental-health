@@ -14,7 +14,6 @@ class YourAppointment extends StatefulWidget {
 }
 
 class _YourAppointmentState extends State<YourAppointment> {
-  Stream<QuerySnapshot>? dateOfAppointmentStream;
   String dateThatCurrentUserIsAppointed = '';
   String? priority;
   bool ifLowPriority = false;
@@ -38,11 +37,14 @@ class _YourAppointmentState extends State<YourAppointment> {
     });
 
     await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
-        .whatDateTheCurrentUserIsAppointed()
+        .checkPriority()
         .then((value) async {
-      setState(() {
-        dateOfAppointmentStream = value;
-      });
+      if (value == 'Low Priority') {
+        setState(() {
+          ifLowPriority = true;
+          ifInWaitingList = false;
+        });
+      }
     });
   }
 
@@ -91,7 +93,12 @@ class _YourAppointmentState extends State<YourAppointment> {
                       child: SizedBox(
                         height: 300,
                         child: StreamBuilder<QuerySnapshot>(
-                          stream: dateOfAppointmentStream,
+                          stream: FirebaseFirestore.instance
+                              .collection('appointments')
+                              .where('appointedUser',
+                                  isEqualTo:
+                                      FirebaseAuth.instance.currentUser!.uid)
+                              .snapshots(),
                           builder: (context, snapshot) {
                             if (!snapshot.hasData ||
                                 snapshot.connectionState ==

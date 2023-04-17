@@ -92,7 +92,6 @@ class DatabaseService {
       'isUserDoneWithChatbot': false,
       'isUserDoneWithQuestionnaire': false,
       'isUserDoneWithResults': false,
-      'inWaitingList': false,
       'whatShouldICallYou': '',
       'dateSignedUpUsingEmailOnly': DateTime.now(),
     });
@@ -416,7 +415,6 @@ class DatabaseService {
   //   }
 
   //   // If no empty slot is found, throw an error
-  //   //TODO Create a no available slots dialog
   //   print('No available slots');
   //   errorSnackbar(context, 'Oh Snap!', 'Time slot already taken');
   // }
@@ -473,6 +471,10 @@ class DatabaseService {
               'appointedUser': waitingListDoc.get('uid'),
               'priorityNumber': waitingListDoc.get('priority'),
             });
+
+            await userCollection.doc(waitingListDoc.get('uid')).update({
+              'inWaitingList': false,
+            });
             sendEmail();
           }
         }
@@ -481,90 +483,90 @@ class DatabaseService {
   }
 
   //add additional appointment for emergency cases
-  Future additionalAppointment(BuildContext context, String date, String time,
-      {bool mounted = true}) async {
-    // List of available times in ascending order
-    final List<String> availableTimes = [
-      '9:00 AM',
-      '10:00 AM',
-      '11:00 AM',
-      '2:00 PM',
-      '3:00 PM',
-      '4:00 PM',
-    ];
+  // Future additionalAppointment(BuildContext context, String date,
+  //     {bool mounted = true}) async {
+  //   // List of available times in ascending order
+  //   final List<String> availableTimes = [
+  //     '9:00 AM',
+  //     '10:00 AM',
+  //     '11:00 AM',
+  //     '2:00 PM',
+  //     '3:00 PM',
+  //     '4:00 PM',
+  //   ];
 
-    // Get the index of the selected time
-    int timeIndex = availableTimes.indexOf(time);
-    if (timeIndex == -1) {
-      return;
-    }
+  //   // Get the index of the selected time
+  //   int timeIndex = availableTimes.indexOf(availableTimes[2]);
+  //   if (timeIndex == -1) {
+  //     return;
+  //   }
 
-    String documentId = "$date-$timeIndex";
+  //   String documentId = "$date-$timeIndex";
 
-    while (true) {
-      DocumentSnapshot documentSnapshot =
-          await additionalAppointmentsCollection.doc(documentId).get();
+  //   while (true) {
+  //     DocumentSnapshot documentSnapshot =
+  //         await additionalAppointmentsCollection.doc(documentId).get();
 
-      if (!documentSnapshot.exists) {
-        break;
-      }
+  //     if (!documentSnapshot.exists) {
+  //       break;
+  //     }
 
-      if (timeIndex == 2) {
-        timeIndex += 3;
-      } else {
-        timeIndex += 2;
-      }
+  //     if (timeIndex == 2) {
+  //       timeIndex += 3;
+  //     } else {
+  //       timeIndex += 2;
+  //     }
 
-      if (timeIndex >= availableTimes.length) {
-        if (!mounted) return;
-        errorSnackbar(context, 'Oh Snap!', 'No more available time slots');
-        return;
-      }
+  //     if (timeIndex >= availableTimes.length) {
+  //       if (!mounted) return;
+  //       errorSnackbar(context, 'Oh Snap!', 'No more available time slots');
+  //       return;
+  //     }
 
-      documentId = "$date-$timeIndex";
-    }
+  //     documentId = "$date-$timeIndex";
+  //     print(documentId);
+  //   }
 
-    // Check if there are any schedules already for the given date and time
-    final QuerySnapshot querySnapshot = await appointmentsCollection
-        .where('date', isEqualTo: date)
-        .where('time', isEqualTo: time)
-        .get();
+  //   // Check if there are any schedules already for the given date and time
+  //   final QuerySnapshot querySnapshot = await appointmentsCollection
+  //       .where('date', isEqualTo: date)
+  //       .where('time', isEqualTo: time)
+  //       .get();
 
-    if (querySnapshot.docs.isNotEmpty) {
-      if (!mounted) return;
-      errorSnackbar(context, 'Oh Snap!', 'Time slot already taken');
-    } else {
-      await additionalAppointmentsCollection.doc(documentId).set({
-        'date': date,
-        'time': time,
-        'appointedUser': '',
-        'status': 'pending',
-      });
-    }
+  //   if (querySnapshot.docs.isNotEmpty) {
+  //     if (!mounted) return;
+  //     errorSnackbar(context, 'Oh Snap!', 'Time slot already taken');
+  //   } else {
+  //     await additionalAppointmentsCollection.doc(documentId).set({
+  //       'date': date,
+  //       'time': time,
+  //       'appointedUser': '',
+  //       'status': 'pending',
+  //     });
+  //   }
 
-    //appoint user
-    List<String> scheduleIds = [];
-    await additionalAppointmentsCollection.get().then((QuerySnapshot snapshot) {
-      scheduleIds = snapshot.docs.map((doc) => doc.id).toList();
-    });
+  //   //appoint user
+  //   List<String> scheduleIds = [];
+  //   await additionalAppointmentsCollection.get().then((QuerySnapshot snapshot) {
+  //     scheduleIds = snapshot.docs.map((doc) => doc.id).toList();
+  //   });
 
-    for (String scheduleId in scheduleIds) {
-      final DocumentSnapshot appointmentsDoc =
-          await additionalAppointmentsCollection.doc(scheduleId).get();
-      if (appointmentsDoc.get('appointedUser') == '') {
-        // If the slot is empty, update it with the uid and return
-        await additionalAppointmentsCollection.doc(scheduleId).update({
-          'appointedUser': uid,
-        });
-        return;
-      }
-    }
+  //   for (String scheduleId in scheduleIds) {
+  //     final DocumentSnapshot appointmentsDoc =
+  //         await additionalAppointmentsCollection.doc(scheduleId).get();
+  //     if (appointmentsDoc.get('appointedUser') == '') {
+  //       // If the slot is empty, update it with the uid and return
+  //       await additionalAppointmentsCollection.doc(scheduleId).update({
+  //         'appointedUser': uid,
+  //       });
+  //       return;
+  //     }
+  //   }
 
-    // If no empty slot is found, throw an error
-    //TODO Create a no available slots dialog
-    print('No available slots');
-    errorSnackbar(context, 'Oh Snap!', 'Time slot already taken');
-  }
+  //   // If no empty slot is found, throw an error
+  //   print('No available slots');
+  //   errorSnackbar(context, 'Oh Snap!', 'Time slot already taken');
+  // }
 
   //Streams
   Future<Stream<QuerySnapshot>> getSchedules() async {
@@ -599,7 +601,6 @@ class DatabaseService {
         .snapshots();
   }
 
-  //TODO this is okay
   Future getAllSchedulesDocId() async {
     List<String> documentIds = [];
     await appointmentsCollection.get().then((QuerySnapshot snapshot) {
@@ -615,47 +616,6 @@ class DatabaseService {
     });
     return documentIds[0];
   }
-
-  // //get appointment schedule
-  // Future checkIfUidOfScheduleExist(String date, int increment) async {
-  //   List<String> documentIds = [];
-  //   await FirebaseFirestore.instance
-  //       .collection("counseling")
-  //       .get()
-  //       .then((QuerySnapshot snapshot) {
-  //     documentIds = snapshot.docs.map((doc) => doc.id).toList();
-  //   });
-  //   List<String> filteredIds = documentIds
-  //       .where((element) => element.startsWith('$date-$increment'))
-  //       .toList();
-  //   return filteredIds;
-  // }
-
-  // Future getSchedulesOfDateNow() async {
-  //   List<String> documentIds = [];
-  //   await FirebaseFirestore.instance
-  //       .collection("counseling")
-  //       .get()
-  //       .then((QuerySnapshot snapshot) {
-  //     documentIds = snapshot.docs.map((doc) => doc.id).toList();
-  //   });
-  //   List<String> filteredIds = documentIds
-  //       .where((element) => element.startsWith(
-  //           "${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year}"))
-  //       .toList();
-
-  //   List<Map<String, dynamic>> schedules = [];
-  //   for (var i = 0; i < filteredIds.length; i++) {
-  //     await FirebaseFirestore.instance
-  //         .collection("counseling")
-  //         .doc(filteredIds[i])
-  //         .get()
-  //         .then((DocumentSnapshot snapshot) {
-  //       schedules.add(snapshot.data() as Map<String, dynamic>);
-  //     });
-  //   }
-  //   return schedules;
-  // }
 
   Future updateAppointmentStatus(String schedUid, String status) async {
     return await appointmentsCollection.doc(schedUid).update({

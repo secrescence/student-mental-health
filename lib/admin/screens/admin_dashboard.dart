@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:student_mental_health/widgets/utils/colors.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -32,9 +33,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
               const Text(
                 'Dashboard',
                 style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                ),
+                    fontSize: 28, fontWeight: FontWeight.bold, fontFamily: ''),
               ),
               const SizedBox(height: 30),
               Row(
@@ -56,6 +55,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
+                                fontFamily: 'Sofia Pro',
                               ),
                             ),
                             const SizedBox(height: 20),
@@ -257,12 +257,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                     showLabels: false,
                                     animateAxis: true,
                                     axisTrackStyle: const LinearAxisTrackStyle(
+                                        borderWidth: 0,
                                         thickness: 13,
                                         edgeStyle: LinearEdgeStyle.bothCurve,
                                         borderColor: Colors.transparent,
                                         color: Colors.transparent),
                                     barPointers: <LinearBarPointer>[
                                       LinearBarPointer(
+                                        borderWidth: 0,
                                         value: pendingCount.toDouble(),
                                         thickness: 13,
                                         edgeStyle: LinearEdgeStyle.bothCurve,
@@ -319,6 +321,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
+                                fontFamily: 'Sofia Pro',
                               ),
                             ),
                             Container(
@@ -527,7 +530,20 @@ class _AdminDashboardState extends State<AdminDashboard> {
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
+                            fontFamily: 'Sofia Pro',
                           ),
+                        ),
+                        Row(
+                          children: [
+                            Text(
+                              'Month of ${DateFormat('MMMM').format(DateTime(2022, DateTime.now().month))}',
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: 'Sofia Pro',
+                              ),
+                            ),
+                          ],
                         ),
                         Expanded(
                           child: StreamBuilder<QuerySnapshot>(
@@ -585,17 +601,23 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                       return SfCartesianChart(
                                         // title: ChartTitle(text: 'Internet Users - 2016'),
                                         plotAreaBorderWidth: 0,
-
-                                        /// X axis as category axis placed here.
                                         primaryXAxis: CategoryAxis(
                                           majorGridLines:
                                               const MajorGridLines(width: 0),
+                                          labelStyle: const TextStyle(
+                                            fontFamily: 'Sofia Pro',
+                                          ),
                                         ),
                                         primaryYAxis: NumericAxis(
                                             minimum: 0,
                                             maximum: 80,
                                             isVisible: false,
-                                            labelFormat: '{value} Students'),
+                                            labelFormat: '{value} Students',
+                                            majorGridLines:
+                                                const MajorGridLines(width: 0),
+                                            labelStyle: const TextStyle(
+                                              fontFamily: 'Sofia Pro',
+                                            )),
                                         series: <
                                             ColumnSeries<ChartSampleData,
                                                 String>>[
